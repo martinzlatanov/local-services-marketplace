@@ -21,12 +21,14 @@
 
 **Web Frontend:**
 - Next.js (App Router) — client-facing web application
+- React + TypeScript (strict mode)
+- Tailwind CSS — styling
 
 **Mobile Frontend:**
 - React Native via Expo — service provider mobile application
 
 **Backend:**
-- Node.js with RESTful API architecture — HTTP API server
+- Next.js API Routes — backend API (same Next.js app as frontend)
 
 **Real-time:**
 - WebSockets — live job status updates between backend and clients
@@ -34,10 +36,10 @@
 ## Database
 
 **Database:**
-- PostgreSQL — relational, source of truth for all application state
+- Neon — serverless PostgreSQL, source of truth for all application state
 
 **ORM:**
-- Prisma — database client and schema management
+- Drizzle ORM — database client and schema management
 
 ## Monorepo Structure
 

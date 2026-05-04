@@ -73,7 +73,7 @@ This is a course capstone project. The primary evaluation criteria are technical
 
 ## Constraints
 
-- **Tech Stack**: TypeScript strict mode, Next.js App Router, Expo/React Native, Node.js, PostgreSQL + Prisma, WebSockets — all mandated by curriculum
+- **Tech Stack**: TypeScript strict mode, Next.js App Router (frontend + API Route Handlers), Expo/React Native, Neon (serverless PostgreSQL) + Drizzle ORM, WebSockets — all mandated by curriculum
 - **Type Safety**: All cross-platform contracts must flow through `packages/types` — no exceptions
 - **State Machine**: Only valid transitions allowed: PENDING → ACCEPTED → IN_PROGRESS → COMPLETED; invalid transitions return HTTP 409
 - **Concurrency**: Optimistic locking via `version` column on Jobs table — version mismatch returns HTTP 409

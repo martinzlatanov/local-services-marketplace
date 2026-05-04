@@ -32,14 +32,14 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Success Criteria** (what must be TRUE):
   1. Running `tsc --noEmit` across all packages produces zero errors in strict mode
   2. `packages/types` exports the JobStatus enum (`PENDING`, `ACCEPTED`, `IN_PROGRESS`, `COMPLETED`), the Role enum (`CLIENT`, `PROVIDER`), all job DTO interfaces, and all API response wrapper types
-  3. `apps/web`, `apps/mobile`, and `apps/api` each import types exclusively from `packages/types` — no locally defined duplicates exist anywhere in the codebase
-  4. The monorepo workspace is configured so that a single install command (`npm install` or `pnpm install`) resolves all inter-package dependencies
+  3. `apps/web` and `apps/mobile` import types exclusively from `packages/types` — no locally defined duplicates exist anywhere in the codebase
+  4. The monorepo workspace is configured so that a single `npm install` at root resolves all inter-package dependencies
 **Plans**: TBD
 
 Plans:
-- [ ] 01-01: Initialize monorepo workspace (npm/pnpm workspaces, tsconfig base, shared eslint config)
+- [ ] 01-01: Initialize monorepo with npm workspaces (root package.json, tsconfig.base.json, shared eslint config)
 - [ ] 01-02: Scaffold `packages/types` — define all enums, DTOs, and API response shapes; configure package build
-- [ ] 01-03: Scaffold app skeletons (`apps/api`, `apps/web`, `apps/mobile`) with workspace references to `packages/types`; verify tsc clean
+- [ ] 01-03: Scaffold `apps/web` (Next.js) and `apps/mobile` (Expo) with workspace references to `packages/types`; verify tsc clean
 
 ### Phase 2: Backend Auth API
 **Goal**: Users can register and log in via the API; role is fixed at registration; authenticated requests carry verifiable credentials
@@ -54,7 +54,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: Set up Prisma schema (User model with role, email, passwordHash), run first migration, connect to PostgreSQL
+- [ ] 02-01: Set up Drizzle schema (User model with role, email, passwordHash), run first migration, connect to PostgreSQL
 - [ ] 02-02: Implement `/auth/register` and `/auth/login` endpoints with bcrypt + JWT; apply auth middleware to protected routes
 
 ### Phase 3: Auth Client Integration
@@ -85,7 +85,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 04-01: Extend Prisma schema with Job model (category, description, timeframe, cityArea, status, version, clientId); run migration; seed category enum
+- [ ] 04-01: Extend Drizzle schema with Job model (category, description, timeframe, cityArea, status, version, clientId); run migration; seed category enum
 - [ ] 04-02: Implement `/jobs` POST endpoint (create job, enforce CLIENT role) and state transition endpoint (enforce valid transition sequence, return 409 for violations)
 
 ### Phase 5: Backend Job Acceptance & Concurrency
@@ -100,7 +100,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: Implement `/jobs/:id/accept` endpoint using Prisma optimistic concurrency (version check in WHERE clause, atomic increment); return 409 on version mismatch; enforce PROVIDER role
+- [ ] 05-01: Implement `/jobs/:id/accept` endpoint using Drizzle optimistic concurrency (version check in WHERE clause, atomic increment); return 409 on version mismatch; enforce PROVIDER role
 - [ ] 05-02: Implement `/jobs` GET endpoint with `cityArea` and `status=PENDING` filtering; write concurrent acceptance integration test (two simultaneous requests, verify exactly one 200 and one 409)
 
 ### Phase 6: Real-Time Infrastructure
@@ -115,7 +115,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: Add WebSocket server to `apps/api` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
+- [ ] 06-01: Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
 - [ ] 06-02: Wire state transition logic to broadcast events on every job status change; implement client-side subscription in Next.js dashboard (context or hook); verify PENDING→ACCEPTED, ACCEPTED→IN_PROGRESS, IN_PROGRESS→COMPLETED all arrive in real time
 
 ### Phase 7: Web Client — Job Posting & Dashboard
@@ -179,7 +179,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 10-01: Add Rating model to Prisma schema (jobId unique, providerId, score 1-5, text optional); implement `/jobs/:id/close` endpoint and `/ratings` POST endpoint with uniqueness enforcement
+- [ ] 10-01: Add Rating model to Drizzle schema (jobId unique, providerId, score 1-5, text optional); implement `/jobs/:id/close` endpoint and `/ratings` POST endpoint with uniqueness enforcement
 - [ ] 10-02: Build web client — Close button on COMPLETED jobs, history section on dashboard, post-close rating form
 - [ ] 10-03: Build provider profile page (web and/or mobile) showing average rating and review list; fetch from `/providers/:id/profile` endpoint
 **UI hint**: yes

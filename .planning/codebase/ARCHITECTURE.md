@@ -6,24 +6,26 @@
 ## System Overview
 
 ```text
-┌─────────────────────────────────┬─────────────────────────────────┐
-│         Web (Next.js)           │      Mobile (Expo/RN)           │
-│         Clients (Web)           │   Service Providers (Mobile)    │
-│    `apps/web/` (planned)        │   `apps/mobile/` (planned)      │
-└────────────────┬────────────────┴──────────────┬──────────────────┘
-                 │  REST + WebSocket              │  REST + WebSocket
-                 ▼                                ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                  apps/web/ — Next.js (Unified App)                      │
+│   ┌──────────────────────────┐   ┌────────────────────────────────────┐ │
+│   │  Frontend (React + TW)   │   │  Backend (API Route Handlers)      │ │
+│   │  Client web UI           │   │  Job lifecycle · Auth · State      │ │
+│   └──────────────────────────┘   └──────────────┬─────────────────────┘ │
+└──────────────────────────────────────────────────│─────────────────────┘
+                                                   │  Drizzle ORM
+                                                   ▼
 ┌────────────────────────────────────────────────────────────────────┐
-│                     Backend (Node.js REST API)                     │
-│                       `apps/api/` (planned)                        │
-│            Job lifecycle · Bidding · State machine                 │
-└───────────────────────────────────┬────────────────────────────────┘
-                                    │  Prisma
-                                    ▼
-┌────────────────────────────────────────────────────────────────────┐
-│                          PostgreSQL                                │
+│                     Neon (Serverless PostgreSQL)                   │
 │                     Source of truth for all state                  │
 └────────────────────────────────────────────────────────────────────┘
+
+                    REST (HTTP)     ▲
+                                   │ (connects to apps/web API routes)
+┌─────────────────────────────────────────────────────────────────┐
+│              apps/mobile/ — Expo / React Native                 │
+│              Service Providers (Mobile)                         │
+└─────────────────────────────────────────────────────────────────┘
 
 Shared across all layers:
 ┌────────────────────────────────────────────────────────────────────┐
@@ -35,11 +37,11 @@ Shared across all layers:
 
 | Component | Responsibility | Planned Path |
 |-----------|----------------|--------------|
-| Web (Next.js) | Client-facing UI — job posting, tracking | `apps/web/` |
-| Mobile (Expo) | Provider-facing UI — job discovery, bidding, updates | `apps/mobile/` |
-| Backend API | Business logic, job lifecycle, auth, WebSocket hub | `apps/api/` |
-| PostgreSQL | Persistent state, source of truth | external service |
-| Prisma | Schema definition, migrations, query client | `apps/api/` |
+| Web — Frontend | Client-facing UI — job posting, tracking (React + Tailwind) | `apps/web/` |
+| Web — Backend | API Route Handlers — business logic, job lifecycle, auth, WebSocket hub | `apps/web/app/api/` |
+| Mobile (Expo) | Provider-facing UI — job discovery, acceptance, status updates | `apps/mobile/` |
+| Neon PostgreSQL | Persistent state, source of truth (serverless) | external service |
+| Drizzle ORM | Schema definition, migrations, query client | `apps/web/` |
 | Shared Types | DTOs, response shapes, Enums — imported by all layers | `packages/types/` |
 
 ## Monorepo Structure
@@ -49,9 +51,8 @@ The project is structured as a monorepo with distinct app packages and a shared 
 ```
 [project-root]/
 ├── apps/
-│   ├── web/          # Next.js App Router — web client
-│   ├── mobile/       # Expo/React Native — mobile client
-│   └── api/          # Node.js REST API + WebSocket server
+│   ├── web/          # Next.js — frontend (React + Tailwind) + backend (API Route Handlers) + Drizzle
+│   └── mobile/       # Expo/React Native — mobile client
 └── packages/
     └── types/        # Shared TypeScript types: DTOs, Enums, API contracts
 ```
@@ -88,7 +89,7 @@ Invalid transitions (e.g., `PENDING → COMPLETED`, `COMPLETED → IN_PROGRESS`)
 **Problem addressed:** Multiple service providers may attempt to accept the same job simultaneously.
 
 **Approach:**
-- The `Jobs` table includes a `version` integer column (managed by Prisma).
+- The `Jobs` table includes a `version` integer column (managed by Drizzle ORM).
 - Every update request from a client must include the current `version` of the job.
 - The backend checks that the submitted `version` matches the database value before applying the update.
 - If `version` has changed (another update occurred first), the backend returns `409 Conflict`.
