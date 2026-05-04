@@ -1,0 +1,10 @@
+{
+  "permission": {
+    "read": {
+      "/Users/mzlatanov/Desktop/VS Code Projects/local-services-marketplace/.kilo/get-shit-done/*": "allow"
+    },
+    "external_directory": {
+      "/Users/mzlatanov/Desktop/VS Code Projects/local-services-marketplace/.kilo/get-shit-done/*": "allow"
+    }
+  }
+}
