@@ -8,10 +8,10 @@
 ## 2. Technology Stack
 Adhere to the following stack as defined in the course curriculum:
 *   **Language:** TypeScript (Strict Mode).
-*   **Web Frontend:** Next.js (App Router).
+*   **Web Frontend:** Next.js (App Router) + React + Tailwind CSS.
 *   **Mobile Frontend:** React Native via Expo.
-*   **Backend:** Node.js with RESTful API architecture.
-*   **Database:** Relational (PostgreSQL) using Prisma ORM.
+*   **Backend:** Next.js API Routes.
+*   **Database:** Neon serverless PostgreSQL using Drizzle ORM.
 *   **Real-time Communication:** WebSockets for live status updates.
 
 ## 3. Architectural Guidelines
