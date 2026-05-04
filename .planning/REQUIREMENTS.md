@@ -85,12 +85,34 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| AUTH-01 – AUTH-04 | — | Pending mapping |
-| JOB-POST-01 – JOB-POST-04 | — | Pending mapping |
-| DASH-01 – DASH-03 | — | Pending mapping |
-| DISC-01 – DISC-03 | — | Pending mapping |
-| ACCEPT-01 – ACCEPT-05 | — | Pending mapping |
-| LIFECYCLE-01 – LIFECYCLE-04 | — | Pending mapping |
-| CLOSE-01 – CLOSE-02 | — | Pending mapping |
-| RATING-01 – RATING-03 | — | Pending mapping |
-| TYPES-01 – TYPES-03 | — | Pending mapping |
+| TYPES-01 | Phase 1 | Pending |
+| TYPES-02 | Phase 1 | Pending |
+| TYPES-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 2 | Pending |
+| AUTH-02 | Phase 2 | Pending |
+| AUTH-03 | Phase 3 | Pending |
+| AUTH-04 | Phase 3 | Pending |
+| JOB-POST-01 | Phase 4 | Pending |
+| JOB-POST-02 | Phase 4 | Pending |
+| JOB-POST-03 | Phase 4 | Pending |
+| LIFECYCLE-03 | Phase 4 | Pending |
+| ACCEPT-01 | Phase 5 | Pending |
+| ACCEPT-02 | Phase 5 | Pending |
+| ACCEPT-03 | Phase 5 | Pending |
+| ACCEPT-04 | Phase 5 | Pending |
+| ACCEPT-05 | Phase 5 | Pending |
+| DASH-01 | Phase 6 | Pending |
+| DASH-02 | Phase 6 | Pending |
+| DASH-03 | Phase 6 | Pending |
+| LIFECYCLE-04 | Phase 6 | Pending |
+| JOB-POST-04 | Phase 7 | Pending |
+| DISC-01 | Phase 8 | Pending |
+| DISC-02 | Phase 8 | Pending |
+| DISC-03 | Phase 8 | Pending |
+| LIFECYCLE-01 | Phase 9 | Pending |
+| LIFECYCLE-02 | Phase 9 | Pending |
+| CLOSE-01 | Phase 10 | Pending |
+| CLOSE-02 | Phase 10 | Pending |
+| RATING-01 | Phase 10 | Pending |
+| RATING-02 | Phase 10 | Pending |
+| RATING-03 | Phase 10 | Pending |
