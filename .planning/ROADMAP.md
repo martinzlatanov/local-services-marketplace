@@ -34,11 +34,16 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. `packages/types` exports the JobStatus enum (`PENDING`, `ACCEPTED`, `IN_PROGRESS`, `COMPLETED`), the Role enum (`CLIENT`, `PROVIDER`), all job DTO interfaces, and all API response wrapper types
   3. `apps/web` and `apps/mobile` import types exclusively from `packages/types` — no locally defined duplicates exist anywhere in the codebase
   4. The monorepo workspace is configured so that a single `npm install` at root resolves all inter-package dependencies
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
+**Wave 1**
 - [ ] 01-01: Initialize monorepo with npm workspaces (root package.json, tsconfig.base.json, shared eslint config)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02: Scaffold `packages/types` — define all enums, DTOs, and API response shapes; configure package build
+
+**Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 01-03: Scaffold `apps/web` (Next.js) and `apps/mobile` (Expo) with workspace references to `packages/types`; verify tsc clean
 
 ### Phase 2: Backend Auth API

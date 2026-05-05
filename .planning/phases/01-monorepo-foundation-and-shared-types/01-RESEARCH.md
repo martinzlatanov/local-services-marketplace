@@ -569,12 +569,13 @@ No missing dependencies. All phase prerequisites are available. Node.js v25.8.1 
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **npm --workspaces exit code on first failure**
    - What we know: `npm run <script> --workspaces --if-present` runs the script in each workspace. npm documentation states it runs all workspaces and collects results.
    - What's unclear: Whether npm 11 exits non-zero if one workspace fails but others succeed, or whether it runs all and exits 0 if the majority succeed.
    - Recommendation: The phase gate verification step should run `npm run typecheck --workspaces --if-present` and then explicitly check `echo $?` — or alternatively, add a root-level `typecheck` script that runs per-workspace `tsc --noEmit` calls sequentially with `&&`.
+   - **RESOLVED:** Plan 01-03 Task 3 implements the `&&`-chained per-workspace typecheck as an explicit fallback (`npm run typecheck --workspace=packages/types && npm run typecheck --workspace=apps/web && npm run typecheck --workspace=apps/mobile`), guaranteeing a non-zero exit on any workspace failure independent of npm orchestrator exit-code behavior.
 
 ---
 
