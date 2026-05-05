@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt'
 import { sign, verify } from 'jsonwebtoken'
-import { db } from './db/client'
-import { users } from './db/schema'
-import { eq } from 'drizzle-orm'
+// Lazy-load database modules at runtime to avoid importing Drizzle at module
+// initialization time (Prevents Next dev server from failing when DB/env
+// are not configured). Imports below are performed inside functions.
 import { AuthRegisterRequest, AuthLoginRequest, AuthUserDto, Role } from '@local/types'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret'
@@ -32,14 +32,20 @@ export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUse
   const { email, password, role } = payload
   const passwordHash = await hashPassword(password)
   const userRole = role ?? Role.CLIENT
+  const { db } = await import('./db/client')
+  const { users } = await import('./db/schema')
+  const { eq } = await import('drizzle-orm')
   await db.insert(users).values({ email, passwordHash, role: userRole })
-  const created = await db.select().from(users).where(eq(users.email, email))
+  const created = await db.select().from(users).where((eq as any)(users.email, email))
   const userRow = created[0]
   return { id: String(userRow.id), email: userRow.email, role: userRow.role as any, createdAt: (userRow.createdAt instanceof Date) ? userRow.createdAt.toISOString() : String(userRow.createdAt) }
 }
 
 export async function findUserByEmail(email: string) {
-  const rows = await db.select().from(users).where(eq(users.email, email))
+  const { db } = await import('./db/client')
+  const { users } = await import('./db/schema')
+  const { eq } = await import('drizzle-orm')
+  const rows = await db.select().from(users).where((eq as any)(users.email, email))
   return rows[0] || null
 }
 
