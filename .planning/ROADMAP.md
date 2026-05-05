@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 **Wave 1**
-- [ ] 01-01: Initialize monorepo with npm workspaces (root package.json, tsconfig.base.json, shared eslint config)
+- [x] 01-01: Initialize monorepo with npm workspaces (root package.json, tsconfig.base.json, shared eslint config)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02: Scaffold `packages/types` — define all enums, DTOs, and API response shapes; configure package build
@@ -196,7 +196,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Monorepo Foundation & Shared Types | 0/3 | Not started | - |
+| 1. Monorepo Foundation & Shared Types | 1/3 | In Progress|  |
 | 2. Backend Auth API | 0/2 | Not started | - |
 | 3. Auth Client Integration | 0/2 | Not started | - |
 | 4. Backend Job Core — Posting & State Machine | 0/2 | Not started | - |
