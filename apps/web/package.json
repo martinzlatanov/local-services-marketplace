@@ -10,12 +10,18 @@
   },
   "dependencies": {
     "@local/types": "*",
+    "bcrypt": "^6.0.0",
+    "drizzle-kit": "^0.31.10",
+    "drizzle-orm": "^0.45.2",
+    "jsonwebtoken": "^9.0.3",
     "next": "16.2.4",
+    "pg": "^8.20.0",
     "react": "19.2.5",
     "react-dom": "19.2.5"
   },
   "devDependencies": {
     "@types/node": "^22",
+    "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "typescript": "^6.0.3"

@@ -32,12 +32,12 @@ export interface ApiSuccessResponse<T> {
   data: T
 }
 
+// Validation error payload: field -> message map (required by Phase 2 D-03)
 export interface ApiErrorResponse {
-  error: string
-  code: string
-  statusCode: number
+  errors: Record<string, string>
 }
 
+// Job-related request shapes (keep intact)
 export interface CreateJobRequest {
   category: string
   description: string
@@ -51,4 +51,31 @@ export interface AcceptJobRequest {
 
 export interface UpdateJobStatusRequest {
   status: JobStatus
+}
+
+// Auth DTOs for Phase 2
+export interface AuthRegisterRequest {
+  email: string
+  password: string
+  role?: Role
+}
+
+export interface AuthLoginRequest {
+  email: string
+  password: string
+}
+
+export interface AuthUserDto {
+  id: string
+  email: string
+  role: Role
+  createdAt: string
+}
+
+export interface AuthRegisterResponse {
+  user: AuthUserDto
+}
+
+export interface AuthLoginResponse {
+  user: AuthUserDto
 }

@@ -1,5 +1,4 @@
 // TDD: type-level tests for packages/types/src/index.ts exports (D-08)
-// These imports will fail until index.ts is created.
 
 import {
   JobStatus,
@@ -10,6 +9,9 @@ import {
   CreateJobRequest,
   AcceptJobRequest,
   UpdateJobStatusRequest,
+  AuthRegisterRequest,
+  AuthLoginRequest,
+  AuthUserDto,
 } from './index'
 
 // Verify enum string values at type level via assignability
@@ -37,7 +39,7 @@ const _job: JobDto = {
 }
 
 const _success: ApiSuccessResponse<JobDto> = { data: _job }
-const _error: ApiErrorResponse = { error: 'Not found', code: 'NOT_FOUND', statusCode: 404 }
+const _error: ApiErrorResponse = { errors: { email: 'required' } }
 
 const _create: CreateJobRequest = {
   category: 'plumbing',
@@ -49,7 +51,13 @@ const _create: CreateJobRequest = {
 const _accept: AcceptJobRequest = { version: 1 }
 const _updateStatus: UpdateJobStatusRequest = { status: JobStatus.ACCEPTED }
 
+// Auth DTO checks
+const _registerReq: AuthRegisterRequest = { email: 'a@b.com', password: 'secret', role: Role.CLIENT }
+const _loginReq: AuthLoginRequest = { email: 'a@b.com', password: 'secret' }
+const _user: AuthUserDto = { id: 'u1', email: 'a@b.com', role: Role.CLIENT, createdAt: new Date().toISOString() }
+
 // Suppress unused variable warnings
 void _pending; void _accepted; void _inProgress; void _completed
 void _client; void _provider
 void _job; void _success; void _error; void _create; void _accept; void _updateStatus
+void _registerReq; void _loginReq; void _user

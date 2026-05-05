@@ -51,16 +51,18 @@ Plans:
 **Depends on**: Phase 1
 **Requirements**: AUTH-01, AUTH-02
 **Success Criteria** (what must be TRUE):
-  1. A POST to `/auth/register` with email, password, and role (`CLIENT` or `PROVIDER`) creates a new user in the database and returns a signed JWT
-  2. A POST to `/auth/login` with valid credentials returns a signed JWT containing the user's ID and role
+  1. A POST to `/auth/register` with email, password, and role (`CLIENT` or `PROVIDER`) creates a new user in the database and returns a signed JWT cookie
+  2. A POST to `/auth/login` with valid credentials returns a signed JWT cookie containing the user's ID and role
   3. A POST to `/auth/login` with invalid credentials returns HTTP 401
   4. Attempting to register with an already-used email returns HTTP 409
   5. Protected routes reject requests with no or invalid JWT with HTTP 401
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 02-01: Set up Drizzle schema (User model with role, email, passwordHash), run first migration, connect to PostgreSQL
-- [ ] 02-02: Implement `/auth/register` and `/auth/login` endpoints with bcrypt + JWT; apply auth middleware to protected routes
+**Wave 1**
+- [ ] 02-01: Lock shared auth contracts and Drizzle user schema
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 02-02: Implement auth routes, JWT cookie flow, logout revocation, and protected probe
 
 ### Phase 3: Auth Client Integration
 **Goal**: Users on web and mobile can log in once and stay logged in across sessions; they can log out

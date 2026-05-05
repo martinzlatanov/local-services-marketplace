@@ -1,13 +1,17 @@
 {
   "name": "local-services-marketplace",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:mobile": "npm run start --workspace=apps/mobile"
   },
   "devDependencies": {
+    "@gsd-build/sdk": "^0.1.0",
     "typescript": "^6.0.3"
   }
 }
