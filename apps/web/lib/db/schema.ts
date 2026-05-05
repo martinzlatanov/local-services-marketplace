@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import { pgTable, serial, varchar, text, timestamp } from 'drizzle-orm/pg-core'
 import { Role } from '@local/types'
 
 export const users = pgTable('users', {
@@ -9,4 +9,4 @@ export const users = pgTable('users', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
-export const users_email_idx = uniqueIndex('users_email_unique').on(users.email)
+// Note: unique index applied via SQL migration in apps/web/drizzle/0000_initial_user.sql
