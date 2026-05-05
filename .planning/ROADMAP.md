@@ -44,7 +44,7 @@ Plans:
 - [x] 01-02: Scaffold `packages/types` — define all enums, DTOs, and API response shapes; configure package build
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 01-03: Scaffold `apps/web` (Next.js) and `apps/mobile` (Expo) with workspace references to `packages/types`; verify tsc clean
+- [x] 01-03: Scaffold `apps/web` (Next.js) and `apps/mobile` (Expo) with workspace references to `packages/types`; verify tsc clean
 
 ### Phase 2: Backend Auth API
 **Goal**: Users can register and log in via the API; role is fixed at registration; authenticated requests carry verifiable credentials
@@ -196,7 +196,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Monorepo Foundation & Shared Types | 2/3 | In Progress|  |
+| 1. Monorepo Foundation & Shared Types | 3/3 | Complete | 2026-05-05 |
 | 2. Backend Auth API | 0/2 | Not started | - |
 | 3. Auth Client Integration | 0/2 | Not started | - |
 | 4. Backend Job Core — Posting & State Machine | 0/2 | Not started | - |
