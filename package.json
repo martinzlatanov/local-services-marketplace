@@ -1,0 +1,13 @@
+{
+  "name": "local-services-marketplace",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:mobile": "npm run start --workspace=apps/mobile"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}
