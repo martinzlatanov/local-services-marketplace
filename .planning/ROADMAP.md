@@ -73,11 +73,19 @@ Plans:
   2. After logging in on the mobile app, closing and reopening the app does not require re-login
   3. Tapping/clicking Log Out on either platform clears the stored token and redirects to the login screen
   4. After logout, navigating to a protected route redirects to login rather than loading the protected page
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 03-01: Implement web auth flow (Next.js login/register pages, token stored in httpOnly cookie or localStorage, auth context/middleware protecting client routes)
-- [ ] 03-02: Implement mobile auth flow (Expo login/register screens, token stored in SecureStore, navigation guard protecting provider screens)
+**Wave 1**
+- [ ] 03-01-PLAN.md — Extend backend auth routes: token in login/register response body; upgrade /me to dual-auth (cookie OR Authorization header)
+
+**Wave 2** *(parallel — both blocked on Wave 1 completion)*
+- [ ] 03-02-PLAN.md — Web foundation: install Tailwind CSS, create AuthContext, create middleware, update root layout
+- [ ] 03-03-PLAN.md — Mobile bootstrap: install expo-router + expo-secure-store + react-native-paper; update package.json main; create root _layout.tsx
+
+**Wave 3** *(parallel — 03-04 blocked on 03-02; 03-05 blocked on 03-03)*
+- [ ] 03-04-PLAN.md — Web pages: login, register, dashboard with logout
+- [ ] 03-05-PLAN.md — Mobile auth: AuthContext (SecureStore), login/register screens, navigation guard in root layout
 
 ### Phase 4: Backend Job Core — Posting & State Machine
 **Goal**: Jobs can be created via the API and the backend enforces all valid state transitions, rejecting invalid ones
@@ -200,7 +208,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Monorepo Foundation & Shared Types | 3/3 | Complete | 2026-05-05 |
 | 2. Backend Auth API | 0/2 | Not started | - |
-| 3. Auth Client Integration | 0/2 | Not started | - |
+| 3. Auth Client Integration | 0/5 | Not started | - |
 | 4. Backend Job Core — Posting & State Machine | 0/2 | Not started | - |
 | 5. Backend Job Acceptance & Concurrency | 0/2 | Not started | - |
 | 6. Real-Time Infrastructure | 0/2 | Not started | - |
