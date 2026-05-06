@@ -51,6 +51,7 @@ created: 2026-05-06
 | Audit Date | Threats Total | Closed | Open | Run By |
 |------------|---------------|--------|------|--------|
 | 2026-05-06 | 3 | 3 | 0 | gsd-security-auditor |
+| 2026-05-06 | 3 | 3 | 0 | GSD Re-verification | |
 
 ---
 
