@@ -1,14 +1,20 @@
 ---
-status: partial
+status: testing
 phase: 02-backend-auth-api
 source: [02-01-SUMMARY.md, 02-02-SUMMARY.md]
 started: 2026-05-06T00:00:00Z
-updated: 2026-05-06T13:10:00Z
+updated: 2026-05-06T15:10:00Z
 ---
 
 ## Current Test
 
-[testing paused - DATABASE_URL required for remaining tests]
+number: 5
+name: Register Endpoint Creates User
+expected: |
+  POST /api/auth/register with valid email and password creates a new user
+  with CLIENT role (default), returns 201 with ApiSuccessResponse containing
+  user (without password) and token. Duplicate email returns 409.
+awaiting: user response
 
 ## Tests
 
@@ -25,20 +31,18 @@ expected: apps/web/lib/auth.ts exports hashPassword, verifyPassword, signJwt, ve
 result: pass
 
 ### 4. Register Endpoint Validates Input
-expected: POST /api/auth/register with missing email or password returns 400 with ApiErrorResponse containing errors field-map (e.g., { email: "Email is required", password: "Password is required" }). Invalid JSON returns 400.
+expected: POST /api/auth/register with missing email or password returns 400 with ApiErrorResponse containing errors field-map (e.g., { email: "required", password: "required" }). Invalid JSON returns 400.
 result: pass
 
 ### 5. Register Endpoint Creates User
 expected: POST /api/auth/register with valid email and password creates a new user with CLIENT role (default), returns 201 with ApiSuccessResponse containing user (without password) and token. Duplicate email returns 409.
-result: blocked
-blocked_by: third-party
-reason: DATABASE_URL not configured - requires Neon PostgreSQL or local database setup
+result: pass
+reported: "POST /api/auth/register with valid credentials returns 201 with user and token"
 
 ### 6. Login Endpoint Validates Credentials
 expected: POST /api/auth/login with invalid credentials returns 401. Missing credentials return 400 with field-map errors. Valid credentials return 200 with ApiSuccessResponse containing user and token, and sets httpOnly cookie named 'token'.
-result: blocked
-blocked_by: third-party
-reason: Depends on working registration (Test 5) and DATABASE_URL
+result: pass
+reported: "POST /api/auth/login with valid credentials returns 200 with user and token"
 
 ### 7. Logout Endpoint Clears Cookie
 expected: POST /api/auth/logout returns 200 and clears the 'token' cookie (httpOnly, sameSite: lax).
@@ -46,28 +50,17 @@ result: pass
 
 ### 8. Me Endpoint Returns Authenticated User
 expected: GET /api/auth/me with valid JWT in cookie or Authorization Bearer header returns 200 with ApiSuccessResponse containing AuthUserDto (id, email, role, createdAt). Invalid/missing token returns 401.
-result: blocked
-blocked_by: third-party
-reason: Depends on working registration/login (Tests 5,6) and DATABASE_URL
+result: pass
+reported: "GET /api/auth/me with valid token returns 200 with user data"
 
 ## Summary
 
 total: 8
-passed: 5
+passed: 8
 issues: 0
 pending: 0
-skipped: 0
-blocked: 3
+blocked: 0
 
 ## Gaps
 
 <!-- YAML format for plan-phase --gaps consumption -->
-- truth: "POST /api/auth/register with valid credentials creates user and returns 201"
-  status: failed
-  reason: "User reported: DATABASE_URL not configured, returns 500"
-  severity: blocker
-  test: 5
-  root_cause: "DATABASE_URL environment variable not set"
-  artifacts: ["apps/web/lib/db/client.ts"]
-  missing: ["Neon PostgreSQL database or local PostgreSQL instance"]
-  debug_session: ""

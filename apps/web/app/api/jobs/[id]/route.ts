@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { db } from '../../../../../lib/db'
-import { jobs } from '../../../../../lib/db/schema'
-import { getAuthenticatedUser } from '../../../../../lib/auth'
+import { db } from '@/lib/db/client'
+import { jobs } from '@/lib/db/schema'
+import { getAuthenticatedUser } from '@/lib/auth'
 import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@local/types'
 import { eq } from 'drizzle-orm'
 
@@ -13,7 +13,7 @@ const VALID_TRANSITIONS: Record<JobStatus, JobStatus[]> = {
   [JobStatus.COMPLETED]: [],
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   // 1. Authenticate user
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
@@ -29,7 +29,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 
   // 3. Fetch current job
-  const jobId = parseInt(params.id, 10)
+  const { id } = await params
+  const jobId = parseInt(id, 10)
   if (isNaN(jobId)) {
     return NextResponse.json({ errors: { id: 'invalid' } }, { status: 400 })
   }
@@ -49,16 +50,33 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     }, { status: 409 })
   }
 
-  // 5. Update job status
+  // 5. Check version for optimistic concurrency
+  if (payload.version && payload.version !== currentJob.version) {
+    return NextResponse.json({
+      errors: { version: 'conflict', currentVersion: currentJob.version }
+    }, { status: 409 })
+  }
+
+  // 6. Update job status
+  const updateData: any = {
+    status: requestedStatus,
+    updatedAt: new Date(),
+  }
+  
+  // Set providerId when accepting job
+  if (requestedStatus === JobStatus.ACCEPTED) {
+    updateData.providerId = String(user.id)
+  }
+  
+  // Increment version
+  updateData.version = currentJob.version + 1
+
   const [updatedJob] = await db.update(jobs)
-    .set({ 
-      status: requestedStatus,
-      updatedAt: new Date(),
-    })
+    .set(updateData)
     .where(eq(jobs.id, jobId))
     .returning()
 
-  // 6. Return updated JobDto
+  // 7. Return updated JobDto
   const jobDto: JobDto = {
     id: String(updatedJob.id),
     status: updatedJob.status as JobStatus,

@@ -26,10 +26,10 @@ created: 2026-05-06
 
 **Visual hierarchy per screen:**
 
-- **Onboarding:** Heading ("Choose your service area") is the first anchor; the radio list is the dominant interactive area; "Continue" CTA at bottom is the only primary action.
+- **Onboarding:** Heading ("Choose your service area") is the first anchor; the radio list is the dominant interactive area; "Save area" CTA at bottom is the only primary action.
 - **Feed (Tab 1):** `Appbar` with current service area as title; the FlatList of `Card`s is the dominant content; each Card's category + cityArea is the visual anchor; the entire Card is the tap target (no in-Card buttons).
 - **Settings (Tab 2):** Section list — current service area row is the anchor; "Log out" action is destructive and visually subordinate to "Edit area".
-- **Job Detail:** Job category is the screen heading (largest type); the `Accept` button at the bottom is the dominant CTA — no other primary action competes with it.
+- **Job Detail:** Job category is the screen heading (largest type); the "Accept job" button at the bottom is the dominant CTA — no other primary action competes with it.
 
 ---
 
@@ -40,7 +40,7 @@ created: 2026-05-06
 | `/(app)/onboarding` | One-time forced city/area picker. Blocks access to feed if SecureStore has no `service_area`. | NavigationGuard redirect after login when area unset |
 | `/(app)/(tabs)/feed` | Tab 1. Live FlatList of `PENDING` jobs filtered by stored `cityArea`. | Default tab post-login (when area is set) |
 | `/(app)/(tabs)/settings` | Tab 2. Edit service area; log out. | Tab bar |
-| `/(app)/jobs/[id]` | Detail view of a single `JobDto` + `Accept` button. Stack-pushed over the feed tab. | Tap a Card on Feed |
+| `/(app)/jobs/[id]` | Detail view of a single `JobDto` + "Accept job" button. Stack-pushed over the feed tab. | Tap a Card on Feed |
 
 Existing `(auth)/login` and `(auth)/register` are unchanged; `apps/mobile/app/index.tsx` becomes a redirect to `/(app)/(tabs)/feed`.
 
@@ -56,7 +56,7 @@ Reused from Phase 3. Mobile-only — Tailwind values are not applicable.
 | sm | 8px | `8` | Gap between metadata lines (timeframe, area) inside a Card |
 | md | 16px | `16` | Default element spacing; vertical gap between Cards in the feed |
 | lg | 24px | `24` | Screen horizontal padding; Card inner padding; Detail screen body padding |
-| xl | 32px | `32` | Vertical padding around the Detail screen Accept button |
+| xl | 32px | `32` | Vertical padding around the Detail screen primary CTA button |
 | 2xl | 48px | `48` | Empty state vertical padding |
 | 3xl | 64px | `64` | Onboarding screen top padding |
 
@@ -95,7 +95,7 @@ Reused from Phase 3 (RN Paper MD3 type scale). Mobile-only.
 | Detail | Job category (screen heading) | `headlineSmall` |
 | Detail | Field labels ("Description", "Timeframe", "Area") | `labelLarge` |
 | Detail | Field values | `bodyLarge` |
-| Detail | Accept button label | Paper Button default (`labelLarge`) |
+| Detail | "Accept job" button label | Paper Button default (`labelLarge`) |
 | Snackbar | "Job already taken" | `bodyLarge` |
 
 Exactly 2 weights: 400 regular for body, 600 semibold for headings/labels.
@@ -110,12 +110,12 @@ Reused from Phase 3 (Paper MD3 default theme — no custom theme this phase).
 |------|-----------------|---------------------|
 | Dominant (60%) | `theme.colors.background` | Screen background (all screens), FlatList container |
 | Secondary (30%) | `theme.colors.surfaceVariant` | Card surface, Settings list rows, RadioButton row backgrounds, Snackbar surface |
-| Accent (10%) | `theme.colors.primary` | Accept button (Detail), Continue button (Onboarding), active tab indicator, RefreshControl tint, RadioButton selected dot |
+| Accent (10%) | `theme.colors.primary` | "Accept job" button (Detail), "Save area" button (Onboarding), active tab indicator, RefreshControl tint, RadioButton selected dot |
 | Destructive | `theme.colors.error` | Log out action label and confirmation Snackbar; "Couldn't load jobs" error banner text |
 
 **Accent reserved for:**
-1. Detail screen Accept button (`mode="contained"`)
-2. Onboarding Continue button (`mode="contained"`)
+1. Detail screen "Accept job" button (`mode="contained"`)
+2. Onboarding "Save area" button (`mode="contained"`)
 3. Active bottom-tab indicator (Paper Tabs default)
 4. RefreshControl spinner color
 5. Selected `RadioButton` dot
@@ -141,14 +141,14 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 | `Text` (heading) | Paper | `variant="headlineSmall"` — "Choose your service area" |
 | `Text` (helper) | Paper | `variant="bodyLarge"` — "We'll show you jobs posted in this area." |
 | `RadioButton.Group` + `RadioButton.Item` (one per `CITY_AREAS` entry) | Paper | Vertically stacked; `position="leading"`; row min-height 44 |
-| `Button` (Continue) | Paper | `mode="contained"`, `disabled={!selected}`, full-width; persists to SecureStore then `router.replace('/(app)/(tabs)/feed')` |
+| `Button` ("Save area") | Paper | `mode="contained"`, `disabled={!selected}`, full-width; persists to SecureStore then `router.replace('/(app)/(tabs)/feed')` |
 
 | State | Behavior |
 |-------|----------|
-| Initial (no selection) | Continue button `disabled` |
-| Option selected | Continue button enabled |
+| Initial (no selection) | "Save area" button `disabled` |
+| Option selected | "Save area" button enabled |
 | Saving | Button `loading={true}` + `disabled` while SecureStore write resolves |
-| Error writing SecureStore (extremely rare) | Inline `HelperText type="error"` under Continue: "Couldn't save your area. Please try again." |
+| Error writing SecureStore (extremely rare) | Inline `HelperText type="error"` under "Save area": "Couldn't save your area. Please try again." |
 
 ### Feed Tab (`/(app)/(tabs)/feed`)
 
@@ -182,7 +182,7 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 | `Appbar.Header` + `Appbar.Content` | Paper | Title "Settings" |
 | `List.Section` + `List.Subheader` | Paper | "Service Area" subheader |
 | `List.Item` (current area) | Paper | `title={currentArea}`, `description="Tap to change"`, `right` = chevron icon; `onPress` opens a `Dialog` with `RadioButton.Group` of `CITY_AREAS` |
-| `Dialog` | Paper | Two actions: "Cancel" (text), "Save" (text, `theme.colors.primary`) |
+| `Dialog` | Paper | Two actions: "Keep current area" (text), "Update area" (text, `theme.colors.primary`) |
 | `List.Subheader` | Paper | "Account" |
 | `List.Item` (logged-in email) | Paper | `title={user.email}`, `disabled`, no chevron |
 | `Button` (Log out) | Paper | `mode="text"`, `textColor={theme.colors.error}`, full-width within section padding |
@@ -190,8 +190,8 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 | State | Behavior |
 |-------|----------|
 | Default | List rendered; current area shown |
-| Dialog open, no change | Cancel closes |
-| Dialog open, new area selected, Save tapped | Persist to SecureStore; close dialog; trigger feed refetch on next focus |
+| Dialog open, no change | "Keep current area" closes |
+| Dialog open, new area selected, "Update area" tapped | Persist to SecureStore; close dialog; trigger feed refetch on next focus |
 | Logout tapped | No confirmation dialog (matches Phase 3 contract); call `logout()`, NavigationGuard handles redirect to `(auth)/login` |
 
 ### Job Detail Screen (`/(app)/jobs/[id]`)
@@ -204,20 +204,20 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 | `Text` (label "Description") + `Text` (value) | Paper | `labelLarge` + `bodyLarge` |
 | `Text` (label "Timeframe") + `Text` (value) | Paper | Same pattern |
 | `Text` (label "Area") + `Text` (value) | Paper | Same pattern |
-| `Button` (Accept) | Paper | `mode="contained"`, full-width, `style={{ marginTop: 32 }}`, `contentStyle={{ minHeight: 44 }}` |
+| `Button` ("Accept job") | Paper | `mode="contained"`, full-width, `style={{ marginTop: 32 }}`, `contentStyle={{ minHeight: 44 }}` |
 | `ActivityIndicator` | Paper | Centered while initial GET `/api/jobs/:id` in flight |
 | `Snackbar` (409 path) | Paper | Bottom-anchored; auto-hides at 3000ms; copy: "Job already taken" |
 
 | State | Behavior |
 |-------|----------|
 | Initial fetch in flight | Centered ActivityIndicator; no body |
-| Fetch succeeded, job loaded | Body visible; Accept button enabled |
-| Fetch failed (network or non-409) | Inline error banner: "Couldn't load this job. Tap back and try again." Accept button hidden. |
+| Fetch succeeded, job loaded | Body visible; "Accept job" button enabled |
+| Fetch failed (network or non-409) | Inline error banner: "Couldn't load this job. Tap back and try again." "Accept job" button hidden. |
 | Fetch returned 404 (job vanished mid-navigation) | Same banner copy; user backs out via Appbar back action |
-| Accept tapped — submitting | Button `loading={true}` + `disabled={true}`; no other UI change |
-| Accept returned 200 | Stop loading; navigate back to feed (`router.back()`); the WS `JOB_UPDATED` (status=ACCEPTED) drops it from the feed automatically |
-| Accept returned 409 | Show Snackbar "Job already taken"; after Snackbar dismisses (or immediately, in parallel), `router.back()` to feed; trigger feed refetch on focus |
-| Accept returned other non-200 (network, 500) | Show Snackbar "Couldn't accept job. Please try again." (stays open until dismissed or 4000ms); button returns to enabled |
+| "Accept job" tapped — submitting | Button `loading={true}` + `disabled={true}`; no other UI change |
+| Acceptance returned 200 | Stop loading; navigate back to feed (`router.back()`); the WS `JOB_UPDATED` (status=ACCEPTED) drops it from the feed automatically |
+| Acceptance returned 409 | Show Snackbar "Job already taken"; after Snackbar dismisses (or immediately, in parallel), `router.back()` to feed; trigger feed refetch on focus |
+| Acceptance returned other non-200 (network, 500) | Show Snackbar "Couldn't accept job. Please try again." (stays open until dismissed or 4000ms); button returns to enabled |
 
 ---
 
@@ -226,25 +226,25 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 ### Flow 1: First-time onboarding
 1. User logs in (Phase 3 flow)
 2. `NavigationGuard` (extended) detects authenticated user + no `service_area` in SecureStore → `router.replace('/(app)/onboarding')`
-3. User picks an area → taps Continue → SecureStore write → `router.replace('/(app)/(tabs)/feed')`
+3. User picks an area → taps "Save area" → SecureStore write → `router.replace('/(app)/(tabs)/feed')`
 4. Feed mounts and fetches `GET /api/jobs?cityArea=<area>`
 
 ### Flow 2: Tap a Card → push to detail
 1. User taps a Card on the Feed tab
 2. `router.push('/(app)/jobs/' + id)` — Stack push, animated slide-in
 3. Detail screen fetches `GET /api/jobs/:id`
-4. Body renders with category as heading, three labeled fields, Accept button at bottom
+4. Body renders with category as heading, three labeled fields, "Accept job" button at bottom
 
-### Flow 3: Accept success path (200)
-1. On Detail screen, user taps Accept
+### Flow 3: Acceptance success path (200)
+1. On Detail screen, user taps "Accept job"
 2. Button enters loading state
 3. `POST /api/jobs/:id/accept` with body `{ version: jobDto.version }`
 4. 200 response → `router.back()` returns to Feed
 5. Within milliseconds, the WS `JOB_UPDATED` event (status=ACCEPTED) arrives → Feed drops the job from its list
 6. No additional UI confirmation (the disappearance is the confirmation; matches Phase 3 "no confirm dialog" mobile aesthetic)
 
-### Flow 4: Accept conflict path (409)
-1. On Detail screen, user taps Accept
+### Flow 4: Acceptance conflict path (409)
+1. On Detail screen, user taps "Accept job"
 2. Button enters loading state
 3. `POST /api/jobs/:id/accept` returns 409
 4. Snackbar shows "Job already taken" (Paper default surface, `bodyLarge` text)
@@ -274,7 +274,7 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 |---------|------|
 | Onboarding heading | Choose your service area |
 | Onboarding helper | We'll show you jobs posted in this area. |
-| Onboarding primary CTA (idle) | Continue |
+| Onboarding primary CTA (idle) | Save area |
 | Onboarding primary CTA (saving) | Saving... |
 | Onboarding write error | Couldn't save your area. Please try again. |
 | Feed Appbar title | (dynamic — current `cityArea` value verbatim, e.g. "Downtown") |
@@ -285,15 +285,15 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 | Settings section: area | Service Area |
 | Settings row: current area secondary | Tap to change |
 | Settings dialog title | Choose your service area |
-| Settings dialog cancel | Cancel |
-| Settings dialog save | Save |
+| Settings dialog cancel | Keep current area |
+| Settings dialog save | Update area |
 | Settings section: account | Account |
 | Settings logout label | Log out |
 | Detail screen Appbar title | Job details |
 | Detail screen field label 1 | Description |
 | Detail screen field label 2 | Timeframe |
 | Detail screen field label 3 | Area |
-| Detail screen primary CTA (idle) | Accept |
+| Detail screen primary CTA (idle) | Accept job |
 | Detail screen primary CTA (submitting) | Accepting... |
 | Detail screen fetch error | Couldn't load this job. Tap back and try again. |
 | Snackbar — 409 conflict | Job already taken |
@@ -301,7 +301,7 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 
 **Destructive actions in this phase:**
 - **Log out** in Settings — no confirmation dialog (consistent with Phase 3 mobile contract). The label is rendered in `theme.colors.error` to signal the destructive nature visually.
-- No other destructive actions. Accept is **not** destructive (it's a commit, not a delete) — handled with a single tap, no confirm.
+- No other destructive actions. Acceptance is **not** destructive (it's a commit, not a delete) — handled with a single tap, no confirm.
 
 ---
 
@@ -311,13 +311,13 @@ Do NOT apply accent to: Card surfaces, Card text, Settings rows, Appbar backgrou
 |---------|------|
 | Minimum touch target | 44pt on every Card, Button, ListItem, RadioButton row, Tab bar item, Snackbar action. Enforced via `contentStyle.minHeight = 44` on Buttons and `style.minHeight = 44` on Card wrappers. |
 | Screen reader labels | Each Card has `accessibilityLabel="Job: {category} in {cityArea}, posted {timeframe}. Double-tap to view details."` and `accessibilityRole="button"`. |
-| Accept button label | `accessibilityLabel="Accept this job"`, `accessibilityRole="button"`, `accessibilityState={{ disabled, busy: submitting }}`. |
+| "Accept job" button label | `accessibilityLabel="Accept this job"`, `accessibilityRole="button"`, `accessibilityState={{ disabled, busy: submitting }}`. |
 | Onboarding RadioButtons | Paper `RadioButton.Item` provides correct `accessibilityRole="radio"` and `accessibilityState.selected` automatically — no override needed. |
 | Tab bar | Paper Tabs sets `accessibilityRole="tab"` and `accessibilityState.selected` automatically. |
 | Snackbar | Paper Snackbar uses `accessibilityLiveRegion="polite"` by default; copy is short enough to be announced once. Verify on iOS VoiceOver during executor smoke test. |
-| Focus order on Detail | Heading (category) → Description label/value → Timeframe label/value → Area label/value → Accept button. Use default DOM-equivalent order (no explicit `accessibilityElementsHidden` overrides needed). |
+| Focus order on Detail | Heading (category) → Description label/value → Timeframe label/value → Area label/value → "Accept job" button. Use default DOM-equivalent order (no explicit `accessibilityElementsHidden` overrides needed). |
 | Color contrast | Paper MD3 default theme already meets WCAG AA. Do not introduce custom colors that could regress this. |
-| Loading announcement | When Accept enters loading state, `accessibilityState.busy = true` triggers VoiceOver "in progress" hint. |
+| Loading announcement | When the "Accept job" button enters loading state, `accessibilityState.busy = true` triggers VoiceOver "in progress" hint. |
 
 ---
 
@@ -379,7 +379,7 @@ No third-party shadcn registries declared. Vetting gate does not apply.
 | Forced onboarding | CONTEXT.md D-03 |
 | Pull-to-refresh + WS | CONTEXT.md D-05 (mirror web Phase 6 pattern, ws:// URL with token query) |
 | WS PENDING-only filter rule | CONTEXT.md D-06 |
-| Detail screen + single Accept (no confirm) | CONTEXT.md D-07 |
+| Detail screen + single "Accept job" CTA (no confirm) | CONTEXT.md D-07 |
 | 409 → Snackbar + auto-back + refetch | CONTEXT.md D-08 |
 | AcceptJobRequest sends version from JobDto | CONTEXT.md D-09 |
 | Spacing tokens (xs/sm/md/lg/xl/2xl/3xl) | Phase 3 UI-SPEC reuse |

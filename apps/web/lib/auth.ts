@@ -44,13 +44,13 @@ export async function getAuthenticatedUser(req: Request): Promise<AuthUserDto | 
       }
     }
   }
-  if (!token) return null
+  if (!token) { ; return null }
   const payload = verifyJwt(token)
-  if (!payload || !payload.id) return null
-  const { db } = await import("./db/client")
-  const { users } = await import("./db/schema")
+  if (!payload || !payload.sub) { ; return null }
+  const { db } = await import("@/lib/db/client")
+  const { users } = await import("@/lib/db/schema")
   const { eq } = await import("drizzle-orm")
-  const rows = await db.select().from(users).where((eq as any)(users.id, parseInt(payload.id)))
+  const rows = await db.select().from(users).where((eq as any)(users.id, parseInt(payload.sub)))
   if (!rows[0]) return null
   return toAuthUserDto(rows[0])
 }
@@ -59,8 +59,8 @@ export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUse
   const { email, password, role } = payload
   const passwordHash = await hashPassword(password)
   const userRole = role ?? Role.CLIENT
-  const { db } = await import("./db/client")
-  const { users } = await import("./db/schema")
+  const { db } = await import("@/lib/db/client")
+  const { users } = await import("@/lib/db/schema")
   const { eq } = await import("drizzle-orm")
   await db.insert(users).values({ email, passwordHash, role: userRole })
   const created = await db.select().from(users).where((eq as any)(users.email, email))
@@ -69,8 +69,8 @@ export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUse
 }
 
 export async function findUserByEmail(email: string) {
-  const { db } = await import("./db/client")
-  const { users } = await import("./db/schema")
+  const { db } = await import("@/lib/db/client")
+  const { users } = await import("@/lib/db/schema")
   const { eq } = await import("drizzle-orm")
   const rows = await db.select().from(users).where((eq as any)(users.email, email))
   return rows[0] || null
