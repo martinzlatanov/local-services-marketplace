@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import * as SecureStore from 'expo-secure-store'
 import type { AuthUserDto } from '@local/types'
 
-const TOKEN_KEY = 'auth_token'
+export const TOKEN_KEY = 'auth_token'
 export const SERVICE_AREA_KEY = 'service_area'
 export const API_BASE = 'http://localhost:3000'
 
