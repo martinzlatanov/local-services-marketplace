@@ -77,15 +77,15 @@ Plans:
 
 Plans:
 **Wave 1** *(parallel — independent)*
-- [ ] 03-01-PLAN.md — Extend backend auth routes: token in login/register response body; upgrade /me to dual-auth (cookie OR Authorization header)
-- [ ] 03-03-PLAN.md — Mobile bootstrap: install expo-router + expo-secure-store + react-native-paper; update package.json main; create root _layout.tsx
+- [x] 03-01-PLAN.md — Extend backend auth routes: token in login/register response body; upgrade /me to dual-auth (cookie OR Authorization header)
+- [x] 03-03-PLAN.md — Mobile bootstrap: install expo-router + expo-secure-store + react-native-paper; update package.json main; create root _layout.tsx
 
 **Wave 2** *(blocked on 03-01 completion)*
-- [ ] 03-02-PLAN.md — Web foundation: install Tailwind CSS, create AuthContext, create middleware, update root layout
+- [x] 03-02-PLAN.md — Web foundation: install Tailwind CSS, create AuthContext, create middleware, update root layout
 
 **Wave 3** *(parallel — 03-04 blocked on 03-02; 03-05 blocked on 03-01 + 03-03)*
-- [ ] 03-04-PLAN.md — Web pages: login, register, dashboard with logout
-- [ ] 03-05-PLAN.md — Mobile auth: AuthContext (SecureStore), login/register screens, home screen, navigation guard in root layout
+- [x] 03-04-PLAN.md — Web pages: login, register, dashboard with logout
+- [x] 03-05-PLAN.md — Mobile auth: AuthContext (SecureStore), login/register screens, home screen, navigation guard in root layout
 
 ### Phase 4: Backend Job Core — Posting & State Machine
 **Goal**: Jobs can be created via the API and the backend enforces all valid state transitions, rejecting invalid ones
@@ -208,7 +208,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. Monorepo Foundation & Shared Types | 3/3 | Complete | 2026-05-05 |
 | 2. Backend Auth API | 0/2 | Not started | - |
-| 3. Auth Client Integration | 0/5 | Not started | - |
+| 3. Auth Client Integration | 5/5 | Complete | 2026-05-06 |
 | 4. Backend Job Core — Posting & State Machine | 0/2 | Not started | - |
 | 5. Backend Job Acceptance & Concurrency | 0/2 | Not started | - |
 | 6. Real-Time Infrastructure | 0/2 | Not started | - |
