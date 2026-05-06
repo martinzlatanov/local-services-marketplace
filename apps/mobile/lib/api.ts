@@ -4,7 +4,7 @@ import type { ApiErrorResponse, ApiSuccessResponse, JobDto } from '@local/types'
 async function parseResponse<T>(res: Response): Promise<T> {
   const data = (await res.json().catch(() => null)) as ApiSuccessResponse<T> | ApiErrorResponse | null
   if (!res.ok) {
-    throw data as ApiErrorResponse
+    throw { status: res.status, ...(data as ApiErrorResponse | null) }
   }
   return (data as ApiSuccessResponse<T>).data
 }
