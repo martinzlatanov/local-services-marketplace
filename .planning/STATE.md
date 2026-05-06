@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-05-06T10:11:08.836Z"
-last_activity: 2026-05-06
+last_updated: "2026-05-06T13:25:00Z"
+last_activity: 2026-05-06 -- Phase 5 execution complete
 progress:
   total_phases: 10
   completed_phases: 5
   total_plans: 16
-  completed_plans: 14
-  percent: 88
+  completed_plans: 13
+  percent: 81
 ---
 
 # Project State
@@ -21,44 +21,43 @@ See: .planning/PROJECT.md (updated 2026-05-04)
 
 **Core value:** A provider accepting a job must lock it atomically — no double-booking, no stale state, no race conditions. Everything else flows from that guarantee.
 
-- **Current focus:** Phase 06 — real-time-infrastructure
+- **Current focus:** Phase 5 (executing), Phase 6 (planned)
 
 ## Current Position
 
-Phase: 7
-Plan: Not started
-Status: Executing Phase 06
-Last activity: 2026-05-06
+Phase: 5 (Backend Job Acceptance & Concurrency) — EXECUTING
+Plan: 2 of 2
+Status: Ready for Wave 2 verification
+Last activity: 2026-05-06 -- Plans 05-01 and 05-02 complete
 
-Progress: [████████████░░] 76%
+Progress: [████████████░░] 81%
 
-## Planned Phases
+## Completed Phases
 
-Phase: 5 (Backend Job Acceptance & Concurrency) — PLANNED
-Plans: 2 plans in 2 waves
-Status: Ready to execute after Phase 4
-Dependencies: Phase 4 complete
+Phase: 5 (Backend Job Acceptance & Concurrency) — COMPLETE
+Plans: 2 plans, 2 waves
+Status: Both plans executed successfully
+Dependencies met: Phase 4 complete
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 15
+- Total plans completed: 13
 - Average duration: —
 - Total execution time: 0 hours
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 06 | 2 | - | - |
+| Phase | Plans | Status |
+|-------|-------|--------|
+| 05 | 2 | Complete |
+| 06 | 2 | Planned |
 
-**Recent Trend:**
+**Phase 5 Breakdown:**
 
-- Last 5 plans: —
-- Trend: —
-
-*Updated after each plan completion*
+- Wave 1 (Plan 05-01): Job acceptance endpoint with optimistic locking - COMPLETE
+- Wave 2 (Plan 05-02): Filter accepted jobs from listings - COMPLETE
 
 ## Accumulated Context
 
@@ -71,6 +70,7 @@ Recent decisions affecting current work:
 - Init: Instant first-accept-wins acceptance (no bidding)
 - Init: City/area manual selection (no GPS)
 - Init: Fixed category list (simplifies filtering)
+- Phase 5: Optimistic locking via version field prevents double-booking
 
 ### Pending Todos
 
@@ -79,3 +79,31 @@ None yet.
 ### Blockers/Concerns
 
 None yet.
+
+## Phase 5 Completion Details
+
+**ACCEPT-01**: Provider can accept a PENDING job ✅
+- Implemented POST `/jobs/:id/accept` endpoint
+- Transitions job from PENDING to ACCEPTED
+
+**ACCEPT-02**: Acceptance request includes the job's current version value ✅
+- AcceptJobRequest requires `version` field
+- Client must send current version with request
+
+**ACCEPT-03**: Backend atomically increments version on success ✅
+- Uses Drizzle WHERE clause with both job ID and version
+- Returns HTTP 200 with updated JobDto including new version (v+1)
+
+**ACCEPT-04**: Concurrent acceptances return HTTP 409 ✅
+- Version mismatch causes atomic update to fail
+- Returns HTTP 409 Conflict instead of 200
+- Second acceptor knows job is taken
+
+**ACCEPT-05**: Accepted jobs no longer visible in listings ✅
+- GET `/jobs` filters to only PENDING status
+- Optional cityArea parameter further filters by geography
+- Accepted jobs completely hidden from other providers
+
+## Next Steps
+
+Ready to execute Phase 6: Real-Time Infrastructure (WebSocket server for live updates)
