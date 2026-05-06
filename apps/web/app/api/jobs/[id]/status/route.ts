@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { db } from '../../../../../../lib/db'
-import { jobs } from '../../../../../../lib/db/schema'
-import { getAuthenticatedUser } from '../../../../../../lib/auth'
-import { broadcastToUser } from '../../../../../../lib/ws/server'
+import { db } from '@/lib/db/client'
+import { jobs } from '@/lib/db/schema'
+import { getAuthenticatedUser } from '@/lib/auth'
+import { broadcastToUser } from '@/lib/ws/server'
 import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@local/types'
 import { eq } from 'drizzle-orm'
 

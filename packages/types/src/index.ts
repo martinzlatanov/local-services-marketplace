@@ -64,6 +64,7 @@ export interface AcceptJobRequest {
 
 export interface UpdateJobStatusRequest {
   status: JobStatus
+  version?: number
 }
 
 // Auth DTOs for Phase 2
