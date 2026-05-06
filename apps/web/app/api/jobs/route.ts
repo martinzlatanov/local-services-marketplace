@@ -4,7 +4,47 @@ import { jobs } from '../../../../lib/db/schema'
 import { getAuthenticatedUser } from '../../../../lib/auth'
 import { CreateJobRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@local/types'
 import { JOB_CATEGORIES } from '../../../../lib/db/categories'
-import { eq } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
+
+export async function GET(req: Request) {
+  // 1. Authenticate user
+  const user = await getAuthenticatedUser(req)
+  if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
+
+  // 2. Get query parameters
+  const url = new URL(req.url)
+  const cityArea = url.searchParams.get('cityArea')
+
+  // 3. Query PENDING jobs only (ACCEPT-05: accepted jobs are not visible)
+  let jobList: typeof jobs.$inferSelect[]
+  if (cityArea) {
+    jobList = await db.select().from(jobs).where(
+      and(
+        eq(jobs.status, JobStatus.PENDING),
+        eq(jobs.cityArea, cityArea)
+      )
+    )
+  } else {
+    jobList = await db.select().from(jobs).where(eq(jobs.status, JobStatus.PENDING))
+  }
+
+  // 4. Convert to JobDtos
+  const jobDtos: JobDto[] = jobList.map(job => ({
+    id: String(job.id),
+    status: job.status as JobStatus,
+    version: job.version,
+    category: job.category,
+    description: job.description,
+    timeframe: job.timeframe,
+    cityArea: job.cityArea,
+    clientId: job.clientId,
+    providerId: job.providerId,
+    createdAt: job.createdAt.toISOString(),
+    updatedAt: job.updatedAt.toISOString(),
+  }))
+
+  return NextResponse.json({ data: jobDtos } as ApiSuccessResponse<JobDto[]>)
+}
 
 export async function POST(req: Request) {
   // 1. Authenticate user
