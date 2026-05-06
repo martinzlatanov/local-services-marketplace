@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createUser } from '../../../../lib/auth'
+import { createUser, signJwt } from '../../../../lib/auth'
 import { ApiErrorResponse, AuthRegisterRequest, AuthRegisterResponse } from '@local/types'
 
 export async function POST(req: Request) {
@@ -11,12 +11,15 @@ export async function POST(req: Request) {
   }
   try {
     const existing = await createUser({ email: payload.email, password: payload.password, role: payload.role })
+    const token = signJwt({ sub: existing.id, email: existing.email })
     const response: AuthRegisterResponse = { user: existing }
-    return NextResponse.json(response, { status: 201 })
+    const res = NextResponse.json({ ...response, token }, { status: 201 })
+    res.cookies.set('token', token, { httpOnly: true, sameSite: 'lax' })
+    return res
   } catch (e: any) {
     // simplistic duplicate detection — Drizzle insert may throw PG error code 23505
     const msg = (e && e.code === '23505') ? { errors: { email: 'already_exists' } } : { errors: { server: 'error' } }
     const status = (e && e.code === '23505') ? 409 : 500
-    return NextResponse.json(msg as ApiErrorResponse, { status })
+    return NextResponse.json(msg as unknown as ApiErrorResponse, { status })
   }
 }
