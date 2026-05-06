@@ -2,7 +2,7 @@
   "name": "mobile",
   "version": "0.0.1",
   "private": true,
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -12,9 +12,15 @@
   "dependencies": {
     "@local/types": "*",
     "expo": "55.0.20",
+    "expo-constants": "^55.0.16",
+    "expo-linking": "^55.0.15",
+    "expo-router": "^55.0.14",
+    "expo-secure-store": "^55.0.13",
     "expo-status-bar": "~3.0.0",
     "react": "19.2.5",
-    "react-native": "0.85.2"
+    "react-native": "0.85.2",
+    "react-native-paper": "^5.15.1",
+    "react-native-safe-area-context": "^5.7.0"
   },
   "devDependencies": {
     "@types/react": "^19",

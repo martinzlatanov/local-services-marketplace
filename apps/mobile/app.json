@@ -4,6 +4,10 @@
     "slug": "local-services-provider",
     "version": "0.0.1",
     "platforms": ["ios", "android"],
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "scheme": "localservices",
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }
