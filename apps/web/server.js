@@ -1,7 +1,5 @@
 import { createServer } from 'http'
-import { parse } from 'url'
 import next from 'next'
-import { initWsServer } from './lib/ws/server.js'
 
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = process.env.HOSTNAME || 'localhost'
@@ -12,15 +10,11 @@ const handle = app.getRequestHandler()
 
 app.prepare().then(() => {
   const server = createServer((req, res) => {
-    const parsedUrl = parse(req.url!, true)
-    handle(req, res, parsedUrl)
+    const url = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`)
+    handle(req, res, url)
   })
-
-  // Initialize WebSocket server with upgrade handler
-  initWsServer(server)
 
   server.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`)
-    console.log(`> WebSocket server initialized`)
   })
 })
