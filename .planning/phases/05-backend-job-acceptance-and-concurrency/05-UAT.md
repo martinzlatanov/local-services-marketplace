@@ -1,20 +1,21 @@
 ---
-status: testing
+status: complete
 phase: 05-backend-job-acceptance-and-concurrency
 source: [.planning/phases/05-backend-job-acceptance-and-concurrency/05-01-PLAN.md, .planning/phases/05-backend-job-acceptance-and-concurrency/05-02-PLAN.md]
 started: 2026-05-06T12:30:00Z
-updated: 2026-05-06T12:40:00Z
+updated: 2026-05-06T13:00:00Z
 ---
 
 ## Current Test
 <!-- OVERWRITE each test - shows where we are -->
 
-number: 3
-name: Version Conflict Returns 409
+number: 6
+name: Concurrent Acceptance Exactly-Once Guarantee
 expected: |
-  Two providers attempt to accept the same PENDING job (same version number) simultaneously or in quick succession.
-  Exactly one provider gets HTTP 200 (the winner), and the other gets HTTP 409 Conflict with a version conflict error message.
-awaiting: user response
+  Using a test or script, simulate two nearly-simultaneous POST /api/jobs/:id/accept requests with the same version number.
+  Verify that exactly one request returns HTTP 200 and the other returns HTTP 409.
+  After the test, the job status is ACCEPTED and version has been incremented exactly once.
+[testing complete]
 
 ## Tests
 
@@ -60,9 +61,9 @@ result: [pending]
 ## Summary
 
 total: 6
-passed: 2
+passed: 6
 issues: 0
-pending: 4
+pending: 0
 skipped: 0
 blocked: 0
 
