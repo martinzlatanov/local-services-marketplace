@@ -1,8 +1,8 @@
 ---
 phase: 06
 slug: real-time-infrastructure
-status: draft
-threats_open: 3
+status: verified
+threats_open: 0
 asvs_level: 1
 created: 2026-05-06
 ---
@@ -26,9 +26,9 @@ created: 2026-05-06
 
 | Threat ID | Category | Component | Disposition | Mitigation | Status |
 |-----------|----------|-----------|-------------|------------|--------|
-| T-06-01 | Spoofing | WebSocket Server | mitigate | Authenticate connections using JWT on handshake | open |
-| T-06-02 | Information Disclosure | WebSocket Server | mitigate | Only broadcast events to the specific user ID associated with the connection | open |
-| T-06-03 | Elevation of Privilege | Status Update API | mitigate | Ensure the provider requesting the status update owns the job | open |
+| T-06-01 | Spoofing | WebSocket Server | mitigate | Authenticate connections using JWT on handshake (verifyJwt in server.ts) | closed |
+| T-06-02 | Information Disclosure | WebSocket Server | mitigate | Only broadcast events to the specific user ID associated with the connection (clients Map) | closed |
+| T-06-03 | Elevation of Privilege | Status Update API | mitigate | Ensure the provider requesting the status update owns the job (providerId check in status/route.ts) | closed |
 
 *Status: open · closed*
 *Disposition: mitigate (implementation required) · accept (documented risk) · transfer (third-party)*
@@ -50,15 +50,15 @@ created: 2026-05-06
 
 | Audit Date | Threats Total | Closed | Open | Run By |
 |------------|---------------|--------|------|--------|
-| 2026-05-06 | 3 | 0 | 3 | gsd-security-auditor |
+| 2026-05-06 | 3 | 3 | 0 | gsd-security-auditor |
 
 ---
 
 ## Sign-Off
 
-- [ ] All threats have a disposition (mitigate / accept / transfer)
-- [ ] Accepted risks documented in Accepted Risks Log
-- [ ] `threats_open: 0` confirmed
-- [ ] `status: verified` set in frontmatter
+- [x] All threats have a disposition (mitigate / accept / transfer)
+- [x] Accepted risks documented in Accepted Risks Log
+- [x] `threats_open: 0` confirmed
+- [x] `status: verified` set in frontmatter
 
-**Approval:** pending
+**Approval:** verified 2026-05-06
