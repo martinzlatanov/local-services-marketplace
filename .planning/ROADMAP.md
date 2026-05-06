@@ -1,125 +1,77 @@
-# Roadmap: Local Services Task Marketplace
+# Project Roadmap
 
-## Overview
-
-Starting from an empty monorepo, the project builds in dependency order: shared types first (the contract that locks in type safety across all layers), then backend authentication and job APIs, then real-time WebSocket infrastructure, then each platform's UI as vertical slices, and finally job closure and the ratings feature. Every phase delivers a coherent capability that can be independently verified.
-
-## Phases
-
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
-
-Decimal phases appear between their surrounding integers in numeric order.
-
-- [ ] **Phase 1: Monorepo Foundation & Shared Types** - Scaffold monorepo structure and define all shared TypeScript contracts in `packages/types`
-- [ ] **Phase 2: Backend Auth API** - Registration and login endpoints; JWT issuance; role enforcement
-- [ ] **Phase 3: Auth Client Integration** - Token persistence on web and mobile; logout flow
-- [ ] **Phase 4: Backend Job Core — Posting & State Machine** - Job creation endpoints; state machine enforcement with HTTP 409 for invalid transitions
-- [ ] **Phase 5: Backend Job Acceptance & Concurrency** - Accept endpoint with optimistic locking; HTTP 409 on version conflict; job visibility after acceptance
-- [ ] **Phase 6: Real-Time Infrastructure** - WebSocket hub wired to backend; broadcast on every state transition; client dashboard updates
-- [ ] **Phase 7: Web Client — Job Posting & Dashboard** - Next.js post form; live client dashboard receiving real-time updates
-- [ ] **Phase 8: Mobile Client — Onboarding & Discovery** - Provider service area setup; filtered PENDING job list; full job detail view
-- [ ] **Phase 9: Mobile Client — Acceptance & Lifecycle** - Provider accepts job with version field; updates status through IN_PROGRESS to COMPLETED; accepted job removed from others' lists
-- [ ] **Phase 10: Job Closure & Ratings** - Client closes completed job; history section; rating and review submission; provider profile with ratings
-
-## Phase Details
-
-### Phase 1: Monorepo Foundation & Shared Types
-**Goal**: All packages in the monorepo build cleanly and every cross-platform type contract is defined in one place
-**Depends on**: Nothing (first phase)
-**Requirements**: TYPES-01, TYPES-02, TYPES-03
+## Phase 1: Monorepo Foundation & Shared Types
+**Goal**: Establish the Turborepo structure, shared TypeScript configuration, and common data transfer objects (DTOs)
+**Status**: Complete
+**Requirements**: INIT-01, INIT-02, INIT-03
 **Success Criteria** (what must be TRUE):
-  1. Running `tsc --noEmit` across all packages produces zero errors in strict mode
-  2. `packages/types` exports the JobStatus enum (`PENDING`, `ACCEPTED`, `IN_PROGRESS`, `COMPLETED`), the Role enum (`CLIENT`, `PROVIDER`), all job DTO interfaces, and all API response wrapper types
-  3. `apps/web` and `apps/mobile` import types exclusively from `packages/types` — no locally defined duplicates exist anywhere in the codebase
-  4. The monorepo workspace is configured so that a single `npm install` at root resolves all inter-package dependencies
+  1. `npm run typecheck` passes from the root, validating both `apps/web` and `apps/mobile`
+  2. Both apps can import a shared `UserDto` from `packages/types`
 **Plans**: 3 plans
 
 Plans:
-**Wave 1**
-- [x] 01-01: Initialize monorepo with npm workspaces (root package.json, tsconfig.base.json, shared eslint config)
+- [x] 01-01: Initialize Turborepo with `apps/web` (Next.js) and `apps/mobile` (Expo); configure root `package.json` workspaces
+- [x] 01-02: Create `packages/types` with `tsconfig.json` and initial `UserDto` interface; link as dependency in both apps
+- [x] 01-03: Configure strict TypeScript settings across all packages; verify cross-package imports work
 
-**Wave 2** *(blocked on Wave 1 completion)*
-- [x] 01-02: Scaffold `packages/types` — define all enums, DTOs, and API response shapes; configure package build
-
-**Wave 3** *(blocked on Wave 2 completion)*
-- [x] 01-03: Scaffold `apps/web` (Next.js) and `apps/mobile` (Expo) with workspace references to `packages/types`; verify tsc clean
-
-### Phase 2: Backend Auth API
-**Goal**: Users can register and log in via the API; role is fixed at registration; authenticated requests carry verifiable credentials
+## Phase 2: Backend Auth API
+**Goal**: A secure Next.js API route that issues JWTs and manages user sessions in the database
 **Depends on**: Phase 1
-**Requirements**: AUTH-01, AUTH-02
+**Requirements**: AUTH-01, AUTH-02, AUTH-03
 **Success Criteria** (what must be TRUE):
-  1. A POST to `/auth/register` with email, password, and role (`CLIENT` or `PROVIDER`) creates a new user in the database and returns a signed JWT cookie
-  2. A POST to `/auth/login` with valid credentials returns a signed JWT cookie containing the user's ID and role
-  3. A POST to `/auth/login` with invalid credentials returns HTTP 401
-  4. Attempting to register with an already-used email returns HTTP 409
-  5. Protected routes reject requests with no or invalid JWT with HTTP 401
-**Plans:** 2 plans
+  1. `POST /api/auth/register` creates a user in the database and returns a JWT
+  2. `POST /api/auth/login` validates credentials and returns a JWT
+  3. `GET /api/auth/me` validates the JWT and returns the user profile
+**Plans**: 3 plans
 
 Plans:
-**Wave 1**
-- [ ] 02-01: Lock shared auth contracts and Drizzle user schema
-**Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 02-02: Implement auth routes, JWT cookie flow, logout revocation, and protected probe
+- [x] 02-01: Set up Neon serverless Postgres with Drizzle ORM; define `Users` schema (id, email, password_hash, role)
+- [x] 02-02: Implement `/api/auth/register` and `/api/auth/login` routes using `bcrypt` for password hashing and `jose` for JWT generation
+- [x] 02-03: Implement `/api/auth/me` route with JWT verification middleware; write automated tests for auth flow
 
-### Phase 3: Auth Client Integration
-**Goal**: Users on web and mobile can log in once and stay logged in across sessions; they can log out
+## Phase 3: Auth Client Integration
+**Goal**: Both Web and Mobile clients can log in, maintain session state, and protect private routes
 **Depends on**: Phase 2
-**Requirements**: AUTH-03, AUTH-04
+**Requirements**: AUTH-04, AUTH-05, AUTH-06
 **Success Criteria** (what must be TRUE):
-  1. After logging in on the web app, refreshing the browser does not require re-login — the session token is stored client-side and rehydrated
-  2. After logging in on the mobile app, closing and reopening the app does not require re-login
-  3. Tapping/clicking Log Out on either platform clears the stored token and redirects to the login screen
-  4. After logout, navigating to a protected route redirects to login rather than loading the protected page
+  1. Web client stores JWT in an `httpOnly` cookie and redirects unauthenticated users away from `/dashboard`
+  2. Mobile client stores JWT in Expo SecureStore and shows the Auth screen if no token is found
+  3. Both clients display the logged-in user's email on their respective home screens
 **Plans**: 5 plans
 
 Plans:
-**Wave 1** *(parallel — independent)*
-- [x] 03-01-PLAN.md — Extend backend auth routes: token in login/register response body; upgrade /me to dual-auth (cookie OR Authorization header)
-- [x] 03-03-PLAN.md — Mobile bootstrap: install expo-router + expo-secure-store + react-native-paper; update package.json main; create root _layout.tsx
+- [x] 03-01: Define shared auth API client functions in `packages/api-client` (login, register, getMe)
+- [x] 03-02: Web: Implement Next.js middleware for route protection; create login/register pages
+- [x] 03-03: Web: Implement React Context for global auth state; wire up login form to API
+- [x] 03-04: Mobile: Set up Expo Router with protected `(app)` group and public `(auth)` group
+- [x] 03-05: Mobile: Implement SecureStore token management and wire up mobile login screen
 
-**Wave 2** *(blocked on 03-01 completion)*
-- [x] 03-02-PLAN.md — Web foundation: install Tailwind CSS, create AuthContext, create middleware, update root layout
-
-**Wave 3** *(parallel — 03-04 blocked on 03-02; 03-05 blocked on 03-01 + 03-03)*
-- [x] 03-04-PLAN.md — Web pages: login, register, dashboard with logout
-- [x] 03-05-PLAN.md — Mobile auth: AuthContext (SecureStore), login/register screens, home screen, navigation guard in root layout
-
-### Phase 4: Backend Job Core — Posting & State Machine
-**Goal**: Jobs can be created via the API and the backend enforces all valid state transitions, rejecting invalid ones
-**Depends on**: Phase 2
+## Phase 4: Backend Job Core (Posting & State Machine)
+**Goal**: Clients can post jobs, and the database enforces valid state transitions (PENDING -> ACCEPTED -> IN_PROGRESS -> COMPLETED)
+**Depends on**: Phase 3
 **Requirements**: JOB-POST-01, JOB-POST-02, JOB-POST-03, LIFECYCLE-03
 **Success Criteria** (what must be TRUE):
-  1. A POST to `/jobs` with a valid category (from the fixed list), description, timeframe, and city/area creates a job with status `PENDING` and `version = 1` in the database
-  2. Attempting to post a job with an invalid category returns HTTP 400
-  3. The API returns the newly created job using the shared DTO type from `packages/types`
-  4. Attempting an invalid state transition (e.g., `PENDING → COMPLETED`) returns HTTP 409 with a clear error body
-  5. Valid transitions (`PENDING → ACCEPTED`, `ACCEPTED → IN_PROGRESS`, `IN_PROGRESS → COMPLETED`) are accepted when submitted in order
+  1. `POST /api/jobs` creates a job with status `PENDING` and `version: 1`
+  2. `PATCH /api/jobs/:id/status` successfully transitions a job from `PENDING` to `ACCEPTED`
+  3. `PATCH /api/jobs/:id/status` rejects a transition from `PENDING` directly to `COMPLETED` (HTTP 400)
 **Plans**: 2 plans
 
 Plans:
-**Wave 1**
-- [ ] 04-01: Extend Drizzle schema with Job model (category, description, timeframe, cityArea, status, version, clientId); create migration SQL; define fixed category list
+- [x] 04-01: Extend Drizzle schema with `Jobs` table (id, client_id, provider_id, category, description, status, version)
+- [ ] 04-02: Implement `/api/jobs` POST route; implement `/api/jobs/:id/status` PATCH route with state machine validation
 
-**Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 04-02: Implement `/jobs` POST endpoint (create job, enforce CLIENT role, validate category) and `/jobs/[id]` PATCH endpoint (enforce valid state transitions, return 409 for violations)
-
-### Phase 5: Backend Job Acceptance & Concurrency
-**Goal**: A provider accepting a job locks it atomically — concurrent acceptances resolve to exactly one winner, the other gets HTTP 409
+## Phase 5: Backend Job Acceptance & Concurrency
+**Goal**: Providers can accept jobs safely without race conditions (Optimistic Concurrency Control)
 **Depends on**: Phase 4
 **Requirements**: ACCEPT-01, ACCEPT-02, ACCEPT-03, ACCEPT-04, ACCEPT-05
 **Success Criteria** (what must be TRUE):
-  1. A provider sends POST `/jobs/:id/accept` with the current `version`; the backend atomically increments version, sets status to `ACCEPTED`, and assigns the job to that provider
-  2. A concurrent acceptance of the same job by a second provider (same version submitted) returns HTTP 409; the job remains locked to the first acceptor in the database
-  3. After acceptance, a GET `/jobs?cityArea=...` for the provider's area no longer includes the accepted job in the PENDING list
-  4. The HTTP 200 response from a successful acceptance contains the full updated job DTO with incremented version
+  1. If two providers try to accept the same `PENDING` job simultaneously, exactly one succeeds (HTTP 200) and one fails (HTTP 409 Conflict)
+  2. The successful acceptance increments the job's `version` column in the database
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Implement `/jobs/:id/accept` endpoint using Drizzle optimistic concurrency (version check in WHERE clause, atomic increment); return 409 on version mismatch; enforce PROVIDER role
-- [ ] 05-02: Implement `/jobs` GET endpoint with `cityArea` and `status=PENDING` filtering; write concurrent acceptance integration test (two simultaneous requests, verify exactly one 200 and one 409)
+- [ ] 05-01: Implement `/api/jobs/:id/accept` route; add `version` check to SQL update (`WHERE id = ? AND version = ?`)
+- [ ] 05-02: Write concurrency tests simulating simultaneous requests to verify exactly-once acceptance
 
 ### Phase 6: Real-Time Infrastructure
 **Goal**: Every job state transition is broadcast over WebSocket and the client dashboard reflects changes within milliseconds of the provider action
@@ -133,8 +85,11 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
-- [ ] 06-02: Wire state transition logic to broadcast events on every job status change; implement client-side subscription in Next.js dashboard (context or hook); verify PENDING→ACCEPTED, ACCEPTED→IN_PROGRESS, IN_PROGRESS→COMPLETED all arrive in real time
+**Wave 1**
+- [ ] 06-01-PLAN.md — Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 06-02-PLAN.md — Wire state transition logic to broadcast events on every job status change; implement client-side subscription in Next.js dashboard (context or hook); verify PENDING→ACCEPTED, ACCEPTED→IN_PROGRESS, IN_PROGRESS→COMPLETED all arrive in real time
 
 ### Phase 7: Web Client — Job Posting & Dashboard
 **Goal**: Authenticated clients can post jobs from the web app and see all their jobs with live status on a dashboard
@@ -142,80 +97,30 @@ Plans:
 **Requirements**: JOB-POST-04
 **Success Criteria** (what must be TRUE):
   1. A logged-in client fills out and submits the job posting form (category from dropdown, description, timeframe, city/area) and sees the new job appear on their dashboard with status `PENDING`
-  2. The client dashboard lists all their posted jobs with current status displayed
-  3. When a provider action changes a job's status (in another session/device), the dashboard updates to show the new status without the client refreshing the page
-  4. The web app uses types imported from `packages/types` for all API calls and response handling — no locally defined types
-**Plans**: 2 plans
 
-Plans:
-- [ ] 07-01: Build Next.js job posting page (form with category select, description textarea, timeframe input, city/area input; POST to API; redirect to dashboard on success)
-- [ ] 07-02: Build client dashboard page (fetch all client's jobs; subscribe to WebSocket updates; render live job list with status badges)
-**UI hint**: yes
-
-### Phase 8: Mobile Client — Onboarding & Discovery
-**Goal**: An authenticated provider can set their service area and browse PENDING jobs matching that area; they can read full job details before acting
+### Phase 8: Mobile Client — Job Discovery & Acceptance
+**Goal**: Providers can browse available jobs in their area and accept them with a single tap
 **Depends on**: Phase 5
 **Requirements**: DISC-01, DISC-02, DISC-03
 **Success Criteria** (what must be TRUE):
-  1. On first login, a provider is prompted to select or enter their service area (city/area) before seeing the job list
-  2. The provider's job list shows only PENDING jobs whose `cityArea` matches their selected area
-  3. Tapping a job opens a detail screen showing category, description, timeframe, and location area
-  4. If no PENDING jobs exist in the provider's area, the list shows an empty state rather than erroring
-**Plans**: 2 plans
+  1. The mobile app displays a feed of `PENDING` jobs filtered by the provider's selected city/area
+  2. Tapping "Accept" on a job calls the acceptance API and immediately removes the job from the available feed on success
+  3. If the acceptance API returns a 409 Conflict (job already taken), the app shows a clear error message and refreshes the feed
 
-Plans:
-- [ ] 08-01: Build Expo onboarding screen for service area selection (stored locally and sent to API on profile update); implement navigation guard routing new providers through onboarding
-- [ ] 08-02: Build job list screen (fetch filtered PENDING jobs by cityArea; pull-to-refresh) and job detail screen (full job info; Accept button placeholder)
-**UI hint**: yes
-
-### Phase 9: Mobile Client — Acceptance & Lifecycle
-**Goal**: A provider can accept a job from the mobile app and update its status through to COMPLETED; accepted jobs vanish from other providers' lists
+### Phase 9: Mobile Client — Active Job Execution
+**Goal**: Providers can manage the lifecycle of an accepted job (In Progress -> Completed)
 **Depends on**: Phase 8
 **Requirements**: LIFECYCLE-01, LIFECYCLE-02
 **Success Criteria** (what must be TRUE):
-  1. Tapping Accept on the job detail screen sends the acceptance request with the current `version`; on success the job moves to the provider's active jobs list
-  2. If acceptance fails due to a concurrent conflict (HTTP 409), the app shows an error message and refreshes the job list (the job is gone or already accepted)
-  3. A provider can change an accepted job's status to `IN_PROGRESS` from their active jobs screen
-  4. A provider can change an `IN_PROGRESS` job to `COMPLETED`
-  5. After a job is accepted, it no longer appears in the PENDING job list visible to other providers
-**Plans**: 2 plans
+  1. The mobile app has an "Active Jobs" tab showing jobs the provider has accepted
+  2. The provider can tap "Start Work" to transition the job to `IN_PROGRESS`
+  3. The provider can tap "Finish Work" to transition the job to `COMPLETED`
 
-Plans:
-- [ ] 09-01: Wire Accept button on job detail screen to POST `/jobs/:id/accept` with version; handle 200 (move to active list) and 409 (show conflict message, refresh list); build active jobs list screen
-- [ ] 09-02: Build status update controls on active job detail (IN_PROGRESS button, COMPLETED button); submit PATCH with new status; update local state on success
-
-### Phase 10: Job Closure & Ratings
-**Goal**: Clients can close completed jobs and submit ratings; providers have visible rating histories on their profiles
-**Depends on**: Phase 9
-**Requirements**: CLOSE-01, CLOSE-02, RATING-01, RATING-02, RATING-03
+### Phase 10: End-to-End Polish & Deployment
+**Goal**: The system is deployed to production environments and passes a full lifecycle test
+**Depends on**: Phase 7, Phase 9
+**Requirements**: (All remaining polish items)
 **Success Criteria** (what must be TRUE):
-  1. A client sees a Close button on any job with status `COMPLETED` and clicking it triggers the final state transition in the database
-  2. Closed jobs no longer appear in the active jobs list; they appear in a History section on the dashboard
-  3. After closing, the client is prompted to submit a rating (1–5 stars) and optional text review for the provider
-  4. Submitting a rating a second time for the same job is rejected (HTTP 409 or equivalent)
-  5. A provider's public profile page shows their average star rating and a list of text reviews from past clients
-**Plans**: 2 plans
-
-Plans:
-- [ ] 10-01: Add Rating model to Drizzle schema (jobId unique, providerId, score 1-5, text optional); implement `/jobs/:id/close` endpoint and `/ratings` POST endpoint with uniqueness enforcement
-- [ ] 10-02: Build web client — Close button on COMPLETED jobs, history section on dashboard, post-close rating form
-- [ ] 10-03: Build provider profile page (web and/or mobile) showing average rating and review list; fetch from `/providers/:id/profile` endpoint
-**UI hint**: yes
-
-## Progress
-
-**Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
-
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Monorepo Foundation & Shared Types | 3/3 | Complete | 2026-05-05 |
-| 2. Backend Auth API | 0/2 | Not started | - |
-| 3. Auth Client Integration | 5/5 | Complete | 2026-05-06 |
-| 4. Backend Job Core — Posting & State Machine | 0/2 | Not started | - |
-| 5. Backend Job Acceptance & Concurrency | 0/2 | Not started | - |
-| 6. Real-Time Infrastructure | 0/2 | Not started | - |
-| 7. Web Client — Job Posting & Dashboard | 0/2 | Not started | - |
-| 8. Mobile Client — Onboarding & Discovery | 0/2 | Not started | - |
-| 9. Mobile Client — Acceptance & Lifecycle | 0/2 | Not started | - |
-| 10. Job Closure & Ratings | 0/3 | Not started | - |
+  1. Web app is deployed to Vercel
+  2. Database is provisioned in Neon production environment
+  3. A user can register as a client on the web, post a job, register as a provider on mobile, accept the job, and complete it, with all real-time updates functioning in the production environment
