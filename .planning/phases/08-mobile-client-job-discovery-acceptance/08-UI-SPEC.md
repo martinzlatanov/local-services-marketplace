@@ -1,10 +1,11 @@
 ---
 phase: 8
 slug: mobile-client-job-discovery-acceptance
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-06
+reviewed_at: 2026-05-06
 ---
 
 # Phase 8 — UI Design Contract
