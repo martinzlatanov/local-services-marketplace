@@ -79,3 +79,11 @@ export interface AuthRegisterResponse {
 export interface AuthLoginResponse {
   user: AuthUserDto
 }
+
+// WebSocket event types for Phase 6 Real-Time Infrastructure
+export type WsEventType = 'JOB_UPDATED'
+
+export interface WsEvent {
+  type: WsEventType
+  payload: JobDto
+}

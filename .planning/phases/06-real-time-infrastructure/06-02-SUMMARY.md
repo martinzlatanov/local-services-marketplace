@@ -27,22 +27,22 @@ Wire state transition logic to broadcast events on every job status change; impl
 - Called `broadcastToUser` with client ID and updated job data after successful status update
 
 ### Task 3: Implement client-side WebSocket subscription
-- Updated `apps/web/components/dashboard/JobDashboard.tsx` to connect to WebSocket server
+- Updated `apps/web/app/dashboard/page.tsx` to connect to WebSocket server
 - Used `useEffect` hook to establish WebSocket connection on mount
 - Handled incoming `JOB_UPDATED` events by updating local state with new job data
-- Implemented reconnection logic to refetch current job state from API
+- Implemented reconnection logic to refetch current job state from API when reconnected
 - Ensured WebSocket connection is closed on component unmount
 
 ## Files Created/Modified
 - `apps/web/app/api/jobs/[id]/accept/route.ts` (modified)
 - `apps/web/app/api/jobs/[id]/status/route.ts` (created)
-- `apps/web/components/dashboard/JobDashboard.tsx` (modified)
+- `apps/web/app/dashboard/page.tsx` (modified)
 
 ## Verification Results
 - `npm run typecheck` passes
-- `grep -c "broadcastToUser" apps/web/app/api/jobs/\[id\]/accept/route.ts` returns > 0
-- `grep -c "broadcastToUser" apps/web/app/api/jobs/\[id\]/status/route.ts` returns > 0
-- `grep -c "new WebSocket" apps/web/components/dashboard/JobDashboard.tsx` returns > 0
+- `grep -c "broadcastToUser" apps/web/app/api/jobs/[id]/accept/route.ts` returns 2
+- `grep -c "broadcastToUser" apps/web/app/api/jobs/[id]/status/route.ts` returns 2
+- `grep -c "new WebSocket" apps/web/app/dashboard/page.tsx` returns 1
 
 ## Self-Check: PASSED
 All acceptance criteria met. All verification commands passed.

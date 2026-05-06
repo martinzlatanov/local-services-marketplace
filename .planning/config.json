@@ -21,7 +21,8 @@
     "text_mode": false,
     "research_before_questions": false,
     "skip_discuss": false,
-    "use_worktrees": true
+    "use_worktrees": true,
+    "security_enforcement": false
   },
   "intel": {
     "enabled": false
