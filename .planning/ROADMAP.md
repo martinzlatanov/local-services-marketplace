@@ -76,16 +76,16 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-**Wave 1**
+**Wave 1** *(parallel — independent)*
 - [ ] 03-01-PLAN.md — Extend backend auth routes: token in login/register response body; upgrade /me to dual-auth (cookie OR Authorization header)
-
-**Wave 2** *(parallel — both blocked on Wave 1 completion)*
-- [ ] 03-02-PLAN.md — Web foundation: install Tailwind CSS, create AuthContext, create middleware, update root layout
 - [ ] 03-03-PLAN.md — Mobile bootstrap: install expo-router + expo-secure-store + react-native-paper; update package.json main; create root _layout.tsx
 
-**Wave 3** *(parallel — 03-04 blocked on 03-02; 03-05 blocked on 03-03)*
+**Wave 2** *(blocked on 03-01 completion)*
+- [ ] 03-02-PLAN.md — Web foundation: install Tailwind CSS, create AuthContext, create middleware, update root layout
+
+**Wave 3** *(parallel — 03-04 blocked on 03-02; 03-05 blocked on 03-01 + 03-03)*
 - [ ] 03-04-PLAN.md — Web pages: login, register, dashboard with logout
-- [ ] 03-05-PLAN.md — Mobile auth: AuthContext (SecureStore), login/register screens, navigation guard in root layout
+- [ ] 03-05-PLAN.md — Mobile auth: AuthContext (SecureStore), login/register screens, home screen, navigation guard in root layout
 
 ### Phase 4: Backend Job Core — Posting & State Machine
 **Goal**: Jobs can be created via the API and the backend enforces all valid state transitions, rejecting invalid ones
