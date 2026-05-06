@@ -70,8 +70,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Implement `/api/jobs/:id/accept` route; add `version` check to SQL update (`WHERE id = ? AND version = ?`)
-- [ ] 05-02: Write concurrency tests simulating simultaneous requests to verify exactly-once acceptance
+- [x] 05-01: Implement `/api/jobs/:id/accept` route; add `version` check to SQL update (`WHERE id = ? AND version = ?`)
+- [x] 05-02: Implement tests simulating simultaneous requests to verify exactly-once acceptance
 
 ### Phase 6: Real-Time Infrastructure
 **Goal**: Every job state transition is broadcast over WebSocket and the client dashboard reflects changes within milliseconds of the provider action
