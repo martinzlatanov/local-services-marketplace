@@ -58,7 +58,7 @@ Plans:
 
 Plans:
 - [x] 04-01: Extend Drizzle schema with `Jobs` table (id, client_id, provider_id, category, description, status, version)
-- [ ] 04-02: Implement `/api/jobs` POST route; implement `/api/jobs/:id/status` PATCH route with state machine validation
+- [x] 04-02: Implement `/api/jobs` POST route; implement `/api/jobs/:id/status` PATCH route with state machine validation
 
 ## Phase 5: Backend Job Acceptance & Concurrency
 **Goal**: Providers can accept jobs safely without race conditions (Optimistic Concurrency Control)
@@ -86,10 +86,10 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 06-01-PLAN.md — Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
+- [x] 06-01-PLAN.md — Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 06-02-PLAN.md — Wire state transition logic to broadcast events on every job status change; implement client-side subscription in Next.js dashboard (context or hook); verify PENDING→ACCEPTED, ACCEPTED→IN_PROGRESS, IN_PROGRESS→COMPLETED all arrive in real time
+- [x] 06-02-PLAN.md — Wire state transition logic to broadcast events on every job status change; implement client-side subscription in Next.js dashboard (context or hook); verify PENDING→ACCEPTED, ACCEPTED→IN_PROGRESS, IN_PROGRESS→COMPLETED all arrive in real time
 
 ### Phase 7: Web Client — Job Posting & Dashboard
 **Goal**: Authenticated clients can post jobs from the web app and see all their jobs with live status on a dashboard
