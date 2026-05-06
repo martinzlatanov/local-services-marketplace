@@ -108,6 +108,12 @@ Plans:
   1. The mobile app displays a feed of `PENDING` jobs filtered by the provider's selected city/area
   2. Tapping "Accept" on a job calls the acceptance API and immediately removes the job from the available feed on success
   3. If the acceptance API returns a 409 Conflict (job already taken), the app shows a clear error message and refreshes the feed
+**Plans**: 3 plans
+
+Plans:
+- [x] 08-01-PLAN.md — Service area contract, SecureStore hook, onboarding gate, and tabs shell
+- [ ] 08-02-PLAN.md — Feed list with API client, pull-to-refresh, and WebSocket updates
+- [ ] 08-03-PLAN.md — Job detail accept flow and Settings area editing
 
 ### Phase 9: Mobile Client — Active Job Execution
 **Goal**: Providers can manage the lifecycle of an accepted job (In Progress -> Completed)
