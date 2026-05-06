@@ -20,6 +20,8 @@
     "react-dom": "19.2.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",

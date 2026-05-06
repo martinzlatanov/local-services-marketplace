@@ -1,4 +1,5 @@
 {
+  "$schema": "https://app.kilo.ai/config.json",
   "permission": {
     "read": {
       "/Users/mzlatanov/Desktop/VS Code Projects/local-services-marketplace/.kilo/get-shit-done/*": "allow"
