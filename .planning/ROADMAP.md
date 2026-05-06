@@ -97,11 +97,14 @@ Plans:
   3. The API returns the newly created job using the shared DTO type from `packages/types`
   4. Attempting an invalid state transition (e.g., `PENDING → COMPLETED`) returns HTTP 409 with a clear error body
   5. Valid transitions (`PENDING → ACCEPTED`, `ACCEPTED → IN_PROGRESS`, `IN_PROGRESS → COMPLETED`) are accepted when submitted in order
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 04-01: Extend Drizzle schema with Job model (category, description, timeframe, cityArea, status, version, clientId); run migration; seed category enum
-- [ ] 04-02: Implement `/jobs` POST endpoint (create job, enforce CLIENT role) and state transition endpoint (enforce valid transition sequence, return 409 for violations)
+**Wave 1**
+- [ ] 04-01: Extend Drizzle schema with Job model (category, description, timeframe, cityArea, status, version, clientId); create migration SQL; define fixed category list
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 04-02: Implement `/jobs` POST endpoint (create job, enforce CLIENT role, validate category) and `/jobs/[id]` PATCH endpoint (enforce valid state transitions, return 409 for violations)
 
 ### Phase 5: Backend Job Acceptance & Concurrency
 **Goal**: A provider accepting a job locks it atomically — concurrent acceptances resolve to exactly one winner, the other gets HTTP 409
@@ -112,7 +115,7 @@ Plans:
   2. A concurrent acceptance of the same job by a second provider (same version submitted) returns HTTP 409; the job remains locked to the first acceptor in the database
   3. After acceptance, a GET `/jobs?cityArea=...` for the provider's area no longer includes the accepted job in the PENDING list
   4. The HTTP 200 response from a successful acceptance contains the full updated job DTO with incremented version
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 05-01: Implement `/jobs/:id/accept` endpoint using Drizzle optimistic concurrency (version check in WHERE clause, atomic increment); return 409 on version mismatch; enforce PROVIDER role
@@ -127,7 +130,7 @@ Plans:
   2. When a provider's acceptance transitions a job to `ACCEPTED`, the client's browser dashboard reflects the new status without a page refresh and within seconds of the provider action
   3. When a provider updates a job to `IN_PROGRESS` or `COMPLETED`, those transitions are pushed to the client's open dashboard in real time
   4. Disconnecting and reconnecting a WebSocket client causes the client to refetch current job state (no stale data displayed)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 06-01: Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
@@ -142,7 +145,7 @@ Plans:
   2. The client dashboard lists all their posted jobs with current status displayed
   3. When a provider action changes a job's status (in another session/device), the dashboard updates to show the new status without the client refreshing the page
   4. The web app uses types imported from `packages/types` for all API calls and response handling — no locally defined types
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 07-01: Build Next.js job posting page (form with category select, description textarea, timeframe input, city/area input; POST to API; redirect to dashboard on success)
@@ -158,7 +161,7 @@ Plans:
   2. The provider's job list shows only PENDING jobs whose `cityArea` matches their selected area
   3. Tapping a job opens a detail screen showing category, description, timeframe, and location area
   4. If no PENDING jobs exist in the provider's area, the list shows an empty state rather than erroring
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 08-01: Build Expo onboarding screen for service area selection (stored locally and sent to API on profile update); implement navigation guard routing new providers through onboarding
@@ -175,7 +178,7 @@ Plans:
   3. A provider can change an accepted job's status to `IN_PROGRESS` from their active jobs screen
   4. A provider can change an `IN_PROGRESS` job to `COMPLETED`
   5. After a job is accepted, it no longer appears in the PENDING job list visible to other providers
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 09-01: Wire Accept button on job detail screen to POST `/jobs/:id/accept` with version; handle 200 (move to active list) and 409 (show conflict message, refresh list); build active jobs list screen
@@ -191,7 +194,7 @@ Plans:
   3. After closing, the client is prompted to submit a rating (1–5 stars) and optional text review for the provider
   4. Submitting a rating a second time for the same job is rejected (HTTP 409 or equivalent)
   5. A provider's public profile page shows their average star rating and a list of text reviews from past clients
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 10-01: Add Rating model to Drizzle schema (jobId unique, providerId, score 1-5, text optional); implement `/jobs/:id/close` endpoint and `/ratings` POST endpoint with uniqueness enforcement
