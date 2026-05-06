@@ -112,7 +112,7 @@ Plans:
 
 Plans:
 - [x] 08-01-PLAN.md — Service area contract, SecureStore hook, onboarding gate, and tabs shell
-- [ ] 08-02-PLAN.md — Feed list with API client, pull-to-refresh, and WebSocket updates
+- [x] 08-02-PLAN.md — Feed list with API client, pull-to-refresh, and WebSocket updates
 - [ ] 08-03-PLAN.md — Job detail accept flow and Settings area editing
 
 ### Phase 9: Mobile Client — Active Job Execution
