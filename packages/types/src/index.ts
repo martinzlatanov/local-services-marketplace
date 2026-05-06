@@ -14,6 +14,19 @@ export enum Role {
   PROVIDER = 'PROVIDER',
 }
 
+export const CITY_AREAS = [
+  'Downtown',
+  'Uptown',
+  'Midtown',
+  'Riverside',
+  'Old Town',
+  'Harbor',
+  'Hillcrest',
+  'Westside',
+  'Eastside',
+  'Midtown Heights',
+] as const
+
 export interface JobDto {
   id: string
   status: JobStatus
