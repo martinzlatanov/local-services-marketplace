@@ -71,7 +71,7 @@ Plans:
 
 Plans:
 - [x] 05-01: Implement `/api/jobs/:id/accept` route; add `version` check to SQL update (`WHERE id = ? AND version = ?`)
-- [x] 05-02: Implement tests simulating simultaneous requests to verify exactly-once acceptance
+- [x] 05-02: Write concurrency tests simulating simultaneous requests to verify exactly-once acceptance
 
 ### Phase 6: Real-Time Infrastructure
 **Goal**: Every job state transition is broadcast over WebSocket and the client dashboard reflects changes within milliseconds of the provider action
@@ -85,11 +85,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-**Wave 1**
-- [x] 06-01-PLAN.md — Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
-
-**Wave 2** *(blocked on Wave 1 completion)*
-- [x] 06-02-PLAN.md — Wire state transition logic to broadcast events on every job status change; implement client-side subscription in Next.js dashboard (context or hook); verify PENDING→ACCEPTED, ACCEPTED→IN_PROGRESS, IN_PROGRESS→COMPLETED all arrive in real time
+- [x] 06-01: Add WebSocket server to `apps/web` (ws or socket.io); implement connection auth (JWT on handshake); define WebSocket event types in `packages/types`
+- [x] 06-02: Wire state transition logic to broadcast events on every job status change; implement client-side subscription in Next.js dashboard (context or hook); verify PENDING→ACCEPTED, ACCEPTED→IN_PROGRESS, IN_PROGRESS→COMPLETED all arrive in real time
 
 ### Phase 7: Web Client — Job Posting & Dashboard
 **Goal**: Authenticated clients can post jobs from the web app and see all their jobs with live status on a dashboard
@@ -97,6 +94,11 @@ Plans:
 **Requirements**: JOB-POST-04
 **Success Criteria** (what must be TRUE):
   1. A logged-in client fills out and submits the job posting form (category from dropdown, description, timeframe, city/area) and sees the new job appear on their dashboard with status `PENDING`
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Implement the job posting form and integrate it into the client dashboard
+- [ ] 07-02-PLAN.md — Implement the dashboard layout and job card components to display the user's posted jobs with real-time status updates
 
 ### Phase 8: Mobile Client — Job Discovery & Acceptance
 **Goal**: Providers can browse available jobs in their area and accept them with a single tap
