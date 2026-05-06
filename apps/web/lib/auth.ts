@@ -1,12 +1,12 @@
-import bcrypt from 'bcrypt'
-import { sign, verify } from 'jsonwebtoken'
+import bcrypt from "bcrypt"
+import { sign, verify } from "jsonwebtoken"
 // Lazy-load database modules at runtime to avoid importing Drizzle at module
 // initialization time (Prevents Next dev server from failing when DB/env
 // are not configured). Imports below are performed inside functions.
-import { AuthRegisterRequest, AuthLoginRequest, AuthUserDto, Role } from '@local/types'
+import { AuthRegisterRequest, AuthLoginRequest, AuthUserDto, Role } from "@local/types"
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret'
-const JWT_EXPIRES_IN = '15m'
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret"
+const JWT_EXPIRES_IN = "15m"
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 10)
@@ -28,13 +28,40 @@ export function verifyJwt(token: string) {
   }
 }
 
+export async function getAuthenticatedUser(req: Request): Promise<AuthUserDto | null> {
+  let token: string | undefined
+  const authHeader = req.headers.get("Authorization")
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.substring(7)
+  }
+  if (!token) {
+    const cookieHeader = req.headers.get("cookie")
+    if (cookieHeader) {
+      const cookies = cookieHeader.split(";").map(c => c.trim())
+      const tokenCookie = cookies.find(c => c.startsWith("token="))
+      if (tokenCookie) {
+        token = tokenCookie.substring(6)
+      }
+    }
+  }
+  if (!token) return null
+  const payload = verifyJwt(token)
+  if (!payload || !payload.id) return null
+  const { db } = await import("./db/client")
+  const { users } = await import("./db/schema")
+  const { eq } = await import("drizzle-orm")
+  const rows = await db.select().from(users).where((eq as any)(users.id, parseInt(payload.id)))
+  if (!rows[0]) return null
+  return toAuthUserDto(rows[0])
+}
+
 export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUserDto> {
   const { email, password, role } = payload
   const passwordHash = await hashPassword(password)
   const userRole = role ?? Role.CLIENT
-  const { db } = await import('./db/client')
-  const { users } = await import('./db/schema')
-  const { eq } = await import('drizzle-orm')
+  const { db } = await import("./db/client")
+  const { users } = await import("./db/schema")
+  const { eq } = await import("drizzle-orm")
   await db.insert(users).values({ email, passwordHash, role: userRole })
   const created = await db.select().from(users).where((eq as any)(users.email, email))
   const userRow = created[0]
@@ -42,9 +69,9 @@ export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUse
 }
 
 export async function findUserByEmail(email: string) {
-  const { db } = await import('./db/client')
-  const { users } = await import('./db/schema')
-  const { eq } = await import('drizzle-orm')
+  const { db } = await import("./db/client")
+  const { users } = await import("./db/schema")
+  const { eq } = await import("drizzle-orm")
   const rows = await db.select().from(users).where((eq as any)(users.email, email))
   return rows[0] || null
 }
