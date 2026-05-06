@@ -97,8 +97,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Implement the job posting form and integrate it into the client dashboard
-- [ ] 07-02-PLAN.md — Implement the dashboard layout and job card components to display the user's posted jobs with real-time status updates
+- [x] 07-01-PLAN.md — Implement the job posting form and integrate it into the client dashboard
+- [x] 07-02-PLAN.md — Implement the dashboard layout and job card components to display the user's posted jobs with real-time status updates
 
 ### Phase 8: Mobile Client — Job Discovery & Acceptance
 **Goal**: Providers can browse available jobs in their area and accept them with a single tap
