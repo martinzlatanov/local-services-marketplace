@@ -6,7 +6,13 @@ import { broadcastToUser } from '@/lib/ws/server'
 import { AcceptJobRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@local/types'
 import { eq, and } from 'drizzle-orm'
 
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+interface RouteContext {
+  params: { id: string }
+}
+
+export async function POST(req: Request, context: { params: Promise<RouteContext['params']> }) {
+  const { id } = await context.params;
+  
   // 1. Authenticate user
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
@@ -20,7 +26,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ errors: { body: 'invalid_json' } }, { status: 400 })
 
-  const payload = body as AcceptJobRequest
+  const payload = body as AcceptJobRequest;
 
   // 4. Validate required fields
   if (payload.version === undefined || payload.version === null) {
@@ -28,7 +34,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   }
 
   // 5. Parse and validate job ID
-  const jobId = parseInt(params.id, 10)
+  const jobId = parseInt(id, 10)
   if (isNaN(jobId)) {
     return NextResponse.json({ errors: { id: 'invalid' } }, { status: 400 })
   }
@@ -48,8 +54,6 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   }
 
   // 8. Atomic update with optimistic locking:
-  //    - Match the current version from the request
-  //    - Increment version, set providerId, update status to ACCEPTED
   const [updatedJob] = await db.update(jobs)
     .set({
       status: JobStatus.ACCEPTED,
@@ -57,23 +61,21 @@ export async function POST(req: Request, { params }: { params: { id: string } })
       version: currentJob.version + 1,
       updatedAt: new Date(),
     })
-    .where(
-      and(
-        eq(jobs.id, jobId),
-        eq(jobs.version, payload.version) // Optimistic locking: match the version client sent
-      )
-    )
+    .where(and(
+      eq(jobs.id, jobId),
+      eq(jobs.version, currentJob.version)
+    ))
     .returning()
 
-  // 9. If no rows were updated, version conflict occurred (concurrent acceptance)
+  // 9. Handle concurrent acceptance
   if (!updatedJob) {
     return NextResponse.json(
-      { errors: { version: 'conflict_job_already_accepted' } },
+      { errors: { version: 'job_already_accepted' } },
       { status: 409 }
     )
   }
 
-  // 10. Broadcast JOB_UPDATED event to the client
+  // 10. Broadcast real-time update
   const jobDto: JobDto = {
     id: String(updatedJob.id),
     status: updatedJob.status as JobStatus,
@@ -82,14 +84,17 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     description: updatedJob.description,
     timeframe: updatedJob.timeframe,
     cityArea: updatedJob.cityArea,
-    clientId: updatedJob.clientId,
-    providerId: updatedJob.providerId,
+    clientId: String(updatedJob.clientId),
+    providerId: String(updatedJob.providerId),
     createdAt: updatedJob.createdAt.toISOString(),
     updatedAt: updatedJob.updatedAt.toISOString(),
   }
+  
+  broadcastToUser(String(currentJob.clientId), {
+    type: 'JOB_UPDATED',
+    payload: jobDto,
+  })
 
-  // Broadcast to the client who posted the job
-  broadcastToUser(updatedJob.clientId, { type: 'JOB_UPDATED', payload: jobDto })
-
-  return NextResponse.json({ data: jobDto } as ApiSuccessResponse<JobDto>)
+  // 11. Return updated job
+  return NextResponse.json({ data: updatedJob as unknown as JobDto } as ApiSuccessResponse<JobDto>)
 }

@@ -6,7 +6,9 @@ import { broadcastToUser } from '@/lib/ws/server'
 import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@local/types'
 import { eq } from 'drizzle-orm'
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+  
   // 1. Authenticate user
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
@@ -27,8 +29,8 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     return NextResponse.json({ errors: { status: 'required' } }, { status: 400 })
   }
 
-  // 5. Parse and validate job ID
-  const jobId = parseInt(params.id, 10)
+  // 5. Parse and validat
+  const jobId = parseInt(id, 10)
   if (isNaN(jobId)) {
     return NextResponse.json({ errors: { id: 'invalid' } }, { status: 400 })
   }
@@ -84,7 +86,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     timeframe: updatedJob.timeframe,
     cityArea: updatedJob.cityArea,
     clientId: updatedJob.clientId,
-    providerId: updatedJob.providerId,
+    providerId: String(updatedJob.providerId),
     createdAt: updatedJob.createdAt.toISOString(),
     updatedAt: updatedJob.updatedAt.toISOString(),
   }
