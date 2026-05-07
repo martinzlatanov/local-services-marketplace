@@ -14,6 +14,15 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="active-jobs"
+        options={{
+          title: 'Active Jobs',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="briefcase-clock" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
