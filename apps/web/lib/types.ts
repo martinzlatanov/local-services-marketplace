@@ -26,6 +26,19 @@ export const CITY_AREAS = [
   'Midtown Heights',
 ] as const
 
+export const JOB_CATEGORIES = [
+  'PLUMBING',
+  'ELECTRICAL',
+  'CLEANING',
+  'GARDENING',
+  'MOVING',
+  'HANDYMAN',
+  'PAINTING',
+  'OTHER',
+] as const
+
+export type JobCategory = (typeof JOB_CATEGORIES)[number]
+
 export interface JobDto {
   id: string
   status: JobStatus

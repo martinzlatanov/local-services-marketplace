@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
 import { JobDto, JobStatus } from '@/lib/types'
+import JobPostingForm from '@/components/dashboard/JobPostingForm'
+import JobDashboard from '@/components/dashboard/JobDashboard'
 
 export default function DashboardPage() {
   const { user, isLoading, logout } = useAuth()
@@ -98,6 +100,10 @@ export default function DashboardPage() {
     )
   }
 
+  const handleJobPosted = (newJob: JobDto) => {
+    setJobs(prev => [newJob, ...prev])
+  }
+
   return (
     <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-2xl mx-auto flex flex-col gap-6">
@@ -114,33 +120,13 @@ export default function DashboardPage() {
         </div>
         {user && <p className="text-base font-normal leading-relaxed text-gray-700">Signed in as {user.email}</p>}
         
+        <JobPostingForm onSuccess={handleJobPosted} />
+
         <div className="mt-6">
           <h2 className="text-xl font-semibold mb-4">Your Jobs</h2>
-          {jobs.length === 0 ? (
-            <p className="text-gray-500">No jobs found.</p>
-          ) : (
-            <div className="space-y-4">
-              {jobs.map(job => (
-                <div key={job.id} className="border rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-medium">{job.category}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{job.description}</p>
-                      <p className="text-xs text-gray-500 mt-2">{job.cityArea} • {job.timeframe}</p>
-                    </div>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      job.status === JobStatus.PENDING ? 'bg-yellow-100 text-yellow-800' :
-                      job.status === JobStatus.ACCEPTED ? 'bg-blue-100 text-blue-800' :
-                      job.status === JobStatus.IN_PROGRESS ? 'bg-purple-100 text-purple-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
-                      {job.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <JobDashboard jobs={jobs} onJobUpdate={(updatedJob) => {
+            setJobs(prev => prev.map(j => j.id === updatedJob.id ? updatedJob : j))
+          }} />
         </div>
       </div>
     </div>
