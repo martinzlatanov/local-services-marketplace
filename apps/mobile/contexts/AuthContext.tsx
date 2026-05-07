@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import * as SecureStore from 'expo-secure-store'
-import type { AuthUserDto } from '@local/types'
+import type { AuthUserDto } from '../../packages/types/src'
 
 export const TOKEN_KEY = 'auth_token'
 export const SERVICE_AREA_KEY = 'service_area'
-export const API_BASE = 'https://your-app.vercel.app' // Change to localhost:3000 for dev
+export const API_BASE = 'https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app' // Change to localhost:3000 for dev
 
 interface AuthContextValue {
   user: AuthUserDto | null
