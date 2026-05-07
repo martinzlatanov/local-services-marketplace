@@ -135,7 +135,15 @@ Plans:
 ### Phase 10: End-to-End Polish & Deployment
 **Goal**: The system is deployed to production environments and passes a full lifecycle test
 **Depends on**: Phase 7, Phase 9
-**Requirements**: (All remaining polish items)
+**Requirements**: DEPLOY-01, DEPLOY-02, DEPLOY-03
+**Status**: Planning (3 plans created)
+**Plans**: 3 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — Vercel deployment config + production environment variables
+- [ ] 10-02-PLAN.md — Neon production database + Drizzle migrations setup
+- [ ] 10-03-PLAN.md — E2E test checklist + mobile production configuration
+
 **Success Criteria** (what must be TRUE):
   1. Web app is deployed to Vercel
   2. Database is provisioned in Neon production environment
