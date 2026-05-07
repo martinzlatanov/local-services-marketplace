@@ -34,3 +34,22 @@ export async function acceptJob(token: string, id: string, version: number): Pro
   })
   return parseResponse<JobDto>(res)
 }
+
+export async function getMyJobs(token: string): Promise<JobDto[]> {
+  const res = await fetch(`${API_BASE}/api/jobs/mine`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return parseResponse<JobDto[]>(res)
+}
+
+export async function updateJobStatus(token: string, id: string, status: string): Promise<JobDto> {
+  const res = await fetch(`${API_BASE}/api/jobs/${id}/status`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ status }),
+  })
+  return parseResponse<JobDto>(res)
+}
