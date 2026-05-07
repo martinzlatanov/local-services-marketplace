@@ -3,9 +3,9 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Appbar, ActivityIndicator, Button, Snackbar, Text, useTheme } from 'react-native-paper'
 import * as SecureStore from 'expo-secure-store'
-import { JobDto } from '@local/types'
+import { JobDto, JobStatus } from '@local/types'
 import { TOKEN_KEY } from '../../../contexts/AuthContext'
-import { acceptJob, getJob } from '../../../lib/api'
+import { acceptJob, getJob, updateJobStatus } from '../../../lib/api'
 
 export default function JobDetailScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>()
@@ -80,6 +80,40 @@ export default function JobDetailScreen() {
     }
   }
 
+  async function handleStartWork() {
+    if (!token || !job || isSubmitting) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      await updateJobStatus(token, job.id, JobStatus.IN_PROGRESS)
+      router.back()
+    } catch (err: any) {
+      setSnackbar("Couldn't start work. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  async function handleFinishWork() {
+    if (!token || !job || isSubmitting) {
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      await updateJobStatus(token, job.id, JobStatus.COMPLETED)
+      router.back()
+    } catch (err: any) {
+      setSnackbar("Couldn't finish work. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Appbar.Header>
@@ -122,16 +156,44 @@ export default function JobDetailScreen() {
             {job.cityArea}
           </Text>
 
-          <Button
-            mode="contained"
-            onPress={handleAccept}
-            loading={isSubmitting}
-            disabled={isSubmitting}
-            style={styles.acceptButton}
-            contentStyle={styles.acceptButtonContent}
-          >
-            {isSubmitting ? 'Accepting...' : 'Accept job'}
-          </Button>
+          {job.status === JobStatus.PENDING && (
+            <Button
+              mode="contained"
+              onPress={handleAccept}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              style={styles.actionButton}
+              contentStyle={styles.actionButtonContent}
+            >
+              {isSubmitting ? 'Accepting...' : 'Accept job'}
+            </Button>
+          )}
+
+          {job.status === JobStatus.ACCEPTED && (
+            <Button
+              mode="contained"
+              onPress={handleStartWork}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              style={styles.actionButton}
+              contentStyle={styles.actionButtonContent}
+            >
+              {isSubmitting ? 'Starting...' : 'Start Work'}
+            </Button>
+          )}
+
+          {job.status === JobStatus.IN_PROGRESS && (
+            <Button
+              mode="contained"
+              onPress={handleFinishWork}
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              style={styles.actionButton}
+              contentStyle={styles.actionButtonContent}
+            >
+              {isSubmitting ? 'Finishing...' : 'Finish Work'}
+            </Button>
+          )}
         </ScrollView>
       ) : null}
 
@@ -163,10 +225,10 @@ const styles = StyleSheet.create({
   value: {
     marginTop: 8,
   },
-  acceptButton: {
+  actionButton: {
     marginTop: 32,
   },
-  acceptButtonContent: {
+  actionButtonContent: {
     minHeight: 44,
   },
 })
