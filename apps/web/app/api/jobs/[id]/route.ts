@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { jobs } from '@/lib/db/schema'
 import { getAuthenticatedUser } from '@/lib/auth'
-import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@local/types'
+import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@/lib/types'
 import { eq } from 'drizzle-orm'
 
 // Valid state transitions

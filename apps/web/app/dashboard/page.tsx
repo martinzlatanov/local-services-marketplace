@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
-import { JobDto, JobStatus } from '@local/types'
+import { JobDto, JobStatus } from '@/lib/types'
 
 export default function DashboardPage() {
   const { user, isLoading, logout } = useAuth()

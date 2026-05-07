@@ -3,7 +3,7 @@ import { db } from '@/lib/db/client'
 import { jobs } from '@/lib/db/schema'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { broadcastToUser } from '@/lib/ws/server'
-import { AcceptJobRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@local/types'
+import { AcceptJobRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@/lib/types'
 import { eq, and } from 'drizzle-orm'
 
 interface RouteContext {

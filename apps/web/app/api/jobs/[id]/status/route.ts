@@ -3,7 +3,7 @@ import { db } from '@/lib/db/client'
 import { jobs } from '@/lib/db/schema'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { broadcastToUser } from '@/lib/ws/server'
-import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@local/types'
+import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@/lib/types'
 import { eq } from 'drizzle-orm'
 
 export async function PATCH(req: Request, context: { params: Promise<{ id: string }> }) {

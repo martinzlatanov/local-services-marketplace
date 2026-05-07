@@ -3,7 +3,7 @@ import { sign, verify } from "jsonwebtoken"
 // Lazy-load database modules at runtime to avoid importing Drizzle at module
 // initialization time (Prevents Next dev server from failing when DB/env
 // are not configured). Imports below are performed inside functions.
-import { AuthRegisterRequest, AuthLoginRequest, AuthUserDto, Role } from "@local/types"
+import { AuthRegisterRequest, AuthLoginRequest, AuthUserDto, Role } from "@/lib/types"
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret"
 const JWT_EXPIRES_IN = "15m"

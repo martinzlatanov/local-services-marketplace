@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createUser, signJwt } from '../../../../lib/auth'
-import { ApiErrorResponse, AuthRegisterRequest, AuthRegisterResponse } from '@local/types'
+import { ApiErrorResponse, AuthRegisterRequest, AuthRegisterResponse } from '@/lib/types'
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null)

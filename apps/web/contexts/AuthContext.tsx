@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
-import type { AuthUserDto, ApiErrorResponse, AuthLoginResponse } from '@local/types'
+import type { AuthUserDto, ApiErrorResponse, AuthLoginResponse } from '@/lib/types'
 
 interface AuthContextValue {
   user: AuthUserDto | null

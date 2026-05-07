@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { jobs } from '@/lib/db/schema'
 import { getAuthenticatedUser } from '@/lib/auth'
-import { JobDto, ApiSuccessResponse, JobStatus } from '@local/types'
+import { JobDto, ApiSuccessResponse, JobStatus } from '@/lib/types'
 import { eq, and, inArray } from 'drizzle-orm'
 
 export async function GET(req: Request) {

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
-import { Role, type ApiErrorResponse } from '@local/types'
+import { Role, type ApiErrorResponse } from '@/lib/types'
 
 const TOP_LEVEL_ERROR = 'Something went wrong. Please check your details and try again.'
 const NETWORK_ERROR = 'Unable to connect. Check your connection and try again.'

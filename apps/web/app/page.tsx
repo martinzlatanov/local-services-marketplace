@@ -1,4 +1,4 @@
-import { JobStatus } from '@local/types'
+import { JobStatus } from '@/lib/types'
 
 export default function HomePage() {
   const initialStatus: JobStatus = JobStatus.PENDING

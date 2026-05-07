@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import { verifyJwt } from '../auth'
 import { IncomingMessage } from 'http'
-import { JobDto } from '@local/types'
+import { JobDto } from '@/lib/types'
 
 interface AuthenticatedWebSocket extends WebSocket {
   userId?: string

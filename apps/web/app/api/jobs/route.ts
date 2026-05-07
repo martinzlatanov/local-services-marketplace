@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { jobs } from '@/lib/db/schema'
 import { getAuthenticatedUser, verifyJwt } from '@/lib/auth'
-import { CreateJobRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@local/types'
+import { CreateJobRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@/lib/types'
 import { JOB_CATEGORIES } from '@/lib/db/categories'
 import { eq, and } from 'drizzle-orm'
 

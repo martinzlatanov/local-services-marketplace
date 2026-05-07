@@ -9,7 +9,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@local/types": "*",
     "@types/ws": "^8.18.1",
     "bcrypt": "^6.0.0",
     "drizzle-kit": "^0.31.10",

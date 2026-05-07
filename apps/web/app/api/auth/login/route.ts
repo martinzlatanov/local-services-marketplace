@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { findUserByEmail, verifyPassword, signJwt } from '../../../../lib/auth'
-import { AuthLoginRequest } from '@local/types'
+import { AuthLoginRequest } from '@/lib/types'
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null)
