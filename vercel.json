@@ -1,4 +1,7 @@
 {
   "version": 2,
-  "name": "local-services-marketplace"
+  "name": "local-services-marketplace",
+  "buildCommand": "cd .. && npm install && cd apps/web && npm run build",
+  "outputDirectory": "apps/web/.next",
+  "installCommand": "npm install --workspace=packages/types && npm install --workspace=apps/web"
 }
