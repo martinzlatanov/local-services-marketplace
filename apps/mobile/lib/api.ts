@@ -1,5 +1,5 @@
 import { API_BASE } from '../contexts/AuthContext'
-import type { ApiErrorResponse, ApiSuccessResponse, JobDto } from '../../packages/types/src'
+import type { ApiErrorResponse, ApiSuccessResponse, JobDto } from '@local/types'
 
 async function parseResponse<T>(res: Response): Promise<T> {
   const data = (await res.json().catch(() => null)) as ApiSuccessResponse<T> | ApiErrorResponse | null

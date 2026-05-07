@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import * as SecureStore from 'expo-secure-store'
-import type { AuthUserDto } from '../../packages/types/src'
+import type { AuthUserDto } from '@local/types'
 
 export const TOKEN_KEY = 'auth_token'
 export const SERVICE_AREA_KEY = 'service_area'

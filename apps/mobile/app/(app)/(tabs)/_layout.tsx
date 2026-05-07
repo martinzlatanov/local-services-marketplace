@@ -8,7 +8,7 @@ export default function TabsLayout() {
         name="feed"
         options={{
           title: 'Feed',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <MaterialCommunityIcons name="format-list-bulleted" color={color} size={size} />
           ),
         }}
@@ -17,7 +17,7 @@ export default function TabsLayout() {
         name="active-jobs"
         options={{
           title: 'Active Jobs',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <MaterialCommunityIcons name="briefcase-clock" color={color} size={size} />
           ),
         }}
@@ -26,7 +26,7 @@ export default function TabsLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color, size }: { color: string; size: number }) => (
             <MaterialCommunityIcons name="cog" color={color} size={size} />
           ),
         }}
