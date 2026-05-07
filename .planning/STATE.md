@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-05-07T05:19:41.872Z"
-last_activity: 2026-05-06
+status: executing
+last_updated: "2026-05-07T05:52:00.000Z"
+last_activity: 2026-05-07
 progress:
   total_phases: 10
-  completed_phases: 7
-  total_plans: 24
-  completed_plans: 21
-  percent: 88
+  completed_phases: 8
+  total_plans: 27
+  completed_plans: 24
+  percent: 89
 ---
 
 # Project State
@@ -21,16 +21,16 @@ See: .planning/PROJECT.md (updated 2026-05-04)
 
 **Core value:** A provider accepting a job must lock it atomically — no double-booking, no stale state, no race conditions. Everything else flows from that guarantee.
 
-- **Current focus:** Phase 08 — mobile-client-job-discovery-acceptance
+- **Current focus:** Phase 09 — mobile-client-active-job-execution
 
 ## Current Position
 
-Phase: 08 (mobile-client-job-discovery-acceptance) — EXECUTING
+Phase: 09 (mobile-client-active-job-execution) — EXECUTING
 Plan: 3 of 3
 Status: Phase complete — ready for verification
-Last activity: 2026-05-06
+Last activity: 2026-05-07
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 89%
 
 ## Completed Phases
 
@@ -44,13 +44,23 @@ Plans: 2 plans
 Status: Both plans executed and verified successfully
 Dependencies met: Phase 6 complete
 
+Phase: 8 (Mobile Client — Job Discovery & Acceptance) — COMPLETE
+Plans: 3 plans
+Status: All plans executed and verified successfully
+Dependencies met: Phase 5 complete
+
+Phase: 9 (Mobile Client — Active Job Execution) — COMPLETE
+Plans: 3 plans
+Status: All plans executed successfully
+Dependencies met: Phase 8 complete
+
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 16
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 24
+- Average duration: 5 min per plan
+- Total execution time: 15 min
 
 **By Phase:**
 
@@ -58,9 +68,11 @@ Dependencies met: Phase 6 complete
 |-------|-------|--------|
 | 06 | 2 | Complete |
 | 07 | 2 | Complete |
-| Phase 08 P01 | 0 min | 2 tasks | 7 files |
-| Phase 08 P02 | 0 min | 2 tasks | 4 files |
-| Phase 08 P03 | 0 min | 2 tasks | 3 files |
+| 08 | 3 | Complete |
+| 09 | 3 | Complete |
+| Phase 09 P01 | 5 min | 2 tasks | 2 files |
+| Phase 09 P02 | 5 min | 2 tasks | 2 files |
+| Phase 09 P03 | 5 min | 2 tasks | 1 file |
 
 ## Accumulated Context
 
@@ -76,6 +88,8 @@ Recent decisions affecting current work:
 - Phase 5: Optimistic locking via version field prevents double-booking
 - Phase 6: WebSocket server with JWT auth for real-time updates
 - Phase 7: Web client job posting form with dashboard integration
+- Phase 9: Provider-scoped active jobs endpoint (GET /api/jobs/mine)
+- Phase 9: Status-conditional CTAs for job lifecycle management
 
 ### Pending Todos
 
