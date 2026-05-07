@@ -119,13 +119,13 @@ Plans:
 **Goal**: Providers can manage the lifecycle of an accepted job (In Progress -> Completed)
 **Depends on**: Phase 8
 **Requirements**: LIFECYCLE-01, LIFECYCLE-02
-**Status**: Planning (3 plans created)
+**Status**: Complete
 **Plans**: 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Backend GET /api/jobs/mine endpoint + mobile API helpers (getMyJobs, updateJobStatus)
-- [ ] 09-02-PLAN.md — Active Jobs tab (Feed | Active Jobs | Settings) with tab-focus refresh and pull-to-refresh
-- [ ] 09-03-PLAN.md — Detail screen with conditional CTAs (Accept / Start Work / Finish Work) based on job status
+- [x] 09-01-PLAN.md — Backend GET /api/jobs/mine endpoint + mobile API helpers (getMyJobs, updateJobStatus)
+- [x] 09-02-PLAN.md — Active Jobs tab (Feed | Active Jobs | Settings) with tab-focus refresh and pull-to-refresh
+- [x] 09-03-PLAN.md — Detail screen with conditional CTAs (Accept / Start Work / Finish Work) based on job status
 
 **Success Criteria** (what must be TRUE):
   1. The mobile app has an "Active Jobs" tab showing jobs the provider has accepted
