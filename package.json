@@ -8,7 +8,8 @@
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "dev:web": "npm run dev --workspace=apps/web",
-    "dev:mobile": "npm run start --workspace=apps/mobile"
+    "dev:mobile": "npm run start --workspace=apps/mobile",
+    "vercel-build": "cd apps/web && npm install && npm run build"
   },
   "devDependencies": {
     "@gsd-build/sdk": "^0.1.0",
