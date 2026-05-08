@@ -1,32 +1,17 @@
 import { NextResponse } from 'next/server'
+import { createUser } from '@/lib/auth'
 
 export async function GET() {
   try {
+    const user = await createUser({ email: 'debug-test@test.com', password: 'test1234', role: 'CLIENT' as any })
+
+    // clean up
     const { neon } = await import('@neondatabase/serverless')
     const sql = neon(process.env.DATABASE_URL!)
+    await sql`DELETE FROM users WHERE email = 'debug-test@test.com'`
 
-    // Check tables
-    const tables = await sql`SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`
-
-    // Check users table columns
-    const columns = await sql`SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'users' ORDER BY ordinal_position`
-
-    // Try inserting a test user
-    const bcrypt = await import('bcrypt')
-    const hash = await bcrypt.hash('debugtest123', 10)
-    let insertResult = null
-    let insertError = null
-    try {
-      const rows = await sql`INSERT INTO users (email, password_hash, role) VALUES ('debug-test@test.com', ${hash}, 'CLIENT') RETURNING id, email, role`
-      insertResult = rows[0]
-      // Clean up
-      await sql`DELETE FROM users WHERE email = 'debug-test@test.com'`
-    } catch (e: any) {
-      insertError = { message: e?.message, code: e?.code }
-    }
-
-    return NextResponse.json({ tables, columns, insertResult, insertError })
+    return NextResponse.json({ ok: true, user })
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message, code: e?.code }, { status: 500 })
+    return NextResponse.json({ ok: false, error: e?.message, code: e?.code, stack: e?.stack?.split('\n').slice(0, 5) }, { status: 500 })
   }
 }
