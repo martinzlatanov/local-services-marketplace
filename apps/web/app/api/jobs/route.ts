@@ -12,18 +12,13 @@ export async function GET(req: Request) {
 
   const url = new URL(req.url)
   const cityArea = url.searchParams.get('cityArea')
+  const category = url.searchParams.get('category')
 
-  let jobList: typeof jobs.$inferSelect[]
-  if (cityArea) {
-    jobList = await db.select().from(jobs).where(
-      and(
-        eq(jobs.status, JobStatus.PENDING),
-        eq(jobs.cityArea, cityArea)
-      )
-    )
-  } else {
-    jobList = await db.select().from(jobs).where(eq(jobs.status, JobStatus.PENDING))
-  }
+  const filters = [eq(jobs.status, JobStatus.PENDING)]
+  if (cityArea) filters.push(eq(jobs.cityArea, cityArea))
+  if (category) filters.push(eq(jobs.category, category as any))
+
+  const jobList = await db.select().from(jobs).where(and(...filters))
 
   const jobDtos: JobDto[] = jobList.map(job => ({
     id: String(job.id),

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { JobDto, JobStatus, CITY_AREAS } from '@/lib/types'
+import { JOB_CATEGORIES } from '@/lib/db/categories'
 import ProviderJobFeed from './ProviderJobFeed'
 import ActiveJobCard from './ActiveJobCard'
 import Toast from '../ui/Toast'
@@ -16,12 +17,16 @@ interface ToastState {
 export default function ProviderDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('feed')
   const [selectedArea, setSelectedArea] = useState<string>('All')
+  const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [pendingJobs, setPendingJobs] = useState<JobDto[]>([])
   const [activeJobs, setActiveJobs] = useState<JobDto[]>([])
   const [toast, setToast] = useState<ToastState | null>(null)
 
   const fetchPendingJobs = useCallback(async () => {
-    const url = selectedArea === 'All' ? '/api/jobs' : `/api/jobs?cityArea=${encodeURIComponent(selectedArea)}`
+    const params = new URLSearchParams()
+    if (selectedArea !== 'All') params.append('cityArea', selectedArea)
+    if (selectedCategory !== 'All') params.append('category', selectedCategory)
+    const url = `/api/jobs${params.toString() ? '?' + params.toString() : ''}`
     try {
       const res = await fetch(url, { credentials: 'include' })
       if (res.ok) {
@@ -29,7 +34,7 @@ export default function ProviderDashboard() {
         setPendingJobs(data.data ?? [])
       }
     } catch {}
-  }, [selectedArea])
+  }, [selectedArea, selectedCategory])
 
   const fetchActiveJobs = useCallback(async () => {
     try {
@@ -124,21 +129,47 @@ export default function ProviderDashboard() {
       {/* Find Jobs tab */}
       {activeTab === 'feed' && (
         <div>
-          {/* City area filter */}
-          <div className="flex gap-2 flex-wrap mb-6">
-            {['All', ...CITY_AREAS].map((area) => (
-              <button
-                key={area}
-                onClick={() => setSelectedArea(area)}
-                className={`px-3 py-1.5 text-sm rounded-[var(--radius-badge)] font-medium transition-colors ${
-                  selectedArea === area
-                    ? 'bg-brand-600 text-white'
-                    : 'bg-surface-100 text-surface-700 hover:bg-surface-200'
-                }`}
-              >
-                {area}
-              </button>
-            ))}
+          {/* Filters */}
+          <div className="space-y-4 mb-6">
+            {/* City area filter */}
+            <div>
+              <h3 className="text-xs font-semibold text-surface-700 mb-2 uppercase tracking-wide">Location</h3>
+              <div className="flex gap-2 flex-wrap">
+                {['All', ...CITY_AREAS].map((area) => (
+                  <button
+                    key={area}
+                    onClick={() => setSelectedArea(area)}
+                    className={`px-3 py-1.5 text-sm rounded-[var(--radius-badge)] font-medium transition-colors ${
+                      selectedArea === area
+                        ? 'bg-brand-600 text-white'
+                        : 'bg-surface-100 text-surface-700 hover:bg-surface-200'
+                    }`}
+                  >
+                    {area}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Category filter */}
+            <div>
+              <h3 className="text-xs font-semibold text-surface-700 mb-2 uppercase tracking-wide">Category</h3>
+              <div className="flex gap-2 flex-wrap">
+                {['All', ...JOB_CATEGORIES].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`px-3 py-1.5 text-sm rounded-[var(--radius-badge)] font-medium transition-colors ${
+                      selectedCategory === cat
+                        ? 'bg-brand-600 text-white'
+                        : 'bg-surface-100 text-surface-700 hover:bg-surface-200'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           <ProviderJobFeed jobs={pendingJobs} onAccept={handleAccept} />
