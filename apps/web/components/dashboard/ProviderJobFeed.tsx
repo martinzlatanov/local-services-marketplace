@@ -12,11 +12,15 @@ interface ProviderJobFeedProps {
 
 export default function ProviderJobFeed({ jobs, onAccept }: ProviderJobFeedProps) {
   const [acceptingId, setAcceptingId] = useState<string | null>(null)
+  const [error, setError] = useState<string>('')
 
   const handleAccept = async (job: JobDto) => {
     setAcceptingId(job.id)
+    setError('')
     try {
       await onAccept(job.id, job.version)
+    } catch (err: any) {
+      setError(err?.errors?.version || 'Failed to accept job. Please try again.')
     } finally {
       setAcceptingId(null)
     }
@@ -33,6 +37,11 @@ export default function ProviderJobFeed({ jobs, onAccept }: ProviderJobFeedProps
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 p-3 rounded-[var(--radius-btn)] text-sm">
+          {error}
+        </div>
+      )}
       {jobs.map((job) => (
         <div key={job.id}>
           <JobCard job={job} />
