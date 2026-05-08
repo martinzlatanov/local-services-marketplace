@@ -14,6 +14,6 @@ export async function POST(req: Request) {
   const token = signJwt({ sub: String(user.id), email: user.email })
   // Set httpOnly cookie via NextResponse
   const res = NextResponse.json({ user: { id: String(user.id), email: user.email, role: user.role, createdAt: user.createdAt }, token })
-  res.cookies.set('token', token, { httpOnly: true, sameSite: 'lax' })
+  res.cookies.set('token', token, { httpOnly: true, sameSite: 'none', secure: false })
   return res
 }

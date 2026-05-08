@@ -20,8 +20,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 5000)
 
-    fetch('/api/auth/me', { credentials: 'include' })
+    fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) return null
         return (await res.json()) as { user?: AuthUserDto }
@@ -35,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null)
       })
       .finally(() => {
+        clearTimeout(timeout)
         if (!active) return
         setIsLoading(false)
       })
