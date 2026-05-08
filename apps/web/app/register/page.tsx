@@ -10,7 +10,7 @@ const TOP_LEVEL_ERROR = 'Something went wrong. Please check your details and try
 const NETWORK_ERROR = 'Unable to connect. Check your connection and try again.'
 
 export default function RegisterPage() {
-  const { login, isLoading } = useAuth()
+  const { setUser, isLoading } = useAuth()
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -60,10 +60,13 @@ export default function RegisterPage() {
         return
       }
 
-      await response.json()
-      await login(email, password)
+      const registerResponse = await response.json() as { user?: any }
+      if (registerResponse.user) {
+        setUser(registerResponse.user)
+      }
       router.push('/dashboard')
-    } catch {
+    } catch (error) {
+      console.error('Registration error:', error)
       setTopError(NETWORK_ERROR)
     } finally {
       setSubmitting(false)
