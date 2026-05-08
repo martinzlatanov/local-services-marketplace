@@ -3,9 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
-import { JobDto, JobStatus } from '@/lib/types'
-import JobPostingForm from '@/components/dashboard/JobPostingForm'
-import JobDashboard from '@/components/dashboard/JobDashboard'
+import { JobDto, Role } from '@/lib/types'
+import LiveIndicator from '@/components/ui/LiveIndicator'
+import ClientDashboard from '@/components/dashboard/ClientDashboard'
+import ProviderDashboard from '@/components/dashboard/ProviderDashboard'
+import { Loader2 } from 'lucide-react'
 
 export default function DashboardPage() {
   const { user, isLoading, logout } = useAuth()
@@ -13,7 +15,6 @@ export default function DashboardPage() {
   const [jobs, setJobs] = useState<JobDto[]>([])
   const [wsStatus, setWsStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting')
 
-  // Fetch jobs from API
   const fetchJobs = useCallback(async () => {
     try {
       const res = await fetch('/api/jobs', { credentials: 'include' })
@@ -21,12 +22,9 @@ export default function DashboardPage() {
         const data = await res.json()
         setJobs(data.data || [])
       }
-    } catch (err) {
-      console.error('Failed to fetch jobs:', err)
-    }
+    } catch {}
   }, [])
 
-  // Set up WebSocket connection
   useEffect(() => {
     if (!user) return
 
@@ -35,47 +33,33 @@ export default function DashboardPage() {
 
     const connectWebSocket = () => {
       setWsStatus('connecting')
-      // Get token from cookie
       const cookies = document.cookie.split(';').map(c => c.trim())
       const tokenCookie = cookies.find(c => c.startsWith('token='))
       const token = tokenCookie ? tokenCookie.substring(6) : ''
 
       ws = new WebSocket(`ws://${window.location.host}?token=${token}`)
 
-      ws.onopen = () => {
-        setWsStatus('connected')
-      }
+      ws.onopen = () => setWsStatus('connected')
 
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data)
           if (data.type === 'JOB_UPDATED') {
             const updatedJob: JobDto = data.payload
-            setJobs(prevJobs => 
-              prevJobs.map(job => job.id === updatedJob.id ? updatedJob : job)
-            )
+            setJobs(prev => prev.map(j => j.id === updatedJob.id ? updatedJob : j))
           }
-        } catch (err) {
-          console.error('Failed to parse WebSocket message:', err)
-        }
+        } catch {}
       }
 
       ws.onclose = () => {
         setWsStatus('disconnected')
-        // Attempt to reconnect after 3 seconds
-        reconnectTimer = setTimeout(() => {
-          connectWebSocket()
-        }, 3000)
+        reconnectTimer = setTimeout(connectWebSocket, 3000)
       }
 
-      ws.onerror = (err) => {
-        console.error('WebSocket error:', err)
-      }
+      ws.onerror = () => {}
     }
 
     connectWebSocket()
-
-    // Initial fetch
     fetchJobs()
 
     return () => {
@@ -91,11 +75,11 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <svg className="animate-spin h-8 w-8 text-indigo-600" viewBox="0 0 24 24" fill="none" aria-label="Loading">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-        </svg>
+      <div className="min-h-screen flex items-center justify-center bg-surface-50">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-8 w-8 text-brand-600 animate-spin" aria-label="Loading dashboard" />
+          <p className="text-surface-600">Loading...</p>
+        </div>
       </div>
     )
   }
@@ -104,30 +88,47 @@ export default function DashboardPage() {
     setJobs(prev => [newJob, ...prev])
   }
 
+  const handleJobUpdate = (updatedJob: JobDto) => {
+    setJobs(prev => prev.map(j => j.id === updatedJob.id ? updatedJob : j))
+  }
+
   return (
-    <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-2xl mx-auto flex flex-col gap-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold leading-tight">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <span className={`text-sm ${wsStatus === 'connected' ? 'text-green-600' : 'text-red-600'}`}>
-              {wsStatus === 'connected' ? '● Live' : wsStatus === 'connecting' ? '◌ Connecting...' : '○ Disconnected'}
-            </span>
-            <button onClick={handleLogout} className="bg-indigo-600 text-white rounded py-3 px-6 text-sm font-semibold">
+    <div className="min-h-screen bg-surface-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Dashboard header */}
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h1 className="text-2xl font-bold text-surface-900">Dashboard</h1>
+            {user && (
+              <div className="flex items-center gap-3 mt-1">
+                <p className="text-sm text-surface-600">{user.email}</p>
+                <span className="text-xs font-medium text-surface-600 bg-surface-100 px-2.5 py-1 rounded-[var(--radius-badge)]">
+                  {user.role === Role.CLIENT ? 'Client' : 'Provider'}
+                </span>
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-5">
+            <LiveIndicator status={wsStatus} />
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 text-sm font-medium text-surface-600 hover:text-surface-900 border border-surface-300 rounded-[var(--radius-btn)] hover:bg-surface-100 transition-colors"
+            >
               Log out
             </button>
           </div>
         </div>
-        {user && <p className="text-base font-normal leading-relaxed text-gray-700">Signed in as {user.email}</p>}
-        
-        <JobPostingForm onSuccess={handleJobPosted} />
 
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4">Your Jobs</h2>
-          <JobDashboard jobs={jobs} onJobUpdate={(updatedJob) => {
-            setJobs(prev => prev.map(j => j.id === updatedJob.id ? updatedJob : j))
-          }} />
-        </div>
+        {/* Role-split dashboard content */}
+        {user?.role === Role.CLIENT ? (
+          <ClientDashboard
+            jobs={jobs}
+            onJobPosted={handleJobPosted}
+            onJobUpdate={handleJobUpdate}
+          />
+        ) : (
+          <ProviderDashboard />
+        )}
       </div>
     </div>
   )
