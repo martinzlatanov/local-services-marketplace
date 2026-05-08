@@ -12,6 +12,7 @@
     "vercel-build": "npm run build"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/ws": "^8.18.1",
     "bcrypt": "^6.0.0",
