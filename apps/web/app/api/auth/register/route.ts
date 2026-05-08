@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     res.cookies.set('token', token, { httpOnly: true, sameSite: 'lax' })
     return res
   } catch (e: any) {
-    // simplistic duplicate detection — Drizzle insert may throw PG error code 23505
+    if (e?.code !== '23505') console.error('[register] createUser failed:', e)
     const msg = (e && e.code === '23505') ? { errors: { email: 'already_exists' } } : { errors: { server: 'error' } }
     const status = (e && e.code === '23505') ? 409 : 500
     return NextResponse.json(msg as unknown as ApiErrorResponse, { status })
