@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import JobCard from './JobCard'
+import JobCard from '../JobCard'
 import { JobStatus, type JobDto } from '@/lib/types'
 
 describe('JobCard', () => {

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import JobDashboard from './JobDashboard'
+import JobDashboard from '../JobDashboard'
 import { type JobDto, JobStatus } from '@/lib/types'
 
 describe('JobDashboard', () => {

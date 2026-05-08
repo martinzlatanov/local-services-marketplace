@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import JobPostingForm from './JobPostingForm'
+import JobPostingForm from '../JobPostingForm'
 
 // Mock fetch
 global.fetch = jest.fn()
