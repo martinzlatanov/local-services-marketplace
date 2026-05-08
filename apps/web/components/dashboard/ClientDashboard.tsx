@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { JobDto, JobStatus } from '@/lib/types'
+import { JobDto, JobStatus, Role } from '@/lib/types'
 import JobPostingForm from './JobPostingForm'
 import JobDashboard from './JobDashboard'
+import JobDetailCard from './JobDetailCard'
 
 interface ClientDashboardProps {
   jobs: JobDto[]
@@ -64,7 +65,7 @@ export default function ClientDashboard({ jobs, onJobPosted, onJobUpdate }: Clie
           </p>
         )}
 
-        <JobDashboard jobs={filteredJobs} onJobUpdate={onJobUpdate} />
+        <JobDashboard jobs={filteredJobs} userRole={Role.CLIENT} onJobUpdate={onJobUpdate} />
       </div>
     </div>
   )

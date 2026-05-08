@@ -1,15 +1,18 @@
 'use client'
 
 import { JobDto } from '@/lib/types'
+import { Role } from '@/lib/types'
 import { Inbox } from 'lucide-react'
 import JobCard from './JobCard'
+import JobDetailCard from './JobDetailCard'
 
 interface JobDashboardProps {
   jobs: JobDto[]
+  userRole?: Role
   onJobUpdate?: (updatedJob: JobDto) => void
 }
 
-export default function JobDashboard({ jobs, onJobUpdate }: JobDashboardProps) {
+export default function JobDashboard({ jobs, userRole = Role.CLIENT, onJobUpdate }: JobDashboardProps) {
   if (jobs.length === 0) {
     return (
       <div className="text-center py-12">
@@ -24,9 +27,13 @@ export default function JobDashboard({ jobs, onJobUpdate }: JobDashboardProps) {
 
   return (
     <div className="space-y-4">
-      {jobs.map(job => (
-        <JobCard key={job.id} job={job} />
-      ))}
+      {jobs.map(job =>
+        userRole === Role.CLIENT ? (
+          <JobDetailCard key={job.id} job={job} userRole={userRole} />
+        ) : (
+          <JobCard key={job.id} job={job} />
+        )
+      )}
     </div>
   )
 }

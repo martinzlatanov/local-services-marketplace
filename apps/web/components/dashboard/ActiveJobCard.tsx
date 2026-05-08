@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { JobDto, JobStatus } from '@/lib/types'
-import { MapPin, Loader2 } from 'lucide-react'
+import { MapPin, Loader2, CheckCircle2 } from 'lucide-react'
 
 interface ActiveJobCardProps {
   job: JobDto
   onStatusAdvance: (jobId: string, status: JobStatus) => Promise<void>
 }
+
+const statusOrder = [JobStatus.ACCEPTED, JobStatus.IN_PROGRESS, JobStatus.COMPLETED]
 
 const statusColors: Record<string, string> = {
   [JobStatus.PENDING]: 'bg-yellow-100 text-yellow-800',
@@ -32,6 +34,8 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
     }
   }
 
+  const currentIndex = statusOrder.indexOf(job.status as JobStatus)
+
   return (
     <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-5 shadow-[var(--shadow-card)]">
       <div className="flex justify-between items-start gap-4">
@@ -43,12 +47,31 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
             {job.cityArea} • {job.timeframe}
           </p>
         </div>
-        <span className={`text-xs px-3 py-1.5 rounded-[var(--radius-badge)] font-medium flex-shrink-0 ${statusColors[job.status] ?? 'bg-surface-100 text-surface-800'}`}>
-          {job.status}
-        </span>
       </div>
 
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {/* Status timeline */}
+      <div className="mt-4 flex items-center gap-1">
+        {statusOrder.map((status, idx) => (
+          <div key={status} className="flex items-center gap-1 flex-1">
+            <div className={`flex-1 h-1 rounded-full transition-colors ${
+              idx <= currentIndex ? 'bg-emerald-500' : 'bg-surface-200'
+            }`} />
+            {idx < statusOrder.length - 1 && (
+              <div className={`flex-1 h-1 rounded-full transition-colors ${
+                idx < currentIndex ? 'bg-emerald-500' : 'bg-surface-200'
+              }`} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-2 flex justify-between text-xs font-medium text-surface-600 px-0.5">
+        <span>Accepted</span>
+        <span>In Progress</span>
+        <span>Complete</span>
+      </div>
+
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
       <div className="mt-4 flex gap-2">
         {job.status === JobStatus.ACCEPTED && (
