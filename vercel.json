@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "name": "local-services-marketplace",
-  "buildCommand": "cd apps/web && npm install --include-workspace-root=false && npm run build",
-  "outputDirectory": "apps/web/.next",
-  "installCommand": "echo 'Using workspace packages'"
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "rootDirectory": "apps/web"
 }
