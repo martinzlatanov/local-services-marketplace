@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
-    "vercel-build": "npm install && npm run build"
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.4",
