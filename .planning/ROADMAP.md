@@ -153,3 +153,16 @@ Plans:
 - Production URL: https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app
 - Vercel Inspect: https://vercel.com/martinzlatanov-8547s-projects/web/5SbX5DjDLbCH3tpxGULCFXaRXF2t
 - Mobile app configured with production API URL
+
+### Phase 11: Ratings & Reviews
+**Goal**: Clients can rate and review service providers after job completion; providers can see their ratings on their profile
+**Depends on**: Phase 10
+**Requirements**: REVIEW-01, REVIEW-02
+**Status**: Planning
+**Plans**: 0 plans
+
+**Success Criteria** (what must be TRUE):
+  1. Client can submit a 1-5 star rating with category ratings (communication, quality, punctuality) and text review for a provider after a job is `COMPLETED`
+  2. Review includes optional photo upload; reviews require admin approval before appearing on provider's public profile
+  3. Provider's profile displays their average rating and list of approved reviews
+  4. Both clients and providers can view review history (clients reviewing providers, providers reviewing clients)
