@@ -61,9 +61,7 @@ export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUse
   const userRole = role ?? Role.CLIENT
   const { db } = await import("@/lib/db/client")
   const { users } = await import("@/lib/db/schema")
-  const { eq } = await import("drizzle-orm")
-  await db.insert(users).values({ email, passwordHash, role: userRole })
-  const created = await db.select().from(users).where((eq as any)(users.email, email))
+  const created = await db.insert(users).values({ email, passwordHash, role: userRole }).returning()
   const userRow = created[0]
   return { id: String(userRow.id), email: userRow.email, role: userRow.role as any, createdAt: (userRow.createdAt instanceof Date) ? userRow.createdAt.toISOString() : String(userRow.createdAt) }
 }
