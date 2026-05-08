@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { JOB_CATEGORIES, CreateJobRequest, JobDto, JobCategory } from '@/lib/types'
+import { JOB_CATEGORIES, CITY_AREAS, CreateJobRequest, JobDto, JobCategory } from '@/lib/types'
+import { Plus, Loader2 } from 'lucide-react'
 
 interface JobPostingFormProps {
   onSuccess?: (job: JobDto) => void
@@ -12,7 +13,7 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
     category: JOB_CATEGORIES[0],
     description: '',
     timeframe: '',
-    cityArea: '',
+    cityArea: CITY_AREAS[0],
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -40,12 +41,12 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
       const data = await res.json()
 
       if (res.ok) {
-        setMessage({ type: 'success', text: 'Job posted successfully!' })
+        setMessage({ type: 'success', text: 'Job posted successfully' })
         setFormData({
           category: JOB_CATEGORIES[0],
           description: '',
           timeframe: '',
-          cityArea: '',
+          cityArea: CITY_AREAS[0],
         })
         if (onSuccess && data.data) {
           onSuccess(data.data)
@@ -61,13 +62,19 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold">Post a New Job</h2>
+    <form onSubmit={handleSubmit} className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-6 space-y-4">
+      <div className="flex items-center gap-2 mb-2">
+        <Plus className="h-5 w-5 text-brand-600" aria-hidden="true" />
+        <h2 className="text-lg font-semibold text-surface-900">Post a New Job</h2>
+      </div>
 
       {message && (
         <div
-          className={`p-3 rounded ${
-            message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          role={message.type === 'success' ? 'status' : 'alert'}
+          className={`p-4 rounded-[var(--radius-btn)] text-sm font-medium ${
+            message.type === 'success'
+              ? 'bg-status-completed-bg text-status-completed-text'
+              : 'bg-red-100 text-red-800'
           }`}
         >
           {message.text}
@@ -75,7 +82,7 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
       )}
 
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="category" className="block text-sm font-medium text-surface-700 mb-1.5">
           Category
         </label>
         <select
@@ -83,7 +90,7 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
           name="category"
           value={formData.category}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           required
         >
           {JOB_CATEGORIES.map((cat: JobCategory) => (
@@ -95,7 +102,7 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="description" className="block text-sm font-medium text-surface-700 mb-1.5">
           Description
         </label>
         <textarea
@@ -104,14 +111,14 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
           placeholder="Describe the job details..."
           required
         />
       </div>
 
       <div>
-        <label htmlFor="timeframe" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="timeframe" className="block text-sm font-medium text-surface-700 mb-1.5">
           Timeframe
         </label>
         <input
@@ -120,34 +127,45 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
           name="timeframe"
           value={formData.timeframe}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           placeholder="e.g., Within 3 days"
           required
         />
       </div>
 
       <div>
-        <label htmlFor="cityArea" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="cityArea" className="block text-sm font-medium text-surface-700 mb-1.5">
           City/Area
         </label>
-        <input
-          type="text"
+        <select
           id="cityArea"
           name="cityArea"
           value={formData.cityArea}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder="e.g., Downtown"
+          className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           required
-        />
+        >
+          {CITY_AREAS.map((area) => (
+            <option key={area} value={area}>
+              {area}
+            </option>
+          ))}
+        </select>
       </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 disabled:bg-indigo-300 font-medium"
+        className="w-full bg-brand-600 text-white py-2.5 px-4 rounded-[var(--radius-btn)] hover:bg-brand-700 disabled:bg-brand-300 font-medium transition-colors flex items-center justify-center gap-2"
       >
-        {isSubmitting ? 'Posting...' : 'Post Job'}
+        {isSubmitting ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Posting...
+          </>
+        ) : (
+          'Post Job'
+        )}
       </button>
     </form>
   )

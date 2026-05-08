@@ -1,8 +1,8 @@
 ---
-status: investigating
+status: resolved
 trigger: Registration fails with generic error message after creating user account
 created: 2026-05-08T15:25:00.000Z
-updated: 2026-05-08T15:40:00.000Z
+updated: 2026-05-08T15:56:00.000Z
 ---
 
 # Debug Session: registration-generic-error

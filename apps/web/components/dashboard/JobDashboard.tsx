@@ -1,6 +1,7 @@
 'use client'
 
 import { JobDto } from '@/lib/types'
+import { Inbox } from 'lucide-react'
 import JobCard from './JobCard'
 
 interface JobDashboardProps {
@@ -12,8 +13,9 @@ export default function JobDashboard({ jobs, onJobUpdate }: JobDashboardProps) {
   if (jobs.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 text-lg">No jobs posted yet.</p>
-        <p className="text-gray-400 text-sm mt-2">
+        <Inbox className="h-12 w-12 text-surface-300 mx-auto mb-4" aria-hidden="true" />
+        <p className="text-surface-500 text-lg font-medium">No jobs posted yet.</p>
+        <p className="text-surface-400 text-sm mt-2">
           Use the form above to post your first job!
         </p>
       </div>

@@ -1,3 +1,85 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  /* Brand — Harbor Teal */
+  --color-brand-50: #f0fdf9;
+  --color-brand-100: #ccfbef;
+  --color-brand-200: #99f6df;
+  --color-brand-300: #5eead4;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+  --color-brand-800: #115e59;
+  --color-brand-900: #134e4a;
+  --color-brand-950: #042f2e;
+
+  /* Accent — Amber */
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59e0b;
+  --color-accent-600: #d97706;
+
+  /* Neutrals — Slate as surface-* */
+  --color-surface-0:   #ffffff;
+  --color-surface-50:  #f8fafc;
+  --color-surface-100: #f1f5f9;
+  --color-surface-200: #e2e8f0;
+  --color-surface-300: #cbd5e1;
+  --color-surface-400: #94a3b8;
+  --color-surface-500: #64748b;
+  --color-surface-600: #475569;
+  --color-surface-700: #334155;
+  --color-surface-800: #1e293b;
+  --color-surface-900: #0f172a;
+
+  /* Status badge tokens */
+  --color-status-pending-bg:       #fef9c3;
+  --color-status-pending-text:     #854d0e;
+  --color-status-accepted-bg:      #dbeafe;
+  --color-status-accepted-text:    #1e40af;
+  --color-status-progress-bg:      #ede9fe;
+  --color-status-progress-text:    #5b21b6;
+  --color-status-completed-bg:     #dcfce7;
+  --color-status-completed-text:   #166534;
+
+  /* Typography */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* Radius */
+  --radius-card:  0.75rem;
+  --radius-btn:   0.5rem;
+  --radius-badge: 9999px;
+  --radius-input: 0.5rem;
+
+  /* Shadows */
+  --shadow-card:       0 1px 3px 0 rgb(0 0 0 / 0.07), 0 1px 2px -1px rgb(0 0 0 / 0.07);
+  --shadow-card-hover: 0 4px 12px 0 rgb(0 0 0 / 0.10);
+  --shadow-auth:       0 8px 32px 0 rgb(13 116 110 / 0.10);
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-surface-50);
+  color: var(--color-surface-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+@keyframes slide-up {
+  from { transform: translateY(1rem); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@layer utilities {
+  .animate-slide-up { animation: slide-up 0.2s ease-out; }
+  .animate-fade-in  { animation: fade-in 0.4s ease-out; }
+}
