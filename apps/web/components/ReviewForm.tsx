@@ -201,12 +201,13 @@ export default function ReviewForm({ jobId, reviewType, onSuccess, reviewerUserI
       }
 
       setSuccess(true)
-      setRatings({})
-      setText('')
-      setPhotoFile(null)
-      setPhotoPreview(null)
       setTimeout(() => {
         onSuccess()
+        setSuccess(false)
+        setRatings({})
+        setText('')
+        setPhotoFile(null)
+        setPhotoPreview(null)
       }, 1500)
     } catch (err: any) {
       setError(err.message || 'Network error. Please try again.')
