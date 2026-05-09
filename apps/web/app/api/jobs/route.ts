@@ -14,7 +14,14 @@ export async function GET(req: Request) {
   const cityArea = url.searchParams.get('cityArea')
   const category = url.searchParams.get('category')
 
-  const filters = [eq(jobs.status, JobStatus.PENDING)]
+  // If query params provided, user is browsing job market (PENDING jobs only)
+  // Otherwise, return user's own jobs
+  const isBrowsing = cityArea || category
+
+  const filters = isBrowsing
+    ? [eq(jobs.status, JobStatus.PENDING)]
+    : [eq(jobs.clientId, String(user.id))]
+
   if (cityArea) filters.push(eq(jobs.cityArea, cityArea))
   if (category) filters.push(eq(jobs.category, category as any))
 
