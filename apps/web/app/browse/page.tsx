@@ -19,9 +19,10 @@ export default function BrowsePage() {
   const fetchJobs = useCallback(async () => {
     setIsLoadingJobs(true)
     const params = new URLSearchParams()
+    params.append('browse', '1')
     if (selectedArea !== 'All') params.append('cityArea', selectedArea)
     if (selectedCategory !== 'All') params.append('category', selectedCategory)
-    const url = `/api/jobs${params.toString() ? '?' + params.toString() : ''}`
+    const url = `/api/jobs?${params.toString()}`
     try {
       const res = await fetch(url, { credentials: 'include' })
       if (res.ok) {
