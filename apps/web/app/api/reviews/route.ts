@@ -223,9 +223,14 @@ export async function POST(req: Request) {
       )
     }
 
-    console.error('Review insert error:', error)
+    console.error('Review insert error:', {
+      code: error.code,
+      message: error.message,
+      detail: error.detail,
+      errorObj: JSON.stringify(error),
+    })
     return NextResponse.json(
-      { errors: { database: 'insert_failed' } },
+      { errors: { database: 'insert_failed', detail: error.message } },
       { status: 500 }
     )
   }
