@@ -184,23 +184,40 @@ export async function POST(req: Request) {
 
   // 7. Try inserting review
   try {
+    const insertValues: any = {
+      jobId: jobIdNum,
+      reviewerId: userId,
+      revieweeId,
+      reviewType,
+      text: text.trim(),
+    }
+
+    // Only include fields that have values
+    if (clientCommunication !== null && clientCommunication !== undefined) {
+      insertValues.clientCommunication = clientCommunication
+    }
+    if (clientQuality !== null && clientQuality !== undefined) {
+      insertValues.clientQuality = clientQuality
+    }
+    if (clientPunctuality !== null && clientPunctuality !== undefined) {
+      insertValues.clientPunctuality = clientPunctuality
+    }
+    if (providerPaymentReliability !== null && providerPaymentReliability !== undefined) {
+      insertValues.providerPaymentReliability = providerPaymentReliability
+    }
+    if (providerCommunicationClarity !== null && providerCommunicationClarity !== undefined) {
+      insertValues.providerCommunicationClarity = providerCommunicationClarity
+    }
+    if (providerProfessionalism !== null && providerProfessionalism !== undefined) {
+      insertValues.providerProfessionalism = providerProfessionalism
+    }
+    if (photoUrl) {
+      insertValues.photoUrl = photoUrl
+    }
+
     const [newReview] = await db
       .insert(reviews)
-      .values({
-        jobId: jobIdNum,
-        reviewerId: userId,
-        revieweeId,
-        reviewType,
-        clientCommunication,
-        clientQuality,
-        clientPunctuality,
-        providerPaymentReliability,
-        providerCommunicationClarity,
-        providerProfessionalism,
-        text: text.trim(),
-        photoUrl: photoUrl || null,
-        approvedAt: null,
-      })
+      .values(insertValues)
       .returning()
 
     // 8. Return 201 + review data
