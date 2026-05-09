@@ -48,8 +48,13 @@ export async function POST(req: Request) {
   } = body as any
 
   // 3. Validate required fields
-  if (!jobId || typeof jobId !== 'number') {
+  if (!jobId) {
     return NextResponse.json({ errors: { jobId: 'required' } }, { status: 400 })
+  }
+
+  const jobIdNum = typeof jobId === 'string' ? parseInt(jobId, 10) : jobId
+  if (isNaN(jobIdNum)) {
+    return NextResponse.json({ errors: { jobId: 'must_be_number' } }, { status: 400 })
   }
 
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -61,7 +66,7 @@ export async function POST(req: Request) {
   }
 
   // 4. Fetch job to verify existence and status
-  const [job] = await db.select().from(jobs).where(eq(jobs.id, jobId)).limit(1)
+  const [job] = await db.select().from(jobs).where(eq(jobs.id, jobIdNum)).limit(1)
   if (!job) {
     return NextResponse.json({ errors: { job: 'not_found' } }, { status: 404 })
   }
@@ -174,7 +179,7 @@ export async function POST(req: Request) {
     const [newReview] = await db
       .insert(reviews)
       .values({
-        jobId,
+        jobId: jobIdNum,
         reviewerId: userId,
         revieweeId,
         reviewType,
