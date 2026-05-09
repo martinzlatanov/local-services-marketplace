@@ -164,19 +164,19 @@ export async function POST(req: Request) {
       )
     }
 
-    // Validate it's a Vercel Blob URL
-    if (!photoUrl.startsWith('https://')) {
+    // Allow both HTTPS URLs and data URLs
+    const isValidUrl = photoUrl.startsWith('https://') || photoUrl.startsWith('data:')
+    if (!isValidUrl) {
       return NextResponse.json(
-        { errors: { photoUrl: 'must_be_https' } },
+        { errors: { photoUrl: 'invalid_url' } },
         { status: 400 }
       )
     }
 
-    // For now, accept the URL assuming client-side validated the file
-    // In production, you'd fetch the blob headers to verify size/type
-    if (photoUrl.length > 500) {
+    // For data URLs, check length; for HTTPS, they should be reasonably sized
+    if (photoUrl.length > 5 * 1024 * 1024) {
       return NextResponse.json(
-        { errors: { photoUrl: 'url_too_long' } },
+        { errors: { photoUrl: 'url_too_large' } },
         { status: 400 }
       )
     }
