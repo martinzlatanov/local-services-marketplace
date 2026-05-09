@@ -26,7 +26,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
     const userId = parseInt(user.id, 10)
     const isReviewer = review.reviewerId === userId
-    const isAdmin = user.role === Role.ADMIN || user.role === 'ADMIN'
+    const isAdmin = user.role === Role.ADMIN
 
     if (!isReviewer && !isAdmin) {
       return NextResponse.json(
