@@ -36,8 +36,8 @@ export default function BrowsePage() {
   }, [selectedArea, selectedCategory])
 
   useEffect(() => {
-    fetchJobs()
-  }, [fetchJobs])
+    if (!isLoading && user) fetchJobs()
+  }, [fetchJobs, isLoading, user])
 
   if (isLoading) {
     return (
