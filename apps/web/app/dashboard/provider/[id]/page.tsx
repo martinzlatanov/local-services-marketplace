@@ -45,9 +45,9 @@ export default function ProviderProfilePage() {
           throw new Error('Failed to fetch reviews')
         }
 
-        const reviewsData: ReviewsData = await reviewsRes.json()
-        setReviews(reviewsData.reviews || [])
-        setAverageRatings(reviewsData.averageRatings || {})
+        const reviewsData = await reviewsRes.json()
+        setReviews(reviewsData.data?.reviews || [])
+        setAverageRatings(reviewsData.data?.averageRatings || {})
       } catch (err: any) {
         setError(err.message || 'Failed to load profile')
         console.error('Profile load error:', err)

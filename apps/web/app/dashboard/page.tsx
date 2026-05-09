@@ -125,6 +125,7 @@ export default function DashboardPage() {
             jobs={jobs}
             onJobPosted={handleJobPosted}
             onJobUpdate={handleJobUpdate}
+            userId={parseInt(user.id, 10)}
           />
         ) : (
           <ProviderDashboard />
