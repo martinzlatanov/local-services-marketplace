@@ -1,7 +1,10 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { JobDto, JobStatus, Role } from '@/lib/types'
 import { MapPin, User, Clock, AlertCircle } from 'lucide-react'
+import ReviewForm from '../ReviewForm'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface JobDetailCardProps {
   job: JobDto
@@ -33,6 +36,33 @@ const statusInfo: Record<string, { color: string; label: string; description: st
 
 export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
   const status = statusInfo[job.status] || statusInfo[JobStatus.PENDING]
+  const { user } = useAuth()
+  const [hasReviewed, setHasReviewed] = useState(false)
+  const [showReviewForm, setShowReviewForm] = useState(false)
+
+  useEffect(() => {
+    if (!user || job.status !== JobStatus.COMPLETED) return
+
+    const checkReviewStatus = async () => {
+      try {
+        const res = await fetch(`/api/reviews?jobId=${job.id}`, { credentials: 'include' })
+        if (res.ok) {
+          const data = await res.json()
+          const userReview = (data.data || []).find((r: any) => String(r.reviewerId) === String(user.id))
+          setHasReviewed(!!userReview)
+        }
+      } catch (err) {
+        console.error('Failed to fetch reviews:', err)
+      }
+    }
+
+    checkReviewStatus()
+  }, [job.id, user, job.status])
+
+  const handleReviewSuccess = () => {
+    setHasReviewed(true)
+    setShowReviewForm(false)
+  }
 
   return (
     <div className={`border rounded-[var(--radius-card)] p-5 ${status.color}`}>
@@ -97,6 +127,52 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
       <div className="mt-3 text-xs opacity-50 pt-3 border-t border-current border-opacity-10">
         Posted {new Date(job.createdAt).toLocaleDateString()}
       </div>
+
+      {/* Review section */}
+      {job.status === JobStatus.COMPLETED && userRole === Role.CLIENT && (
+        <div className="mt-6 pt-6 border-t border-current border-opacity-20">
+          {hasReviewed ? (
+            <div className="flex items-center gap-2 p-3 bg-status-completed-bg text-status-completed-text rounded-[var(--radius-btn)]">
+              <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm font-medium">You have reviewed this job</span>
+            </div>
+          ) : (
+            <>
+              {showReviewForm ? (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-medium text-surface-900">Leave a Review</h3>
+                    <button
+                      onClick={() => setShowReviewForm(false)}
+                      className="text-sm text-surface-600 hover:text-surface-900"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  {user && job.providerId && (
+                    <ReviewForm
+                      jobId={job.id}
+                      reviewType="client"
+                      onSuccess={handleReviewSuccess}
+                      reviewerUserId={parseInt(user.id, 10)}
+                      revieweeUserId={parseInt(job.providerId, 10)}
+                    />
+                  )}
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowReviewForm(true)}
+                  className="w-full py-2 px-4 text-sm font-medium bg-brand-600 text-white rounded-[var(--radius-btn)] hover:bg-brand-700 transition-colors"
+                >
+                  Leave a Review
+                </button>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
