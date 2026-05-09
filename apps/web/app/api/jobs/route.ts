@@ -13,10 +13,12 @@ export async function GET(req: Request) {
   const url = new URL(req.url)
   const cityArea = url.searchParams.get('cityArea')
   const category = url.searchParams.get('category')
+  const browse = url.searchParams.get('browse')
 
-  // If query params provided, user is browsing job market (PENDING jobs only)
-  // Otherwise, return user's own jobs
-  const isBrowsing = cityArea || category
+  // browse=1 signals the provider job market feed (PENDING jobs only)
+  // cityArea/category filters also trigger browse mode for backwards compatibility
+  // Without any of these, return the authenticated user's own jobs
+  const isBrowsing = browse || cityArea || category
 
   const filters = isBrowsing
     ? [eq(jobs.status, JobStatus.PENDING)]
@@ -47,24 +49,24 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
-  
+
   if (user.role !== 'CLIENT') {
     return NextResponse.json({ errors: { role: 'only_clients_can_post_jobs' } }, { status: 403 })
   }
 
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ errors: { body: 'invalid_json' } }, { status: 400 })
-  
+
   const payload = body as CreateJobRequest
-  
+
   if (!payload.category || !payload.description || !payload.timeframe || !payload.cityArea) {
-    return NextResponse.json({ 
-      errors: { 
+    return NextResponse.json({
+      errors: {
         category: !payload.category ? 'required' : undefined,
         description: !payload.description ? 'required' : undefined,
         timeframe: !payload.timeframe ? 'required' : undefined,
         cityArea: !payload.cityArea ? 'required' : undefined,
-      } 
+      }
     }, { status: 400 })
   }
 

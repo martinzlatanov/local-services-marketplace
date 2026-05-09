@@ -30,9 +30,10 @@ export default function ProviderDashboard() {
 
   const fetchPendingJobs = useCallback(async () => {
     const params = new URLSearchParams()
+    params.append('browse', '1')
     if (selectedArea !== 'All') params.append('cityArea', selectedArea)
     if (selectedCategory !== 'All') params.append('category', selectedCategory)
-    const url = `/api/jobs${params.toString() ? '?' + params.toString() : ''}`
+    const url = `/api/jobs?${params.toString()}`
     try {
       const res = await fetch(url, { credentials: 'include' })
       if (res.ok) {
@@ -288,7 +289,7 @@ export default function ProviderDashboard() {
           reviews={receivedReviews}
           averageRatings={averageRatings}
           isLoading={reviewsLoading}
-          reviewType="provider"
+          reviewType="client"
         />
       )}
 
