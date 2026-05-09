@@ -70,7 +70,7 @@ export const reviews = pgTable(
     providerProfessionalism: integer("provider_professionalism"),
     // Review content
     text: text("text").notNull(),
-    photoUrl: varchar("photo_url", { length: 500 }),
+    photoUrl: text("photo_url"), // Support large data URLs (~5MB)
     // Approval state
     approvedAt: timestamp("approved_at"),
     // Timestamps
