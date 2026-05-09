@@ -158,11 +158,17 @@ Plans:
 **Goal**: Clients can rate and review service providers after job completion; providers can see their ratings on their profile
 **Depends on**: Phase 10
 **Requirements**: REVIEW-01, REVIEW-02
-**Status**: Planning
-**Plans**: 0 plans
+**Status**: ✅ COMPLETE
+**Plans**: 4 plans
 
 **Success Criteria** (what must be TRUE):
-  1. Client can submit a 1-5 star rating with category ratings (communication, quality, punctuality) and text review for a provider after a job is `COMPLETED`
-  2. Review includes optional photo upload; reviews require admin approval before appearing on provider's public profile
-  3. Provider's profile displays their average rating and list of approved reviews
-  4. Both clients and providers can view review history (clients reviewing providers, providers reviewing clients)
+  1. ✅ Client can submit a 1-5 star rating with category ratings (communication, quality, punctuality) and text review for a provider after a job is `COMPLETED`
+  2. ✅ Review includes optional photo upload; reviews require admin approval before appearing on provider's public profile
+  3. ✅ Provider's profile displays their average rating and list of approved reviews
+  4. ✅ Both clients and providers can view review history (clients reviewing providers, providers reviewing clients)
+
+**Plans Executed**:
+- [x] 11-01-PLAN.md — Database schema & types foundation
+- [x] 11-02-PLAN.md — Review APIs (submission, query, approval)
+- [x] 11-03-PLAN.md — Frontend review UI (forms & profile display)
+- [x] 11-04-PLAN.md — Admin dashboard & WebSocket integration
