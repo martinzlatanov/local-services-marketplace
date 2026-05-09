@@ -194,8 +194,20 @@ export default function ReviewForm({ jobId, reviewType, onSuccess, reviewerUserI
         const data = await res.json()
         if (res.status === 409) {
           setError('You have already submitted a review for this job')
+        } else if (data.errors) {
+          // Get the first error message from the errors object
+          const firstError = Object.values(data.errors)[0]
+          const errorMessages: Record<string, string> = {
+            'invalid_rating_values': 'Please provide valid ratings for all categories',
+            'not_job_participant': 'You are not a participant in this job',
+            'not_found': 'Job not found',
+            'must_be_completed': 'Job must be completed to submit a review',
+            'no_provider_assigned': 'No provider assigned to this job',
+            'unauthorized': 'You must be logged in to submit a review',
+          }
+          setError(errorMessages[firstError as string] || `Error: ${firstError}`)
         } else {
-          setError(data.errors?.message || 'Failed to submit review')
+          setError('Failed to submit review')
         }
         return
       }
