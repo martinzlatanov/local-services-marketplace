@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { JobDto, JobStatus, CITY_AREAS } from '@/lib/types'
+import { JobDto, JobStatus, CITY_AREAS, ReviewDTO } from '@/lib/types'
 import { JOB_CATEGORIES } from '@/lib/db/categories'
 import ProviderJobFeed from './ProviderJobFeed'
 import ActiveJobCard from './ActiveJobCard'
+import ReviewDisplay from '../ReviewDisplay'
 import Toast from '../ui/Toast'
 
-type Tab = 'feed' | 'active' | 'completed'
+type Tab = 'feed' | 'active' | 'completed' | 'reviews'
 
 interface ToastState {
   message: string
@@ -21,6 +22,10 @@ export default function ProviderDashboard() {
   const [pendingJobs, setPendingJobs] = useState<JobDto[]>([])
   const [activeJobs, setActiveJobs] = useState<JobDto[]>([])
   const [completedJobs, setCompletedJobs] = useState<JobDto[]>([])
+  const [receivedReviews, setReceivedReviews] = useState<ReviewDTO[]>([])
+  const [averageRatings, setAverageRatings] = useState<Record<string, number>>({})
+  const [reviewsLoading, setReviewsLoading] = useState(false)
+  const [userId, setUserId] = useState<number | null>(null)
   const [toast, setToast] = useState<ToastState | null>(null)
 
   const fetchPendingJobs = useCallback(async () => {
@@ -51,8 +56,41 @@ export default function ProviderDashboard() {
     } catch {}
   }, [])
 
+  const fetchReceivedReviews = useCallback(async () => {
+    if (!userId) return
+    setReviewsLoading(true)
+    try {
+      const res = await fetch(`/api/reviews?userId=${userId}&approved=true`, { credentials: 'include' })
+      if (res.ok) {
+        const data = await res.json()
+        setReceivedReviews(data.data?.reviews ?? [])
+        setAverageRatings(data.data?.averageRatings ?? {})
+      }
+    } catch {}
+    setReviewsLoading(false)
+  }, [userId])
+
   useEffect(() => { fetchPendingJobs() }, [fetchPendingJobs])
   useEffect(() => { fetchActiveJobs() }, [fetchActiveJobs])
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await fetch('/api/test-auth', { credentials: 'include' })
+        if (res.ok) {
+          const data = await res.json()
+          setUserId(parseInt(data.user.id, 10))
+        }
+      } catch {}
+    }
+    fetchUserData()
+  }, [])
+
+  useEffect(() => {
+    if (activeTab === 'reviews' && userId) {
+      fetchReceivedReviews()
+    }
+  }, [activeTab, userId, fetchReceivedReviews])
 
   const handleAccept = async (jobId: string, version: number) => {
     const res = await fetch(`/api/jobs/${jobId}/accept`, {
@@ -144,6 +182,21 @@ export default function ProviderDashboard() {
             </span>
           )}
         </button>
+        <button
+          onClick={() => setActiveTab('reviews')}
+          className={`px-5 py-2 text-sm font-medium rounded-[var(--radius-btn)] transition-colors ${
+            activeTab === 'reviews'
+              ? 'bg-surface-0 text-surface-900 shadow-sm'
+              : 'text-surface-600 hover:text-surface-900'
+          }`}
+        >
+          Reviews
+          {receivedReviews.length > 0 && (
+            <span className="ml-1.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full">
+              {receivedReviews.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Find Jobs tab */}
@@ -218,7 +271,7 @@ export default function ProviderDashboard() {
           {completedJobs.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-surface-500 font-medium">No completed jobs yet.</p>
-              <p className="text-surface-400 text-sm mt-1">Complete a job to see your reviews here.</p>
+              <p className="text-surface-400 text-sm mt-1">Complete a job to submit and receive reviews.</p>
             </div>
           ) : (
             completedJobs.map((job) => (
@@ -226,6 +279,17 @@ export default function ProviderDashboard() {
             ))
           )}
         </div>
+      )}
+
+      {/* Reviews tab */}
+      {activeTab === 'reviews' && userId && (
+        <ReviewDisplay
+          userId={userId}
+          reviews={receivedReviews}
+          averageRatings={averageRatings}
+          isLoading={reviewsLoading}
+          reviewType="provider"
+        />
       )}
 
       {toast && (
