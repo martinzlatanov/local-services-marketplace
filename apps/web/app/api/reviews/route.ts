@@ -118,6 +118,10 @@ export async function POST(req: Request) {
     clientCommunication = clientRating.communication
     clientQuality = clientRating.quality
     clientPunctuality = clientRating.punctuality
+    // Explicitly set provider fields to null
+    providerPaymentReliability = null as any
+    providerCommunicationClarity = null as any
+    providerProfessionalism = null as any
   } else if (user.role === Role.PROVIDER) {
     // Provider reviewing client
     if (String(job.providerId) !== String(user.id)) {
@@ -140,6 +144,10 @@ export async function POST(req: Request) {
     providerPaymentReliability = providerRating.paymentReliability
     providerCommunicationClarity = providerRating.communicationClarity
     providerProfessionalism = providerRating.professionalism
+    // Explicitly set client fields to null
+    clientCommunication = null as any
+    clientQuality = null as any
+    clientPunctuality = null as any
   } else {
     return NextResponse.json(
       { errors: { role: 'invalid_role' } },
