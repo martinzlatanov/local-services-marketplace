@@ -6,7 +6,7 @@ import { sign, verify } from "jsonwebtoken"
 import { AuthRegisterRequest, AuthLoginRequest, AuthUserDto, Role } from "@/lib/types"
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret"
-const JWT_EXPIRES_IN = "15m"
+const JWT_EXPIRES_IN = "45m"
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 10)
