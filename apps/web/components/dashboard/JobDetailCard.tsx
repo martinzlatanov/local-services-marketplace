@@ -45,7 +45,8 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
 
     const checkReviewStatus = async () => {
       try {
-        const res = await fetch(`/api/reviews?jobId=${job.id}`, { credentials: 'include' })
+        const jobId = typeof job.id === 'string' ? parseInt(job.id, 10) : job.id
+        const res = await fetch(`/api/reviews?jobId=${jobId}`, { credentials: 'include' })
         if (res.ok) {
           const data = await res.json()
           const userReview = (data.data || []).find((r: any) => String(r.reviewerId) === String(user.id))

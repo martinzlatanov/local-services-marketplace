@@ -114,7 +114,7 @@ function ReviewCard({ review, categoryLabels }: { review: ReviewDTO; categoryLab
         <div className="bg-surface-50 rounded-[var(--radius-input)] p-3 space-y-2">
           {Object.entries(ratings).map(([key, value]) => (
             <div key={key} className="flex items-center justify-between text-xs">
-              <span className="text-surface-700 font-medium">{categoryLabels[key as string]}</span>
+              <span className="text-surface-700 font-medium">{categoryLabels[key as keyof typeof categoryLabels]}</span>
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-surface-900">{value}</span>
                 <div className="w-12">
@@ -260,7 +260,7 @@ export default function ReviewDisplay({
                 return (
                   <div key={key} className="bg-surface-50 rounded-[var(--radius-input)] p-4">
                     <p className="text-xs font-medium text-surface-600 uppercase tracking-wide mb-2">
-                      {categoryLabels[key as string]}
+                      {categoryLabels[key as keyof typeof categoryLabels]}
                     </p>
                     <div className="flex items-center gap-2">
                       <span className="text-2xl font-bold text-surface-900">

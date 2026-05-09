@@ -5,11 +5,11 @@ import { ReviewDTO, ClientRatings, ProviderRatings } from '@/lib/types'
 import { Star, Upload, X, Loader2 } from 'lucide-react'
 
 interface ReviewFormProps {
-  jobId: number
+  jobId: string | number
   reviewType: 'client' | 'provider'
   onSuccess: () => void
-  reviewerUserId: number
-  revieweeUserId: number
+  reviewerUserId: string | number
+  revieweeUserId: string | number
 }
 
 type ClientRatingKey = 'communication' | 'quality' | 'punctuality'
@@ -164,7 +164,7 @@ export default function ReviewForm({ jobId, reviewType, onSuccess, reviewerUserI
       }
 
       const requestBody = {
-        jobId,
+        jobId: typeof jobId === 'string' ? parseInt(jobId, 10) : jobId,
         text: text.trim(),
         photoUrl: photoUrl || null,
       }
@@ -251,7 +251,7 @@ export default function ReviewForm({ jobId, reviewType, onSuccess, reviewerUserI
       {/* Rating categories */}
       <div className="space-y-6">
         {categoryKeys.map((category) => {
-          const label = categories[category] as string
+          const label = categories[category as keyof typeof categories]
           const value = ratings[category] || 0
 
           return (
