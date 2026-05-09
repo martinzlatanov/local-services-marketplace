@@ -114,3 +114,39 @@ export interface WsEvent {
   type: WsEventType
   payload: JobDto
 }
+
+// Review types for Phase 11 Ratings & Reviews
+export type ClientRatingCategory = 'communication' | 'quality' | 'punctuality'
+export type ProviderRatingCategory = 'paymentReliability' | 'communicationClarity' | 'professionalism'
+export type ReviewStatus = 'pending' | 'approved'
+
+export interface ClientRatings {
+  communication: number
+  quality: number
+  punctuality: number
+}
+
+export interface ProviderRatings {
+  paymentReliability: number
+  communicationClarity: number
+  professionalism: number
+}
+
+export interface ReviewDTO {
+  id: number
+  jobId: number
+  reviewerId: number
+  revieweeId: number
+  reviewType: 'client' | 'provider'
+  clientCommunication?: number
+  clientQuality?: number
+  clientPunctuality?: number
+  providerPaymentReliability?: number
+  providerCommunicationClarity?: number
+  providerProfessionalism?: number
+  text: string
+  photoUrl?: string | null
+  approvedAt?: string | null
+  createdAt: string
+  updatedAt: string
+}
