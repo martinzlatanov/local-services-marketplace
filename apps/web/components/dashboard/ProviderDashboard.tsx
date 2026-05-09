@@ -7,7 +7,7 @@ import ProviderJobFeed from './ProviderJobFeed'
 import ActiveJobCard from './ActiveJobCard'
 import Toast from '../ui/Toast'
 
-type Tab = 'feed' | 'active'
+type Tab = 'feed' | 'active' | 'completed'
 
 interface ToastState {
   message: string
@@ -20,6 +20,7 @@ export default function ProviderDashboard() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [pendingJobs, setPendingJobs] = useState<JobDto[]>([])
   const [activeJobs, setActiveJobs] = useState<JobDto[]>([])
+  const [completedJobs, setCompletedJobs] = useState<JobDto[]>([])
   const [toast, setToast] = useState<ToastState | null>(null)
 
   const fetchPendingJobs = useCallback(async () => {
@@ -41,7 +42,11 @@ export default function ProviderDashboard() {
       const res = await fetch('/api/jobs/mine', { credentials: 'include' })
       if (res.ok) {
         const data = await res.json()
-        setActiveJobs(data.data ?? [])
+        const jobs = data.data ?? []
+        const active = jobs.filter((j: JobDto) => j.status !== JobStatus.COMPLETED)
+        const completed = jobs.filter((j: JobDto) => j.status === JobStatus.COMPLETED)
+        setActiveJobs(active)
+        setCompletedJobs(completed)
       }
     } catch {}
   }, [])
@@ -124,6 +129,21 @@ export default function ProviderDashboard() {
             </span>
           )}
         </button>
+        <button
+          onClick={() => setActiveTab('completed')}
+          className={`px-5 py-2 text-sm font-medium rounded-[var(--radius-btn)] transition-colors ${
+            activeTab === 'completed'
+              ? 'bg-surface-0 text-surface-900 shadow-sm'
+              : 'text-surface-600 hover:text-surface-900'
+          }`}
+        >
+          Completed
+          {completedJobs.length > 0 && (
+            <span className="ml-1.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full">
+              {completedJobs.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Find Jobs tab */}
@@ -186,6 +206,22 @@ export default function ProviderDashboard() {
             </div>
           ) : (
             activeJobs.map((job) => (
+              <ActiveJobCard key={job.id} job={job} onStatusAdvance={handleStatusAdvance} />
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Completed jobs tab */}
+      {activeTab === 'completed' && (
+        <div className="space-y-4">
+          {completedJobs.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-surface-500 font-medium">No completed jobs yet.</p>
+              <p className="text-surface-400 text-sm mt-1">Complete a job to see your reviews here.</p>
+            </div>
+          ) : (
+            completedJobs.map((job) => (
               <ActiveJobCard key={job.id} job={job} onStatusAdvance={handleStatusAdvance} />
             ))
           )}

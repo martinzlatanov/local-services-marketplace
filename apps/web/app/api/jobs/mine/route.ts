@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   const jobList = await db.select().from(jobs).where(
     and(
       eq(jobs.providerId, String(user.id)),
-      inArray(jobs.status, [JobStatus.ACCEPTED, JobStatus.IN_PROGRESS])
+      inArray(jobs.status, [JobStatus.ACCEPTED, JobStatus.IN_PROGRESS, JobStatus.COMPLETED])
     )
   ).orderBy(jobs.updatedAt)
 

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { JobDto, JobStatus } from '@/lib/types'
-import { MapPin, Loader2, CheckCircle2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { JobDto, JobStatus, ReviewDTO } from '@/lib/types'
+import { MapPin, Loader2, CheckCircle2, Star } from 'lucide-react'
 
 interface ActiveJobCardProps {
   job: JobDto
@@ -21,6 +21,28 @@ const statusColors: Record<string, string> = {
 export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [reviews, setReviews] = useState<ReviewDTO[]>([])
+  const [reviewsLoading, setReviewsLoading] = useState(false)
+
+  useEffect(() => {
+    if (job.status === JobStatus.COMPLETED) {
+      const fetchReviews = async () => {
+        try {
+          setReviewsLoading(true)
+          const res = await fetch(`/api/reviews?jobId=${job.id}`, { credentials: 'include' })
+          if (res.ok) {
+            const data = await res.json()
+            setReviews(data.data || [])
+          }
+        } catch (err) {
+          console.error('Failed to fetch reviews:', err)
+        } finally {
+          setReviewsLoading(false)
+        }
+      }
+      fetchReviews()
+    }
+  }, [job.id, job.status])
 
   const handleAdvance = async (nextStatus: JobStatus) => {
     setLoading(true)
@@ -95,6 +117,82 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
           </button>
         )}
       </div>
+
+      {/* Reviews section for completed jobs */}
+      {job.status === JobStatus.COMPLETED && (
+        <div className="mt-6 pt-6 border-t border-surface-200">
+          <h4 className="text-sm font-semibold text-surface-900 mb-4">Client Reviews</h4>
+          {reviewsLoading ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-4 w-4 animate-spin text-surface-400" aria-hidden="true" />
+            </div>
+          ) : reviews.length === 0 ? (
+            <p className="text-sm text-surface-500">No reviews yet. Check back later.</p>
+          ) : (
+            <div className="space-y-3">
+              {reviews.filter(r => r.approvedAt).map((review) => (
+                <div key={review.id} className="bg-surface-50 rounded-[var(--radius-btn)] p-3 border border-surface-200">
+                  {review.reviewType === 'provider' && review.providerPaymentReliability && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-surface-600">Payment Reliability</span>
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-3 w-3 ${
+                                star <= (review.providerPaymentReliability || 0)
+                                  ? 'fill-brand-500 text-brand-500'
+                                  : 'text-surface-300'
+                              }`}
+                              aria-hidden="true"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-surface-600">Communication</span>
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-3 w-3 ${
+                                star <= (review.providerCommunicationClarity || 0)
+                                  ? 'fill-brand-500 text-brand-500'
+                                  : 'text-surface-300'
+                              }`}
+                              aria-hidden="true"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-surface-600">Professionalism</span>
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star
+                              key={star}
+                              className={`h-3 w-3 ${
+                                star <= (review.providerProfessionalism || 0)
+                                  ? 'fill-brand-500 text-brand-500'
+                                  : 'text-surface-300'
+                              }`}
+                              aria-hidden="true"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {review.text && (
+                    <p className="text-sm text-surface-700 mt-2">{review.text}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
