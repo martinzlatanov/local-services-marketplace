@@ -232,6 +232,7 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
+  const { isNotNull, and } = await import('drizzle-orm')
   const url = new URL(req.url)
   const jobId = url.searchParams.get('jobId')
   const userId = url.searchParams.get('userId')
@@ -253,32 +254,29 @@ export async function GET(req: Request) {
       return NextResponse.json({ errors: { job: 'not_found' } }, { status: 404 })
     }
 
-    const userId = parseInt(user.id, 10)
-    if (String(job.clientId) !== String(userId) && String(job.providerId) !== String(userId)) {
+    const userIdNum = parseInt(user.id, 10)
+    if (String(job.clientId) !== String(userIdNum) && String(job.providerId) !== String(userIdNum)) {
       return NextResponse.json(
         { errors: { auth: 'not_authorized' } },
         { status: 403 }
       )
     }
 
-    // Fetch reviews for job
-    let query = db.select().from(reviews).where(eq(reviews.jobId, jobIdNum))
-
+    // Build query based on approved filter
+    let jobReviews
     if (approved === 'true') {
-      // Import sql for IS NOT NULL check
-      const { isNotNull } = await import('drizzle-orm')
-      query = db
+      jobReviews = await db
         .select()
         .from(reviews)
         .where(
-          approved === 'true'
-            ? isNotNull(reviews.approvedAt)
-            : eq(reviews.jobId, jobIdNum)
+          and(
+            eq(reviews.jobId, jobIdNum),
+            isNotNull(reviews.approvedAt)
+          )
         )
-        .where(eq(reviews.jobId, jobIdNum))
+    } else {
+      jobReviews = await db.select().from(reviews).where(eq(reviews.jobId, jobIdNum))
     }
-
-    const jobReviews = await query
 
     const reviewDtos = jobReviews.map((r) => ({
       id: r.id,
@@ -310,7 +308,6 @@ export async function GET(req: Request) {
     }
 
     // For profile views, always filter by approved
-    const { isNotNull, and } = await import('drizzle-orm')
     const profileReviews = await db
       .select()
       .from(reviews)
