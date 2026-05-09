@@ -65,7 +65,7 @@ export function initWsServer(server: any) {
   return wss
 }
 
-export function broadcastToUser(userId: string, event: { type: string; payload: JobDto }) {
+export function broadcastToUser(userId: string, event: { type: string; payload: any }) {
   const userClients = clients.get(userId)
   if (!userClients) return
 

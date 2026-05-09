@@ -232,11 +232,50 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
-  const { isNotNull, and } = await import('drizzle-orm')
+  const { isNotNull, and, isNull } = await import('drizzle-orm')
   const url = new URL(req.url)
   const jobId = url.searchParams.get('jobId')
   const userId = url.searchParams.get('userId')
   const approved = url.searchParams.get('approved')
+
+  // Pattern 0: Admin pending reviews queue - GET /api/reviews?approved=false
+  if (approved === 'false' && !jobId && !userId) {
+    const user = await getAuthenticatedUser(req)
+    if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
+    if (user.role !== Role.ADMIN) {
+      return NextResponse.json(
+        { errors: { role: 'admin_only' } },
+        { status: 403 }
+      )
+    }
+
+    // Fetch all pending reviews (approvedAt IS NULL)
+    const pendingReviews = await db
+      .select()
+      .from(reviews)
+      .where(isNull(reviews.approvedAt))
+
+    const reviewDtos = pendingReviews.map((r) => ({
+      id: r.id,
+      jobId: r.jobId,
+      reviewerId: r.reviewerId,
+      revieweeId: r.revieweeId,
+      reviewType: r.reviewType as 'client' | 'provider',
+      clientCommunication: r.clientCommunication || undefined,
+      clientQuality: r.clientQuality || undefined,
+      clientPunctuality: r.clientPunctuality || undefined,
+      providerPaymentReliability: r.providerPaymentReliability || undefined,
+      providerCommunicationClarity: r.providerCommunicationClarity || undefined,
+      providerProfessionalism: r.providerProfessionalism || undefined,
+      text: r.text,
+      photoUrl: r.photoUrl,
+      approvedAt: r.approvedAt ? r.approvedAt.toISOString() : null,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+    }))
+
+    return NextResponse.json({ data: reviewDtos } as ApiSuccessResponse<ReviewDTO[]>)
+  }
 
   // Pattern 1: ?jobId=X (internal use, requires auth)
   if (jobId) {

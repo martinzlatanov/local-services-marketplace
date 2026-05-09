@@ -4,6 +4,7 @@ import { reviews } from '@/lib/db/schema'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { ReviewDTO, ApiSuccessResponse, ApiErrorResponse, Role } from '@/lib/types'
 import { eq } from 'drizzle-orm'
+import { broadcastToUser } from '@/lib/ws/server'
 
 export async function POST(req: Request) {
   // 1. Authenticate user and verify admin role
@@ -49,8 +50,21 @@ export async function POST(req: Request) {
     .where(eq(reviews.id, reviewId))
     .returning()
 
-  // TODO for Wave 4: Emit WebSocket 'review_approved' event to revieweeId
-  // This will notify the reviewer that their review has been approved
+  // 6a. Emit WebSocket 'review_approved' event to revieweeId (fire-and-forget)
+  try {
+    const revieweeIdStr = String(updatedReview.revieweeId)
+    broadcastToUser(revieweeIdStr, {
+      type: 'review_approved',
+      payload: {
+        reviewId: updatedReview.id,
+        revieweeId: updatedReview.revieweeId,
+        reviewerName: `User ${updatedReview.reviewerId}`,
+      },
+    })
+  } catch (wsError) {
+    // Log but don't fail the request - WebSocket is fire-and-forget
+    console.error('WebSocket broadcast error:', wsError)
+  }
 
   // 7. Return 200 + updated review
   const reviewDto: ReviewDTO = {

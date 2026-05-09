@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ReviewDTO } from '@/lib/types'
 import { Star, X } from 'lucide-react'
+import { onReviewApproved, initWebSocket } from '@/lib/websocket'
 
 interface ReviewDisplayProps {
   userId: number
@@ -208,6 +209,35 @@ export default function ReviewDisplay({
 }: ReviewDisplayProps) {
   const categoryLabels = reviewType === 'client' ? CATEGORY_LABELS_CLIENT : CATEGORY_LABELS_PROVIDER
   const categoryKeys = Object.keys(categoryLabels) as string[]
+
+  // Set up WebSocket listener for real-time review approval notifications
+  useEffect(() => {
+    // Initialize WebSocket connection
+    initWebSocket().catch((err) => {
+      console.warn('WebSocket initialization failed, updates will not be real-time:', err)
+    })
+
+    // Subscribe to review_approved events
+    const unsubscribe = onReviewApproved(async (payload: { reviewId: number; revieweeId: number; reviewerName?: string }) => {
+      // Only refresh if the approved review is for the current user
+      if (payload.revieweeId === userId) {
+        try {
+          const response = await fetch(`/api/reviews?userId=${userId}&approved=true`)
+          if (response.ok) {
+            const data = await response.json()
+            // Force page refresh to show updated reviews (alternative: could emit custom event to parent)
+            window.location.reload()
+          }
+        } catch (err) {
+          console.error('Failed to refresh reviews after approval:', err)
+        }
+      }
+    })
+
+    return () => {
+      unsubscribe()
+    }
+  }, [userId])
 
   // Calculate overall average
   const validRatings = categoryKeys
