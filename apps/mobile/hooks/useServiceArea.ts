@@ -1,33 +1,7 @@
 import { useEffect, useState } from 'react'
-import * as SecureStore from 'expo-secure-store'
-import { Platform } from 'react-native'
 import { CITY_AREAS } from '@local/types'
 import { SERVICE_AREA_KEY } from '../contexts/AuthContext'
-
-// Storage wrapper that works on both web and native
-const storage = {
-  getItemAsync: async (key: string): Promise<string | null> => {
-    if (Platform.OS === 'web') {
-      return localStorage.getItem(key)
-    } else {
-      return await SecureStore.getItemAsync(key)
-    }
-  },
-  setItemAsync: async (key: string, value: string): Promise<void> => {
-    if (Platform.OS === 'web') {
-      localStorage.setItem(key, value)
-    } else {
-      await SecureStore.setItemAsync(key, value)
-    }
-  },
-  deleteItemAsync: async (key: string): Promise<void> => {
-    if (Platform.OS === 'web') {
-      localStorage.removeItem(key)
-    } else {
-      await SecureStore.deleteItemAsync(key)
-    }
-  }
-}
+import { storage } from '../lib/storage'
 
 interface UseServiceAreaResult {
   serviceArea: string | null

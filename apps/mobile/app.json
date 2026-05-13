@@ -8,7 +8,7 @@
       "android",
       "web"
     ],
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "scheme": "localservices",
     "experiments": {
       "typedRoutes": true

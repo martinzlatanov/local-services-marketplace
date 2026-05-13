@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server'
 import { findUserByEmail, verifyPassword, signJwt } from '../../../../lib/auth'
 import { AuthLoginRequest } from '@/lib/types'
 
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204 })
+}
+
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ errors: { body: 'invalid json' } }, { status: 400 })

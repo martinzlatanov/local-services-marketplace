@@ -17,7 +17,7 @@ export function proxy(req: NextRequest) {
     return new Response(null, {
       status: 200,
       headers: {
-        'Access-Control-Allow-Origin': 'http://localhost:8081',
+        'Access-Control-Allow-Origin': req.headers.get('origin') ?? '*',
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         'Access-Control-Max-Age': '86400', // 24 hours
@@ -44,7 +44,7 @@ export function proxy(req: NextRequest) {
 
   // Add CORS headers for API routes
   if (isApiRoute) {
-    response.headers.set('Access-Control-Allow-Origin', 'http://localhost:8081')
+    response.headers.set('Access-Control-Allow-Origin', req.headers.get('origin') ?? '*')
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
   }

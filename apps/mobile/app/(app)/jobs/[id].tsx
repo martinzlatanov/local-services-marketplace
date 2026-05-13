@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Appbar, ActivityIndicator, Button, Snackbar, Text, useTheme } from 'react-native-paper'
-import * as SecureStore from 'expo-secure-store'
 import { JobDto, JobStatus } from '@local/types'
 import { TOKEN_KEY } from '../../../contexts/AuthContext'
 import { acceptJob, getJob, updateJobStatus } from '../../../lib/api'
+import { storage } from '../../../lib/storage'
 
 export default function JobDetailScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>()
@@ -22,7 +22,7 @@ export default function JobDetailScreen() {
     let isActive = true
 
     async function loadToken() {
-      const stored = await SecureStore.getItemAsync(TOKEN_KEY)
+      const stored = await storage.getItemAsync(TOKEN_KEY)
       if (isActive) {
         setToken(stored)
       }

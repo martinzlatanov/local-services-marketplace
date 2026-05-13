@@ -4,6 +4,10 @@ import { verifyJwt } from '../../../../lib/auth'
 import { db } from '../../../../lib/db/client'
 import { users } from '../../../../lib/db/schema'
 
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204 })
+}
+
 export async function GET(req: NextRequest) {
   const cookieToken = req.cookies.get('token')?.value ?? null
   const headerToken = req.headers.get('Authorization')?.replace('Bearer ', '') ?? null

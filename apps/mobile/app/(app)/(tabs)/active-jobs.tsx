@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Appbar, Card, Text, ActivityIndicator, useTheme } from 'react-native-paper'
-import * as SecureStore from 'expo-secure-store'
 import { JobDto, JobStatus } from '@local/types'
 import { useAuth, TOKEN_KEY } from '../../../contexts/AuthContext'
 import { getMyJobs } from '../../../lib/api'
+import { storage } from '../../../lib/storage'
 
 export default function ActiveJobsScreen() {
   const { user } = useAuth()
@@ -21,7 +21,7 @@ export default function ActiveJobsScreen() {
     let isActive = true
 
     async function loadToken() {
-      const stored = await SecureStore.getItemAsync(TOKEN_KEY)
+      const stored = await storage.getItemAsync(TOKEN_KEY)
       if (isActive) {
         setToken(stored)
       }
