@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import * as SecureStore from 'expo-secure-store'
 import { Platform } from 'react-native'
+import Constants from 'expo-constants'
 import type { AuthUserDto } from '@local/types'
 
 // Storage wrapper that works on both web and native
@@ -30,7 +31,20 @@ const storage = {
 
 export const TOKEN_KEY = 'auth_token'
 export const SERVICE_AREA_KEY = 'service_area'
-export const API_BASE = __DEV__ ? 'http://localhost:3000' : 'https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app'
+function getApiBase(): string {
+  if (!__DEV__) {
+    return 'https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app'
+  }
+  // On a physical device, hostUri is "192.168.x.x:8081" — extract the host IP
+  const hostUri = Constants.expoConfig?.hostUri
+  if (hostUri) {
+    const host = hostUri.split(':')[0]
+    return `http://${host}:3000`
+  }
+  return 'http://localhost:3000'
+}
+
+export const API_BASE = getApiBase()
 
 interface AuthContextValue {
   user: AuthUserDto | null
