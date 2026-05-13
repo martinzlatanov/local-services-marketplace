@@ -29,7 +29,7 @@ export default function JobCard({ job }: JobCardProps) {
   const categoryIcon = categoryIcons[job.category] || '•'
 
   return (
-    <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-5 hover:shadow-[var(--shadow-card-hover)] transition-shadow duration-200">
+    <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-4 hover:shadow-[var(--shadow-card-hover)] transition-shadow duration-200">
       <div className="flex justify-between items-start gap-4">
         <div className="flex-1">
           <h3 className="font-medium text-surface-900 flex items-center gap-2">

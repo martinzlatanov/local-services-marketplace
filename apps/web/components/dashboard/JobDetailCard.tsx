@@ -13,22 +13,22 @@ interface JobDetailCardProps {
 
 const statusInfo: Record<string, { color: string; label: string; description: string }> = {
   [JobStatus.PENDING]: {
-    color: 'bg-yellow-50 border-yellow-200 text-yellow-900',
+    color: 'bg-status-pending-bg border-status-pending-border text-status-pending-text',
     label: 'Pending',
     description: 'Waiting for a provider to accept'
   },
   [JobStatus.ACCEPTED]: {
-    color: 'bg-blue-50 border-blue-200 text-blue-900',
+    color: 'bg-status-accepted-bg border-status-accepted-border text-status-accepted-text',
     label: 'Accepted',
     description: 'A provider has accepted your job'
   },
   [JobStatus.IN_PROGRESS]: {
-    color: 'bg-purple-50 border-purple-200 text-purple-900',
+    color: 'bg-status-progress-bg border-status-progress-border text-status-progress-text',
     label: 'In Progress',
     description: 'Work is underway'
   },
   [JobStatus.COMPLETED]: {
-    color: 'bg-green-50 border-green-200 text-green-900',
+    color: 'bg-status-completed-bg border-status-completed-border text-status-completed-text',
     label: 'Completed',
     description: 'Job finished'
   },
@@ -66,7 +66,7 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
   }
 
   return (
-    <div className={`border rounded-[var(--radius-card)] p-5 ${status.color}`}>
+    <div className={`border rounded-[var(--radius-card)] p-4 ${status.color}`}>
       <div className="flex justify-between items-start gap-4 mb-4">
         <div className="flex-1">
           <h3 className="font-semibold text-lg flex items-center gap-2">

@@ -139,7 +139,7 @@ export default function ReviewApprovalCard({
   }
 
   return (
-    <div className="rounded-lg border border-surface-200 bg-white p-6 shadow-sm">
+    <div className="rounded-[var(--radius-card)] border border-surface-200 bg-white p-6 shadow-[var(--shadow-card)]">
       {/* Header */}
       <div className="mb-4 flex items-start justify-between">
         <div>

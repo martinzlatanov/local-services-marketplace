@@ -91,7 +91,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Panel - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center py-12 px-4 bg-surface-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center py-16 px-4 bg-surface-50">
         <div className="w-full max-w-md">
           <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-8 shadow-[var(--shadow-auth)]">
             {/* Header */}

@@ -3,11 +3,19 @@
     "name": "LocalServicesProvider",
     "slug": "local-services-provider",
     "version": "0.0.1",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "newArchEnabled": true,
     "scheme": "localservices",
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-router"
+    ]
   }
 }

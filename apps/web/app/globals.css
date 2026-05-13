@@ -34,13 +34,19 @@
 
   /* Status badge tokens */
   --color-status-pending-bg:       #fef9c3;
+  --color-status-pending-border:   #fde68a;
   --color-status-pending-text:     #854d0e;
   --color-status-accepted-bg:      #dbeafe;
+  --color-status-accepted-border:  #bfdbfe;
   --color-status-accepted-text:    #1e40af;
   --color-status-progress-bg:      #ede9fe;
+  --color-status-progress-border:  #ddd6fe;
   --color-status-progress-text:    #5b21b6;
   --color-status-completed-bg:     #dcfce7;
+  --color-status-completed-border: #bbf7d0;
   --color-status-completed-text:   #166534;
+  --color-status-error-50:         #fef2f2;
+  --color-status-error-700:        #b91c1c;
 
   /* Typography */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;

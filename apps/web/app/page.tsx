@@ -174,7 +174,7 @@ export default function Home() {
 
         {/* Copyright */}
         <div className="border-t border-brand-800 pt-8 text-center text-brand-200 text-sm">
-          <p>&copy; 2025 LocalPro. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} LocalPro. All rights reserved.</p>
         </div>
       </footer>
 

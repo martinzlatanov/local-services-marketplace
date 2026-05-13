@@ -26,7 +26,7 @@ export default function Toast({ message, type, onDismiss }: ToastProps) {
 
   return (
     <div
-      className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 ${config.bg} border ${config.border} ${config.text} rounded-[var(--radius-btn)] px-4 py-3 shadow-lg animate-slide-up max-w-sm`}
+      className={`fixed bottom-4 right-4 z-50 flex items-center gap-3 ${config.bg} border ${config.border} ${config.text} rounded-[var(--radius-card)] px-4 py-4 shadow-[var(--shadow-card-hover)] animate-slide-up max-w-sm`}
       role="status"
       aria-live="polite"
     >

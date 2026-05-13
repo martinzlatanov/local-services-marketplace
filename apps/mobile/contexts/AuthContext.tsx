@@ -1,10 +1,36 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import * as SecureStore from 'expo-secure-store'
+import { Platform } from 'react-native'
 import type { AuthUserDto } from '@local/types'
+
+// Storage wrapper that works on both web and native
+const storage = {
+  getItemAsync: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key)
+    } else {
+      return await SecureStore.getItemAsync(key)
+    }
+  },
+  setItemAsync: async (key: string, value: string): Promise<void> => {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(key, value)
+    } else {
+      await SecureStore.setItemAsync(key, value)
+    }
+  },
+  deleteItemAsync: async (key: string): Promise<void> => {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key)
+    } else {
+      await SecureStore.deleteItemAsync(key)
+    }
+  }
+}
 
 export const TOKEN_KEY = 'auth_token'
 export const SERVICE_AREA_KEY = 'service_area'
-export const API_BASE = 'https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app' // Change to localhost:3000 for dev
+export const API_BASE = __DEV__ ? 'http://localhost:3000' : 'https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app'
 
 interface AuthContextValue {
   user: AuthUserDto | null
@@ -23,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function rehydrate() {
       try {
-        const token = await SecureStore.getItemAsync(TOKEN_KEY)
+        const token = await storage.getItemAsync(TOKEN_KEY)
         if (!token) {
           return
         }
@@ -36,11 +62,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const data = (await res.json()) as { user: AuthUserDto }
           setUser(data.user)
         } else {
-          await SecureStore.deleteItemAsync(TOKEN_KEY)
+          await storage.deleteItemAsync(TOKEN_KEY)
           setUser(null)
         }
       } catch {
-        await SecureStore.deleteItemAsync(TOKEN_KEY)
+        await storage.deleteItemAsync(TOKEN_KEY)
         setUser(null)
       } finally {
         setIsLoading(false)
@@ -62,17 +88,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const data = (await res.json()) as { user: AuthUserDto; token: string }
-    await SecureStore.setItemAsync(TOKEN_KEY, data.token)
+    await storage.setItemAsync(TOKEN_KEY, data.token)
     setUser(data.user)
   }
 
   async function logout(): Promise<void> {
-    await SecureStore.deleteItemAsync(TOKEN_KEY)
+    await storage.deleteItemAsync(TOKEN_KEY)
     setUser(null)
   }
 
   async function setTokenAndUser(token: string, nextUser: AuthUserDto): Promise<void> {
-    await SecureStore.setItemAsync(TOKEN_KEY, token)
+    await storage.setItemAsync(TOKEN_KEY, token)
     setUser(nextUser)
   }
 

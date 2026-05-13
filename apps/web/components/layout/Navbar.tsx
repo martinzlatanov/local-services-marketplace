@@ -89,7 +89,13 @@ export default function Navbar() {
 
         {/* Mobile menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pt-4 border-t border-surface-200 flex flex-col gap-3">
+          <>
+            <div
+              className="fixed inset-0 z-30 bg-black/20 md:hidden"
+              aria-hidden="true"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+          <div className="md:hidden mt-4 pt-4 border-t border-surface-200 flex flex-col gap-3 relative z-40">
             {!user && !isLoading && (
               <>
                 <Link
@@ -139,6 +145,7 @@ export default function Navbar() {
               </>
             )}
           </div>
+          </>
         )}
       </div>
     </nav>
