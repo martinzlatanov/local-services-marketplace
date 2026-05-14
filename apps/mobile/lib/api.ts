@@ -1,5 +1,5 @@
 import { API_BASE } from '../contexts/AuthContext'
-import type { ApiErrorResponse, ApiSuccessResponse, JobDto } from '@local/types'
+import type { ApiErrorResponse, ApiSuccessResponse, JobDto, PublicUserDto } from '@local/types'
 
 async function parseResponse<T>(res: Response): Promise<T> {
   const data = (await res.json().catch(() => null)) as ApiSuccessResponse<T> | ApiErrorResponse | null
@@ -52,4 +52,11 @@ export async function updateJobStatus(token: string, id: string, status: string)
     body: JSON.stringify({ status }),
   })
   return parseResponse<JobDto>(res)
+}
+
+export async function getUser(token: string, userId: string): Promise<PublicUserDto> {
+  const res = await fetch(`${API_BASE}/api/users/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return parseResponse<PublicUserDto>(res)
 }
