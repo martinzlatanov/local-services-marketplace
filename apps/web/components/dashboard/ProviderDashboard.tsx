@@ -135,88 +135,75 @@ export default function ProviderDashboard() {
   }
 
   return (
-    <div className="mt-6">
-      {/* Tabs */}
-      <div className="flex gap-1 bg-surface-100 p-1 rounded-[var(--radius-btn)] w-fit mb-6">
-        <button
-          onClick={() => setActiveTab('feed')}
-          className={`px-5 py-2 text-sm font-medium rounded-[var(--radius-btn)] transition-colors ${
-            activeTab === 'feed'
-              ? 'bg-surface-0 text-surface-900 shadow-sm'
-              : 'text-surface-600 hover:text-surface-900'
-          }`}
-        >
-          Find Jobs
-          {pendingJobs.length > 0 && (
-            <span className="ml-1.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full">
-              {pendingJobs.length}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('active')}
-          className={`px-5 py-2 text-sm font-medium rounded-[var(--radius-btn)] transition-colors ${
-            activeTab === 'active'
-              ? 'bg-surface-0 text-surface-900 shadow-sm'
-              : 'text-surface-600 hover:text-surface-900'
-          }`}
-        >
-          My Active Jobs
-          {activeJobs.length > 0 && (
-            <span className="ml-1.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full">
-              {activeJobs.length}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('completed')}
-          className={`px-5 py-2 text-sm font-medium rounded-[var(--radius-btn)] transition-colors ${
-            activeTab === 'completed'
-              ? 'bg-surface-0 text-surface-900 shadow-sm'
-              : 'text-surface-600 hover:text-surface-900'
-          }`}
-        >
-          Completed
-          {completedJobs.length > 0 && (
-            <span className="ml-1.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full">
-              {completedJobs.length}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('reviews')}
-          className={`px-5 py-2 text-sm font-medium rounded-[var(--radius-btn)] transition-colors ${
-            activeTab === 'reviews'
-              ? 'bg-surface-0 text-surface-900 shadow-sm'
-              : 'text-surface-600 hover:text-surface-900'
-          }`}
-        >
-          Reviews
-          {receivedReviews.length > 0 && (
-            <span className="ml-1.5 text-xs bg-brand-100 text-brand-700 px-1.5 py-0.5 rounded-full">
-              {receivedReviews.length}
-            </span>
-          )}
-        </button>
+    <div>
+      {/* Page header */}
+      <div className="mb-8">
+        <p className="eyebrow mb-3">Provider Dashboard</p>
+        <h1 className="text-[32px] font-extrabold tracking-[-1px] text-surface-900">My Work</h1>
+        <p className="text-[14px] text-surface-500 mt-1">Browse available jobs and manage your active work.</p>
+      </div>
+
+      {/* Stats strip */}
+      <div className="border border-surface-200 rounded-[var(--radius-card)] overflow-hidden mb-8">
+        <div className="grid grid-cols-4">
+          {([
+            { label: 'Available', value: pendingJobs.length },
+            { label: 'Active',    value: activeJobs.length },
+            { label: 'Completed', value: completedJobs.length },
+            { label: 'Reviews',   value: receivedReviews.length },
+          ] as const).map((stat, i) => (
+            <div key={stat.label} className={`px-6 py-5 ${i < 3 ? 'border-r border-surface-200' : ''}`}>
+              <p className="text-[28px] font-extrabold tracking-[-1px] text-surface-900 font-mono">{stat.value}</p>
+              <p className="text-[12px] text-surface-500 mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Underline tab bar */}
+      <div className="flex border-b border-surface-200 mb-6 gap-0">
+        {([
+          { key: 'feed',      label: 'Find Jobs',      count: pendingJobs.length },
+          { key: 'active',    label: 'Active Jobs',    count: activeJobs.length },
+          { key: 'completed', label: 'Completed',      count: completedJobs.length },
+          { key: 'reviews',   label: 'Reviews',        count: receivedReviews.length },
+        ] as const).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === tab.key
+                ? 'border-surface-900 text-surface-900'
+                : 'border-transparent text-surface-500 hover:text-surface-700'
+            }`}
+          >
+            {tab.label}
+            {tab.count > 0 && (
+              <span className="ml-1.5 text-[11px] bg-surface-100 text-surface-600 px-1.5 py-0.5 rounded-full">
+                {tab.count}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Find Jobs tab */}
       {activeTab === 'feed' && (
-        <div>
-          {/* Filters */}
-          <div className="space-y-4 mb-6">
-            {/* City area filter */}
-            <div>
-              <h3 className="text-xs font-semibold text-surface-700 mb-2 uppercase tracking-wide">Location</h3>
-              <div className="flex gap-2 flex-wrap">
+        <div className="grid lg:grid-cols-[2fr_3fr] gap-0 border border-surface-200 rounded-[var(--radius-card)] overflow-hidden">
+          {/* Left: filters */}
+          <div className="border-r border-surface-200 p-6">
+            <p className="text-[11px] font-bold tracking-[0.06em] text-surface-400 mb-5">01 / Filters</p>
+            <div className="mb-6">
+              <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-500 mb-3">Location</p>
+              <div className="flex flex-col gap-1">
                 {['All', ...CITY_AREAS].map((area) => (
                   <button
                     key={area}
                     onClick={() => setSelectedArea(area)}
-                    className={`px-3 py-1.5 text-sm rounded-[var(--radius-badge)] font-medium transition-colors ${
+                    className={`text-left px-3 py-2 text-[13px] rounded-md transition-colors ${
                       selectedArea === area
-                        ? 'bg-brand-600 text-white'
-                        : 'bg-surface-100 text-surface-700 hover:bg-surface-200'
+                        ? 'bg-surface-900 text-white font-medium'
+                        : 'text-surface-600 hover:bg-surface-100'
                     }`}
                   >
                     {area}
@@ -224,19 +211,17 @@ export default function ProviderDashboard() {
                 ))}
               </div>
             </div>
-
-            {/* Category filter */}
             <div>
-              <h3 className="text-xs font-semibold text-surface-700 mb-2 uppercase tracking-wide">Category</h3>
-              <div className="flex gap-2 flex-wrap">
+              <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-500 mb-3">Category</p>
+              <div className="flex flex-col gap-1">
                 {['All', ...JOB_CATEGORIES].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 text-sm rounded-[var(--radius-badge)] font-medium transition-colors ${
+                    className={`text-left px-3 py-2 text-[13px] rounded-md transition-colors ${
                       selectedCategory === cat
-                        ? 'bg-brand-600 text-white'
-                        : 'bg-surface-100 text-surface-700 hover:bg-surface-200'
+                        ? 'bg-surface-900 text-white font-medium'
+                        : 'text-surface-600 hover:bg-surface-100'
                     }`}
                   >
                     {cat}
@@ -245,8 +230,11 @@ export default function ProviderDashboard() {
               </div>
             </div>
           </div>
-
-          <ProviderJobFeed jobs={pendingJobs} onAccept={handleAccept} />
+          {/* Right: job feed */}
+          <div className="p-6">
+            <p className="text-[11px] font-bold tracking-[0.06em] text-surface-400 mb-5">02 / Available Jobs</p>
+            <ProviderJobFeed jobs={pendingJobs} onAccept={handleAccept} />
+          </div>
         </div>
       )}
 
@@ -254,10 +242,7 @@ export default function ProviderDashboard() {
       {activeTab === 'active' && (
         <div className="space-y-4">
           {activeJobs.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-surface-500 font-medium">No active jobs yet.</p>
-              <p className="text-surface-400 text-sm mt-1">Accept a job from the feed to get started.</p>
-            </div>
+            <div className="text-center py-12 text-surface-500">No active jobs yet — accept one from the feed.</div>
           ) : (
             activeJobs.map((job) => (
               <ActiveJobCard key={job.id} job={job} onStatusAdvance={handleStatusAdvance} />
@@ -270,10 +255,7 @@ export default function ProviderDashboard() {
       {activeTab === 'completed' && (
         <div className="space-y-4">
           {completedJobs.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-surface-500 font-medium">No completed jobs yet.</p>
-              <p className="text-surface-400 text-sm mt-1">Complete a job to submit and receive reviews.</p>
-            </div>
+            <div className="text-center py-12 text-surface-500">No completed jobs yet.</div>
           ) : (
             completedJobs.map((job) => (
               <ActiveJobCard key={job.id} job={job} onStatusAdvance={handleStatusAdvance} />
@@ -293,13 +275,7 @@ export default function ProviderDashboard() {
         />
       )}
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onDismiss={() => setToast(null)}
-        />
-      )}
+      {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
     </div>
   )
 }
