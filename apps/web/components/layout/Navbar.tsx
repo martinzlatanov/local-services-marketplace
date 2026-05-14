@@ -2,17 +2,20 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '../../contexts/AuthContext'
 import { Role } from '@/lib/types'
 import { Wrench, Menu, X } from 'lucide-react'
 
 export default function Navbar() {
   const { user, isLoading, logout } = useAuth()
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLogout = async () => {
     await logout()
     setMobileMenuOpen(false)
+    router.push('/login')
   }
 
   return (

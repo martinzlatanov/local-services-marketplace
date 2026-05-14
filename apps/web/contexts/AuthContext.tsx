@@ -59,11 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const data = (await res.json()) as AuthLoginResponse & { token?: string }
+    if (data.token) localStorage.setItem('auth_token', data.token)
     setUser(data.user)
   }
 
   async function logout(): Promise<void> {
     await fetch('/api/auth/logout', { method: 'POST' })
+    localStorage.removeItem('auth_token')
     setUser(null)
   }
 

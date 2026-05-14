@@ -190,3 +190,17 @@ Plans:
   7. Browse page matches sketch `07-browse-page.html`: sidebar filter list, jobs as data table, pagination
   8. Mobile feed matches sketch `02-mobile-feed-variant-A.html`: filter chips, unified-token cards, pinned Accept CTA
   9. Mobile active jobs + settings match sketch `08-mobile-active-jobs-settings.html`: progress track cards, bottom sheet area picker replaces Paper Dialog
+
+### Phase 13: Provider & Client Identity
+**Goal**: Surface who is involved in each job — providers see client info on job details, clients see provider info on job details — and give providers a public profile page showing all their approved reviews, an avatar, and profile metadata.
+**Depends on**: Phase 12
+**Requirements**: IDENTITY-01, IDENTITY-02, IDENTITY-03, IDENTITY-04, IDENTITY-05
+**Status**: Ready to plan
+**Plans**: TBD
+
+**Success Criteria** (what must be TRUE):
+  1. Web job detail (client view) shows provider email and name when a job has `providerId` set
+  2. Mobile job detail (provider view) shows client email and name for every job
+  3. `GET /api/users/[id]` returns `{ id, email, name, avatarUrl, role, createdAt }` — no password hash
+  4. Provider profile page at `/providers/[id]` renders: avatar initials circle, email/name, member-since date, average star rating, and list of approved reviews with photos
+  5. `users` table has nullable `name` varchar(100) and `avatarUrl` text columns — migration applied without breaking existing rows

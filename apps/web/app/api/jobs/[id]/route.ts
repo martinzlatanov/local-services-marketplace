@@ -5,6 +5,38 @@ import { getAuthenticatedUser } from '@/lib/auth'
 import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@/lib/types'
 import { eq } from 'drizzle-orm'
 
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const user = await getAuthenticatedUser(req)
+  if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
+
+  const { id } = await params
+  const jobId = parseInt(id, 10)
+  if (isNaN(jobId)) {
+    return NextResponse.json({ errors: { id: 'invalid' } }, { status: 400 })
+  }
+
+  const [job] = await db.select().from(jobs).where(eq(jobs.id, jobId)).limit(1)
+  if (!job) {
+    return NextResponse.json({ errors: { job: 'not_found' } }, { status: 404 })
+  }
+
+  const jobDto: JobDto = {
+    id: String(job.id),
+    status: job.status as JobStatus,
+    version: job.version,
+    category: job.category,
+    description: job.description,
+    timeframe: job.timeframe,
+    cityArea: job.cityArea,
+    clientId: job.clientId,
+    providerId: job.providerId,
+    createdAt: job.createdAt.toISOString(),
+    updatedAt: job.updatedAt.toISOString(),
+  }
+
+  return NextResponse.json({ data: jobDto } as ApiSuccessResponse<JobDto>)
+}
+
 // Valid state transitions
 const VALID_TRANSITIONS: Record<JobStatus, JobStatus[]> = {
   [JobStatus.PENDING]: [JobStatus.ACCEPTED],

@@ -9,8 +9,8 @@ async function parseResponse<T>(res: Response): Promise<T> {
   return (data as ApiSuccessResponse<T>).data
 }
 
-export async function getJobs(token: string, cityArea: string): Promise<JobDto[]> {
-  const res = await fetch(`${API_BASE}/api/jobs?cityArea=${encodeURIComponent(cityArea)}`, {
+export async function getJobs(token: string): Promise<JobDto[]> {
+  const res = await fetch(`${API_BASE}/api/jobs?browse=1`, {
     headers: { Authorization: `Bearer ${token}` },
   })
   return parseResponse<JobDto[]>(res)

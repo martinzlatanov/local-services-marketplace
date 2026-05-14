@@ -5,15 +5,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
 import { useServiceArea } from '../hooks/useServiceArea'
 
-const appTheme = {
+const appTheme: typeof MD3LightTheme = {
   ...MD3LightTheme,
   colors: {
     ...MD3LightTheme.colors,
     primary: '#0f172a',
     secondary: '#14b8a6',
-    surface: '#ffffff',
-    surfaceVariant: '#f8fafc',
-    outline: '#e2e8f0',
   },
 }
 

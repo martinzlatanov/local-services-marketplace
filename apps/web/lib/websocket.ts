@@ -24,7 +24,7 @@ class WebSocketClient {
     return new Promise((resolve, reject) => {
       try {
         // Get token from cookie
-        const token = this.getTokenFromCookie()
+        const token = this.getToken()
         if (!token) {
           console.warn('WebSocket: No token found, connection skipped')
           reject(new Error('No authentication token'))
@@ -64,11 +64,9 @@ class WebSocketClient {
     })
   }
 
-  private getTokenFromCookie(): string | null {
-    if (typeof document === 'undefined') return null
-    const cookies = document.cookie.split(';')
-    const tokenCookie = cookies.find((c) => c.trim().startsWith('token='))
-    return tokenCookie ? tokenCookie.trim().substring(6) : null
+  private getToken(): string | null {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem('auth_token')
   }
 
   private handleEvent(event: WebSocketEvent) {

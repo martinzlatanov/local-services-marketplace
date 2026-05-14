@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { CITY_AREAS } from '@local/types'
 import { SERVICE_AREA_KEY } from '../contexts/AuthContext'
 import { storage } from '../lib/storage'
 
@@ -18,11 +17,8 @@ export function useServiceArea(): UseServiceAreaResult {
     async function loadServiceArea() {
       try {
         const stored = await storage.getItemAsync(SERVICE_AREA_KEY)
-        if (stored && CITY_AREAS.includes(stored as (typeof CITY_AREAS)[number])) {
+        if (stored) {
           setServiceArea(stored)
-        } else if (stored) {
-          await storage.deleteItemAsync(SERVICE_AREA_KEY)
-          setServiceArea(null)
         }
       } finally {
         setIsLoading(false)

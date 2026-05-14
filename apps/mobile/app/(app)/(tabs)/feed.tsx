@@ -44,7 +44,7 @@ export default function FeedScreen() {
 
   const fetchJobs = useCallback(
     async (refresh = false) => {
-      if (!token || !serviceArea) {
+      if (!token) {
         return
       }
 
@@ -57,16 +57,17 @@ export default function FeedScreen() {
       setErrorMessage(null)
 
       try {
-        const data = await getJobs(token, serviceArea)
+        const data = await getJobs(token)
         setJobs(data)
-      } catch {
+      } catch (err: any) {
+        console.error('fetchJobs error:', JSON.stringify(err))
         setErrorMessage("Couldn't load jobs. Pull down to retry.")
       } finally {
         setIsLoading(false)
         setIsRefreshing(false)
       }
     },
-    [serviceArea, token]
+    [token]
   )
 
   useEffect(() => {
@@ -75,15 +76,10 @@ export default function FeedScreen() {
 
   const handleJobUpdated = useCallback(
     (job: JobDto) => {
-      if (!serviceArea) {
-        return
-      }
-
       setJobs(prev => {
-        const matchesArea = job.cityArea === serviceArea
         const exists = prev.some(item => item.id === job.id)
 
-        if (job.status !== JobStatus.PENDING || !matchesArea) {
+        if (job.status !== JobStatus.PENDING) {
           return prev.filter(item => item.id !== job.id)
         }
 
@@ -94,7 +90,7 @@ export default function FeedScreen() {
         return [job, ...prev]
       })
     },
-    [serviceArea]
+    []
   )
 
   useJobsWebSocket({

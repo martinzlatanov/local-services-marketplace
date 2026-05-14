@@ -62,6 +62,16 @@
 
 ---
 
+### Provider & Client Identity — Job Context (IDENTITY)
+
+- [ ] **IDENTITY-01**: Web task detail view shows the provider's email/name when a job has been accepted (visible to the client)
+- [ ] **IDENTITY-02**: Mobile job detail screen shows the client's email/name (visible to the provider who accepted or is viewing the job)
+- [ ] **IDENTITY-03**: Provider public profile page (`/providers/[id]`) displays profile info (email, name, avatar initials, member since) and all approved reviews with star ratings
+- [ ] **IDENTITY-04**: `GET /api/users/[id]` returns a public user DTO (email, name, avatarUrl, role, createdAt) — no password hash or sensitive fields
+- [ ] **IDENTITY-05**: Users table gains optional `name` and `avatarUrl` columns (schema migration); existing rows are unaffected (nullable, no backfill required)
+
+---
+
 ### UI Design Language (UI)
 
 - [ ] **UI-01**: Design tokens in `globals.css` — `surface-900` is primary CTA color; amber (`accent-500`) is retired from all button roles
@@ -129,6 +139,11 @@
 | RATING-01 | Phase 10 | Pending |
 | RATING-02 | Phase 10 | Pending |
 | RATING-03 | Phase 10 | Pending |
+| IDENTITY-01 | Phase 13 | Pending |
+| IDENTITY-02 | Phase 13 | Pending |
+| IDENTITY-03 | Phase 13 | Pending |
+| IDENTITY-04 | Phase 13 | Pending |
+| IDENTITY-05 | Phase 13 | Pending |
 | UI-01 | Phase 12 | Pending |
 | UI-02 | Phase 12 | Pending |
 | UI-03 | Phase 12 | Pending |
