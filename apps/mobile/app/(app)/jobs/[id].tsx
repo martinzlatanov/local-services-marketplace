@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Appbar, ActivityIndicator, Snackbar, Text, useTheme } from 'react-native-paper'
-import { JobDto, JobStatus } from '@local/types'
+import { JobDto, JobStatus, PublicUserDto } from '@local/types'
 import { TOKEN_KEY } from '../../../contexts/AuthContext'
-import { acceptJob, getJob, updateJobStatus } from '../../../lib/api'
+import { acceptJob, getJob, getUser, updateJobStatus } from '../../../lib/api'
 import { storage } from '../../../lib/storage'
+import AvatarInitials from '../../../components/AvatarInitials'
+import { Divider } from 'react-native-paper'
 
 export default function JobDetailScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>()
@@ -17,6 +19,8 @@ export default function JobDetailScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [snackbar, setSnackbar] = useState<string | null>(null)
+  const [clientUser, setClientUser] = useState<PublicUserDto | null>(null)
+  const [isClientLoading, setIsClientLoading] = useState(false)
 
   useEffect(() => {
     let isActive = true
@@ -56,6 +60,24 @@ export default function JobDetailScreen() {
 
     void loadJob()
   }, [id, token])
+
+  useEffect(() => {
+    if (!job || !token) return
+
+    const fetchClient = async () => {
+      setIsClientLoading(true)
+      try {
+        const user = await getUser(token, job.clientId)
+        setClientUser(user)
+      } catch {
+        // silently omit section on error
+      } finally {
+        setIsClientLoading(false)
+      }
+    }
+
+    void fetchClient()
+  }, [job, token])
 
   async function handleAccept() {
     if (!token || !job || isSubmitting) {
@@ -157,6 +179,33 @@ export default function JobDetailScreen() {
 
             <Text style={detailStyles.descLabel}>Description</Text>
             <Text style={detailStyles.descValue}>{job.description}</Text>
+
+            <Divider style={{ marginVertical: 16 }} />
+            <Text style={detailStyles.metaLabel}>Client</Text>
+            {isClientLoading ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#e2e8f0' }} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <View style={{ height: 12, backgroundColor: '#e2e8f0', borderRadius: 4, width: '40%' }} />
+                  <View style={{ height: 12, backgroundColor: '#e2e8f0', borderRadius: 4, width: '60%' }} />
+                </View>
+              </View>
+            ) : clientUser ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 }}>
+                <AvatarInitials
+                  name={clientUser.name}
+                  email={clientUser.email}
+                  avatarUrl={clientUser.avatarUrl}
+                  size={40}
+                />
+                <View>
+                  {clientUser.name ? (
+                    <Text style={detailStyles.metaValue}>{clientUser.name}</Text>
+                  ) : null}
+                  <Text style={detailStyles.metaValue}>{clientUser.email}</Text>
+                </View>
+              </View>
+            ) : null}
           </ScrollView>
 
           {/* Pinned CTA */}
