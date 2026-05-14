@@ -172,3 +172,21 @@ Plans:
 - [x] 11-02-PLAN.md — Review APIs (submission, query, approval)
 - [x] 11-03-PLAN.md — Frontend review UI (forms & profile display)
 - [x] 11-04-PLAN.md — Admin dashboard & WebSocket integration
+
+### Phase 12: UI Revamp — Stripe/Linear Design Language
+**Goal**: Replace the current teal-gradient, amber-CTA aesthetic with a clinical monochrome design language across all screens: web (Next.js + Tailwind CSS) and mobile (React Native + Paper). Every public-facing screen is rebuilt to the approved sketch specifications.
+**Depends on**: Phase 11
+**Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07, UI-08
+**Status**: Ready to plan
+**Plans**: TBD
+
+**Success Criteria** (what must be TRUE):
+  1. `apps/web/app/globals.css` primary CTA color is `surface-900` (`#0f172a`); no amber (`#f59e0b`) in any button role
+  2. Landing page matches sketch `01-landing-page-variant-B.html`: announcement bar, split hero, metrics panel, numbered feature strip, categories data table
+  3. Login page matches sketch `03-auth-login.html`: `surface-900` left panel, `surface-50` right form, no teal gradient
+  4. Register page matches sketch `06-auth-register.html`: role picker cards with `surface-900` active border + radio check dot
+  5. Client dashboard matches sketch `04-client-dashboard.html`: stat strip, numbered panels, jobs data table with tab bar
+  6. Provider dashboard matches sketch `05-provider-dashboard.html`: available jobs feed with teal-accent rows, active jobs progress track
+  7. Browse page matches sketch `07-browse-page.html`: sidebar filter list, jobs as data table, pagination
+  8. Mobile feed matches sketch `02-mobile-feed-variant-A.html`: filter chips, unified-token cards, pinned Accept CTA
+  9. Mobile active jobs + settings match sketch `08-mobile-active-jobs-settings.html`: progress track cards, bottom sheet area picker replaces Paper Dialog

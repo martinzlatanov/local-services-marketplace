@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalPro — Register (Variant B language)</title>
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  :root {
+    --s0:#ffffff; --s50:#f8fafc; --s100:#f1f5f9; --s200:#e2e8f0;
+    --s400:#94a3b8; --s500:#64748b; --s600:#475569; --s700:#334155; --s800:#1e293b; --s900:#0f172a;
+    --brand:#14b8a6; --brand-light:#f0fdf9; --brand-muted:#0f766e; --brand-border:#99f6df;
+    --font:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  html { -webkit-font-smoothing:antialiased; }
+  body { font-family:var(--font); background:var(--s0); color:var(--s900); min-height:100vh; display:flex; flex-direction:column; }
+
+  nav {
+    border-bottom:1px solid var(--s200); padding:0 64px; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
+  }
+  .logo { font-weight:800; font-size:16px; letter-spacing:-.5px; color:var(--s900); display:flex; align-items:center; gap:6px; text-decoration:none; }
+  .logo-dot { width:8px; height:8px; background:var(--brand); border-radius:50%; }
+  .nav-r { display:flex; gap:8px; }
+  .btn-ghost { font-size:13px; font-weight:500; color:var(--s600); background:none; border:none; cursor:pointer; padding:7px 12px; border-radius:6px; text-decoration:none; }
+  .btn-dark { font-size:13px; font-weight:600; color:#fff; background:var(--s900); border:none; cursor:pointer; padding:7px 14px; border-radius:6px; text-decoration:none; }
+
+  .page-body { flex:1; display:grid; grid-template-columns:1fr 1px 1fr; }
+  .divider { background:var(--s200); }
+
+  /* Left panel — identical shell to login but different copy */
+  .left-panel {
+    padding:80px 64px; background:var(--s900);
+    display:flex; flex-direction:column; justify-content:space-between;
+    min-height:calc(100vh - 56px);
+  }
+  .panel-logo { font-weight:800; font-size:18px; letter-spacing:-.4px; color:#fff; display:flex; align-items:center; gap:8px; }
+  .panel-logo-dot { width:9px; height:9px; background:var(--brand); border-radius:50%; }
+  .panel-tag { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--s500); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .panel-tag-line { width:20px; height:2px; background:var(--brand); }
+  .panel-h { font-size:clamp(32px,3.5vw,48px); font-weight:800; letter-spacing:-1.5px; color:#fff; line-height:1.1; margin-bottom:16px; }
+  .panel-sub { font-size:16px; color:var(--s400); line-height:1.65; max-width:360px; margin-bottom:40px; }
+  .panel-features { display:flex; flex-direction:column; gap:16px; }
+  .feature-row { display:flex; align-items:flex-start; gap:14px; }
+  .feature-icon { width:32px; height:32px; border-radius:8px; background:var(--s800); border:1px solid var(--s700); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; }
+  .feature-title { font-size:14px; font-weight:600; color:#fff; margin-bottom:2px; }
+  .feature-desc { font-size:13px; color:var(--s400); }
+  .panel-stat-row { display:flex; gap:32px; padding-top:32px; border-top:1px solid var(--s800); }
+  .p-stat-num { font-size:24px; font-weight:800; letter-spacing:-1px; color:#fff; font-family:var(--mono); }
+  .p-stat-num span { color:var(--brand); }
+  .p-stat-lbl { font-size:12px; color:var(--s500); margin-top:2px; }
+
+  /* Right panel */
+  .right-panel { padding:64px; background:var(--s50); display:flex; align-items:center; justify-content:center; }
+  .form-card { width:100%; max-width:440px; }
+  .form-eyebrow { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--s400); margin-bottom:20px; display:flex; align-items:center; gap:8px; }
+  .form-eyebrow-line { width:20px; height:2px; background:var(--s300); }
+  .form-h { font-size:30px; font-weight:800; letter-spacing:-.8px; color:var(--s900); margin-bottom:6px; }
+  .form-sub { font-size:14px; color:var(--s500); margin-bottom:28px; }
+
+  /* Role picker — the key differentiator from login */
+  .role-section-label { font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--s600); margin-bottom:10px; }
+  .role-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px; }
+  .role-card {
+    padding:16px; border:1px solid var(--s200); border-radius:10px;
+    background:var(--s0); cursor:pointer;
+    display:flex; flex-direction:column; gap:6px;
+    transition:border-color .15s, box-shadow .15s;
+    position:relative;
+  }
+  .role-card:hover { border-color:var(--s300); }
+  .role-card.active {
+    border-color:var(--s900);
+    box-shadow:0 0 0 1px var(--s900);
+  }
+  .role-card-check {
+    position:absolute; top:10px; right:10px;
+    width:18px; height:18px; border-radius:50%;
+    border:1.5px solid var(--s200); background:var(--s0);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .role-card.active .role-card-check { background:var(--s900); border-color:var(--s900); }
+  .role-card.active .role-card-check::after { content:''; width:6px; height:6px; border-radius:50%; background:#fff; }
+  .role-card-icon { font-size:20px; margin-bottom:2px; }
+  .role-card-title { font-size:14px; font-weight:700; color:var(--s800); }
+  .role-card.active .role-card-title { color:var(--s900); }
+  .role-card-desc { font-size:12px; color:var(--s400); line-height:1.4; }
+
+  .field { margin-bottom:16px; }
+  label { display:block; font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--s600); margin-bottom:6px; }
+  input[type=email], input[type=password] {
+    width:100%; padding:10px 14px;
+    background:var(--s0); border:1px solid var(--s200); border-radius:8px;
+    font-size:14px; color:var(--s900); font-family:var(--font);
+    transition:border-color .15s, box-shadow .15s; outline:none;
+  }
+  input:focus { border-color:var(--brand); box-shadow:0 0 0 3px rgba(20,184,166,.12); }
+
+  /* Password strength bar */
+  .strength-bar { margin-top:6px; height:3px; border-radius:2px; background:var(--s100); overflow:hidden; }
+  .strength-fill { height:100%; width:60%; background:var(--brand); border-radius:2px; }
+  .strength-label { font-size:11px; color:var(--s400); margin-top:4px; }
+
+  .btn-submit {
+    width:100%; padding:12px; border-radius:8px;
+    background:var(--s900); color:#fff; font-size:15px; font-weight:700;
+    font-family:var(--font); border:none; cursor:pointer; letter-spacing:-.2px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:opacity .15s; margin-top:8px;
+  }
+  .btn-submit:hover { opacity:.88; }
+  .form-foot { text-align:center; margin-top:20px; font-size:14px; color:var(--s500); }
+  .form-foot a { color:var(--s900); font-weight:700; text-decoration:none; }
+  .terms { font-size:12px; color:var(--s400); text-align:center; margin-top:12px; line-height:1.5; }
+  .terms a { color:var(--s600); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo"><span class="logo-dot"></span> LocalPro</a>
+  <div class="nav-r">
+    <a href="#" class="btn-ghost">Already have an account?</a>
+    <a href="#" class="btn-dark">Sign in</a>
+  </div>
+</nav>
+
+<div class="page-body">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="panel-logo"><span class="panel-logo-dot"></span> LocalPro</div>
+    <div>
+      <div class="panel-tag"><span class="panel-tag-line"></span> Create account</div>
+      <h2 class="panel-h">Join the<br>community.</h2>
+      <p class="panel-sub">Whether you need something done or want to offer your skills — get started in under a minute.</p>
+      <div class="panel-features">
+        <div class="feature-row">
+          <div class="feature-icon">🚀</div>
+          <div>
+            <div class="feature-title">Up in 60 seconds</div>
+            <div class="feature-desc">Pick your role, set your email, you're in.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">💼</div>
+          <div>
+            <div class="feature-title">Full job lifecycle</div>
+            <div class="feature-desc">Post, accept, track, complete — all in one dashboard.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">🔒</div>
+          <div>
+            <div class="feature-title">Secure by default</div>
+            <div class="feature-desc">Passwords hashed, sessions JWT-signed, no plain-text storage.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-stat-row">
+      <div><div class="p-stat-num"><span>10</span></div><div class="p-stat-lbl">City areas</div></div>
+      <div><div class="p-stat-num"><span>8</span></div><div class="p-stat-lbl">Categories</div></div>
+      <div><div class="p-stat-num">&lt;1h</div><div class="p-stat-lbl">Response</div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="form-card">
+      <div class="form-eyebrow"><span class="form-eyebrow-line"></span> Step 1 of 1</div>
+      <h1 class="form-h">Create your account</h1>
+      <p class="form-sub">Choose your role, then fill in your details.</p>
+
+      <!-- ROLE PICKER -->
+      <div class="role-section-label">I want to…</div>
+      <div class="role-grid">
+        <div class="role-card active">
+          <div class="role-card-check"></div>
+          <div class="role-card-icon">🏠</div>
+          <div class="role-card-title">Post jobs</div>
+          <div class="role-card-desc">I need local help with tasks around my home or business.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card-check"></div>
+          <div class="role-card-icon">🔧</div>
+          <div class="role-card-title">Find work</div>
+          <div class="role-card-desc">I offer a skill and want to find jobs in my area.</div>
+        </div>
+      </div>
+
+      <form>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password">
+          <div class="strength-bar"><div class="strength-fill"></div></div>
+          <div class="strength-label">Good — add a symbol to make it stronger</div>
+        </div>
+        <button type="submit" class="btn-submit">
+          Create account
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+
+      <p class="form-foot">Already registered? <a href="#">Sign in →</a></p>
+      <p class="terms">By creating an account you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

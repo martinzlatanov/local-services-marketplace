@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalPro — Variant A: Monochrome Precision</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --surface-0:   #ffffff;
+    --surface-50:  #f8fafc;
+    --surface-100: #f1f5f9;
+    --surface-200: #e2e8f0;
+    --surface-300: #cbd5e1;
+    --surface-400: #94a3b8;
+    --surface-500: #64748b;
+    --surface-700: #334155;
+    --surface-800: #1e293b;
+    --surface-900: #0f172a;
+
+    --brand:       #14b8a6;
+    --brand-dim:   #0d9488;
+    --brand-muted: #0f766e;
+
+    --accent:      #14b8a6;
+
+    --radius-sm:   4px;
+    --radius-md:   8px;
+    --radius-lg:   12px;
+    --radius-pill: 9999px;
+
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body { font-family: var(--font); background: var(--surface-0); color: var(--surface-900); line-height: 1.5; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--surface-200);
+    padding: 0 48px;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 8px;
+    font-weight: 700; font-size: 15px; letter-spacing: -0.3px;
+    color: var(--surface-900); text-decoration: none;
+  }
+  .nav-logo-icon {
+    width: 28px; height: 28px;
+    background: var(--surface-900);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 800;
+  }
+  .nav-links { display: flex; align-items: center; gap: 32px; }
+  .nav-links a { font-size: 14px; font-weight: 500; color: var(--surface-500); text-decoration: none; transition: color 0.15s; }
+  .nav-links a:hover { color: var(--surface-900); }
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+  .btn-ghost { font-size: 14px; font-weight: 500; color: var(--surface-700); background: none; border: none; cursor: pointer; padding: 8px 14px; border-radius: var(--radius-md); transition: background 0.15s; }
+  .btn-ghost:hover { background: var(--surface-100); }
+  .btn-primary { font-size: 14px; font-weight: 600; color: #fff; background: var(--surface-900); border: none; cursor: pointer; padding: 8px 18px; border-radius: var(--radius-md); transition: background 0.15s, opacity 0.15s; }
+  .btn-primary:hover { opacity: 0.85; }
+
+  /* HERO */
+  .hero {
+    padding: 128px 48px 96px;
+    max-width: 1200px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--brand-muted);
+    background: #f0fdf9; border: 1px solid #99f6df;
+    padding: 4px 10px; border-radius: var(--radius-pill);
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .hero-title {
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--surface-900);
+    margin-bottom: 24px;
+  }
+  .hero-title span { color: var(--brand); }
+  .hero-sub {
+    font-size: 18px; font-weight: 400; color: var(--surface-500);
+    line-height: 1.65; max-width: 440px; margin-bottom: 40px;
+  }
+  .hero-ctas { display: flex; gap: 12px; align-items: center; }
+  .btn-cta-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface-900); color: #fff;
+    font-size: 15px; font-weight: 600;
+    padding: 13px 24px; border-radius: var(--radius-md);
+    border: none; cursor: pointer; text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .btn-cta-primary:hover { opacity: 0.85; }
+  .btn-cta-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface-0); color: var(--surface-700);
+    font-size: 15px; font-weight: 500;
+    padding: 13px 24px; border-radius: var(--radius-md);
+    border: 1px solid var(--surface-200); cursor: pointer; text-decoration: none;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .btn-cta-secondary:hover { border-color: var(--surface-300); background: var(--surface-50); }
+  .hero-stats {
+    margin-top: 48px; padding-top: 32px;
+    border-top: 1px solid var(--surface-200);
+    display: flex; gap: 40px;
+  }
+  .stat-item { }
+  .stat-num { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--surface-900); }
+  .stat-label { font-size: 13px; color: var(--surface-500); margin-top: 2px; }
+
+  /* HERO CARD MOCKUP */
+  .hero-visual {
+    position: relative;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .job-card-mock {
+    background: var(--surface-0);
+    border: 1px solid var(--surface-200);
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    transition: box-shadow 0.2s;
+  }
+  .job-card-mock:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .job-card-mock.featured {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 1px var(--brand), 0 4px 16px rgba(20,184,166,0.12);
+  }
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .card-category {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--brand-muted); background: #f0fdf9; border: 1px solid #99f6df;
+    padding: 3px 8px; border-radius: var(--radius-pill);
+  }
+  .card-badge-pending {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-pill);
+    background: #fef9c3; color: #854d0e; border: 1px solid #fde68a;
+  }
+  .card-badge-new {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-pill);
+    background: #f0fdf9; color: var(--brand-muted); border: 1px solid #99f6df;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .card-badge-new::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--brand); animation: pulse 1.5s infinite; }
+  .card-desc { font-size: 14px; color: var(--surface-700); line-height: 1.5; margin-bottom: 12px; }
+  .card-meta { display: flex; gap: 16px; }
+  .card-meta-item { font-size: 12px; color: var(--surface-400); display: flex; align-items: center; gap: 5px; }
+  .card-meta-item svg { width: 13px; height: 13px; }
+
+  /* FLOATING LIVE BADGE */
+  .live-badge {
+    position: absolute; top: -14px; right: 24px;
+    background: var(--surface-900); color: #fff;
+    font-size: 12px; font-weight: 600; padding: 6px 14px;
+    border-radius: var(--radius-pill); display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .live-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 1.5s infinite; }
+
+  /* CATEGORIES */
+  .section { padding: 96px 48px; max-width: 1200px; margin: 0 auto; }
+  .section-label {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--surface-400); margin-bottom: 12px;
+  }
+  .section-title { font-size: 36px; font-weight: 800; letter-spacing: -1px; color: var(--surface-900); margin-bottom: 8px; }
+  .section-sub { font-size: 16px; color: var(--surface-500); margin-bottom: 48px; }
+
+  .categories-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; border: 1px solid var(--surface-200); border-radius: var(--radius-lg); overflow: hidden; }
+  .cat-item {
+    background: var(--surface-0);
+    padding: 28px 24px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    border-right: 1px solid var(--surface-200);
+    border-bottom: 1px solid var(--surface-200);
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  .cat-item:nth-child(4n) { border-right: none; }
+  .cat-item:nth-child(n+5) { border-bottom: none; }
+  .cat-item:hover { background: var(--surface-50); }
+  .cat-icon { font-size: 22px; margin-bottom: 12px; }
+  .cat-name { font-size: 14px; font-weight: 600; color: var(--surface-800); margin-bottom: 4px; }
+  .cat-count { font-size: 12px; color: var(--surface-400); }
+
+  /* HOW IT WORKS */
+  .how-section { padding: 96px 48px; background: var(--surface-900); }
+  .how-inner { max-width: 1200px; margin: 0 auto; }
+  .how-label { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--surface-500); margin-bottom: 12px; }
+  .how-title { font-size: 36px; font-weight: 800; letter-spacing: -1px; color: #fff; margin-bottom: 64px; }
+  .how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .how-step {
+    background: var(--surface-800); padding: 40px 32px;
+    position: relative;
+  }
+  .how-step:first-child { border-radius: var(--radius-lg) 0 0 var(--radius-lg); }
+  .how-step:last-child { border-radius: 0 var(--radius-lg) var(--radius-lg) 0; }
+  .step-num { font-size: 48px; font-weight: 900; color: var(--surface-700); letter-spacing: -2px; margin-bottom: 16px; font-family: var(--mono); }
+  .step-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .step-desc { font-size: 14px; color: var(--surface-400); line-height: 1.6; }
+
+  /* CTA BAND */
+  .cta-band {
+    padding: 96px 48px;
+    background: #f0fdf9;
+    border-top: 1px solid #99f6df;
+    border-bottom: 1px solid #99f6df;
+    text-align: center;
+  }
+  .cta-band-title { font-size: 40px; font-weight: 800; letter-spacing: -1.5px; color: var(--surface-900); margin-bottom: 16px; }
+  .cta-band-sub { font-size: 17px; color: var(--surface-600); margin-bottom: 36px; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; }
+
+  /* FOOTER */
+  footer {
+    padding: 48px;
+    background: var(--surface-0);
+    border-top: 1px solid var(--surface-200);
+    display: flex; align-items: center; justify-content: space-between;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .footer-logo { font-weight: 700; font-size: 15px; letter-spacing: -0.3px; color: var(--surface-900); display: flex; align-items: center; gap: 8px; }
+  .footer-copy { font-size: 13px; color: var(--surface-400); }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 13px; color: var(--surface-500); text-decoration: none; }
+  .footer-links a:hover { color: var(--surface-900); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">LP</div>
+    LocalPro
+  </a>
+  <div class="nav-links">
+    <a href="#">How it works</a>
+    <a href="#">Browse jobs</a>
+    <a href="#">Pricing</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-ghost">Log in</button>
+    <button class="btn-primary">Get started</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div style="max-width:1200px;margin:0 auto;padding:0 48px">
+  <div class="hero" style="padding:128px 0 96px; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center">
+    <!-- LEFT -->
+    <div>
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        Live in 10 city areas
+      </div>
+      <h1 class="hero-title">Local help,<br><span>on demand.</span></h1>
+      <p class="hero-sub">Post a job in 60 seconds. Verified local professionals respond within the hour. No middlemen.</p>
+      <div class="hero-ctas">
+        <a href="#" class="btn-cta-primary">
+          Post a job
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#" class="btn-cta-secondary">
+          Find work
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">City areas</div></div>
+        <div class="stat-item"><div class="stat-num">8</div><div class="stat-label">Service categories</div></div>
+        <div class="stat-item"><div class="stat-num">&lt;1h</div><div class="stat-label">Avg. response time</div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT — LIVE JOB FEED MOCKUP -->
+    <div class="hero-visual">
+      <div class="live-badge"><span class="live-badge-dot"></span> Live feed</div>
+      <div class="job-card-mock featured">
+        <div class="card-top">
+          <span class="card-category">Plumbing</span>
+          <span class="card-badge-new">New</span>
+        </div>
+        <div class="card-desc">Kitchen sink is leaking under the cabinet. Need repair within this week. Apartment, 3rd floor.</div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Downtown
+          </span>
+          <span class="card-meta-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Within a week
+          </span>
+        </div>
+      </div>
+      <div class="job-card-mock">
+        <div class="card-top">
+          <span class="card-category">Cleaning</span>
+          <span class="card-badge-pending">Pending</span>
+        </div>
+        <div class="card-desc">End of tenancy deep clean needed for 2-bed flat. Must include oven and windows.</div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Midtown
+          </span>
+          <span class="card-meta-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Today
+          </span>
+        </div>
+      </div>
+      <div class="job-card-mock">
+        <div class="card-top">
+          <span class="card-category">Electrical</span>
+          <span class="card-badge-pending">Pending</span>
+        </div>
+        <div class="card-desc">Need 4 new electrical outlets installed in home office, including cable management.</div>
+        <div class="card-meta">
+          <span class="card-meta-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Riverside
+          </span>
+          <span class="card-meta-item">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            This weekend
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div style="border-top:1px solid var(--surface-200); border-bottom:1px solid var(--surface-200); background:var(--surface-50)">
+  <div class="section" style="padding-top:72px;padding-bottom:72px">
+    <div class="section-label">Service categories</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px">
+      <div>
+        <div class="section-title">What can we help with?</div>
+        <div class="section-sub">8 specialities, 10 city areas</div>
+      </div>
+    </div>
+    <div class="categories-grid">
+      <div class="cat-item"><div class="cat-icon">🔧</div><div class="cat-name">Plumbing</div><div class="cat-count">12 jobs nearby</div></div>
+      <div class="cat-item"><div class="cat-icon">⚡</div><div class="cat-name">Electrical</div><div class="cat-count">8 jobs nearby</div></div>
+      <div class="cat-item"><div class="cat-icon">✨</div><div class="cat-name">Cleaning</div><div class="cat-count">21 jobs nearby</div></div>
+      <div class="cat-item"><div class="cat-icon">🌿</div><div class="cat-name">Gardening</div><div class="cat-count">6 jobs nearby</div></div>
+      <div class="cat-item"><div class="cat-icon">📦</div><div class="cat-name">Moving</div><div class="cat-count">4 jobs nearby</div></div>
+      <div class="cat-item"><div class="cat-icon">🔨</div><div class="cat-name">Handyman</div><div class="cat-count">15 jobs nearby</div></div>
+      <div class="cat-item"><div class="cat-icon">🎨</div><div class="cat-name">Painting</div><div class="cat-count">9 jobs nearby</div></div>
+      <div class="cat-item"><div class="cat-icon">•••</div><div class="cat-name">Other</div><div class="cat-count">7 jobs nearby</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="how-inner">
+    <div class="how-label">Process</div>
+    <div class="how-title">Three steps to get things done</div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">01</div>
+        <div class="step-title">Describe your job</div>
+        <div class="step-desc">Pick a category, add your location and timeframe. Takes under a minute.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">02</div>
+        <div class="step-title">Get matched instantly</div>
+        <div class="step-desc">Local professionals see your job in real-time and respond. No waiting days.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">03</div>
+        <div class="step-title">Get to work</div>
+        <div class="step-desc">Accept a professional, track progress live, and leave a review when done.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <div class="cta-band-title">Ready to get started?</div>
+  <div class="cta-band-sub">Join thousands of locals who trust LocalPro to get things done.</div>
+  <div class="cta-row">
+    <a href="#" class="btn-cta-primary">Post your first job <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    <a href="#" class="btn-cta-secondary">Browse as a provider <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="border-top:1px solid var(--surface-200)">
+  <footer>
+    <div class="footer-logo">
+      <div class="nav-logo-icon" style="width:24px;height:24px;font-size:11px">LP</div>
+      LocalPro
+    </div>
+    <div class="footer-copy">© 2026 LocalPro. All rights reserved.</div>
+    <div class="footer-links">
+      <a href="#">Home</a>
+      <a href="#">Log in</a>
+      <a href="#">Get started</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>

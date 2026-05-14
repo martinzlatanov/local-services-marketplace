@@ -62,6 +62,19 @@
 
 ---
 
+### UI Design Language (UI)
+
+- [ ] **UI-01**: Design tokens in `globals.css` — `surface-900` is primary CTA color; amber (`accent-500`) is retired from all button roles
+- [ ] **UI-02**: Landing page rebuilt to Variant B sketch: announcement bar, split hero, metrics panel, numbered feature strip, categories data table
+- [ ] **UI-03**: Login and register pages rebuilt: `surface-900` left panel, `surface-50` right form; register includes role picker cards and password strength bar
+- [ ] **UI-04**: Client dashboard rebuilt: stat strip, numbered panels, jobs data table with tab bar and search
+- [ ] **UI-05**: Provider dashboard rebuilt: available jobs feed with teal-accent featured rows and active jobs progress track
+- [ ] **UI-06**: Browse page rebuilt: sidebar filter list, jobs as data table, teal accent on new jobs, pagination
+- [ ] **UI-07**: Mobile feed rebuilt: filter chips, unified-token outlined cards, pinned `surface-900` Accept CTA
+- [ ] **UI-08**: Mobile active jobs rebuilt with 4-step progress track; settings rebuilt with grouped icon-tile rows and bottom sheet area picker replacing Paper Dialog
+
+---
+
 ## v2 Requirements (Deferred)
 
 - In-app messaging between client and provider after job acceptance
@@ -116,3 +129,11 @@
 | RATING-01 | Phase 10 | Pending |
 | RATING-02 | Phase 10 | Pending |
 | RATING-03 | Phase 10 | Pending |
+| UI-01 | Phase 12 | Pending |
+| UI-02 | Phase 12 | Pending |
+| UI-03 | Phase 12 | Pending |
+| UI-04 | Phase 12 | Pending |
+| UI-05 | Phase 12 | Pending |
+| UI-06 | Phase 12 | Pending |
+| UI-07 | Phase 12 | Pending |
+| UI-08 | Phase 12 | Pending |

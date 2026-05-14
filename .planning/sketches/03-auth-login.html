@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalPro — Login (Variant B language)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --s0:#ffffff; --s50:#f8fafc; --s100:#f1f5f9; --s200:#e2e8f0; --s300:#cbd5e1;
+    --s400:#94a3b8; --s500:#64748b; --s600:#475569; --s700:#334155; --s800:#1e293b; --s900:#0f172a;
+    --brand:#14b8a6; --brand-light:#f0fdf9; --brand-muted:#0f766e; --brand-border:#99f6df;
+    --r:8px; --font:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  html { -webkit-font-smoothing:antialiased; }
+  body { font-family:var(--font); background:var(--s0); color:var(--s900); min-height:100vh; display:flex; flex-direction:column; }
+
+  /* ── NAV (identical to Variant B) ── */
+  nav {
+    border-bottom:1px solid var(--s200); padding:0 64px; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:10; background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
+  }
+  .logo { font-weight:800; font-size:16px; letter-spacing:-.5px; color:var(--s900); display:flex; align-items:center; gap:6px; text-decoration:none; }
+  .logo-dot { width:8px; height:8px; background:var(--brand); border-radius:50%; }
+  .nav-r { display:flex; gap:8px; }
+  .btn-ghost { font-size:13px; font-weight:500; color:var(--s600); background:none; border:none; cursor:pointer; padding:7px 12px; border-radius:6px; text-decoration:none; }
+  .btn-dark { font-size:13px; font-weight:600; color:#fff; background:var(--s900); border:none; cursor:pointer; padding:7px 14px; border-radius:6px; text-decoration:none; }
+  .btn-dark:hover { opacity:.88; }
+
+  /* ── LAYOUT: left info panel + right form ── */
+  .page-body { flex:1; display:grid; grid-template-columns:1fr 1px 1fr; }
+  .divider { background:var(--s200); }
+
+  /* ── LEFT: identity panel ── */
+  .left-panel {
+    padding:80px 64px;
+    background:var(--s900);
+    display:flex; flex-direction:column; justify-content:space-between;
+    min-height:calc(100vh - 56px);
+  }
+  .panel-logo { font-weight:800; font-size:18px; letter-spacing:-.4px; color:#fff; display:flex; align-items:center; gap:8px; }
+  .panel-logo-dot { width:9px; height:9px; background:var(--brand); border-radius:50%; }
+  .panel-mid { }
+  .panel-tag { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--s500); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+  .panel-tag-line { width:20px; height:2px; background:var(--brand); }
+  .panel-h { font-size:clamp(32px,3.5vw,48px); font-weight:800; letter-spacing:-1.5px; color:#fff; line-height:1.1; margin-bottom:16px; }
+  .panel-sub { font-size:16px; color:var(--s400); line-height:1.65; max-width:360px; margin-bottom:40px; }
+  .panel-features { display:flex; flex-direction:column; gap:16px; }
+  .feature-row { display:flex; align-items:flex-start; gap:14px; }
+  .feature-icon {
+    width:32px; height:32px; border-radius:8px;
+    background:var(--s800); border:1px solid var(--s700);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    font-size:14px;
+  }
+  .feature-text { }
+  .feature-title { font-size:14px; font-weight:600; color:#fff; margin-bottom:2px; }
+  .feature-desc { font-size:13px; color:var(--s400); }
+  .panel-bottom { }
+  .panel-stat-row { display:flex; gap:32px; padding-top:32px; border-top:1px solid var(--s800); }
+  .p-stat-num { font-size:24px; font-weight:800; letter-spacing:-1px; color:#fff; font-family:var(--mono); }
+  .p-stat-num span { color:var(--brand); }
+  .p-stat-lbl { font-size:12px; color:var(--s500); margin-top:2px; }
+
+  /* ── RIGHT: form panel ── */
+  .right-panel {
+    padding:80px 64px;
+    background:var(--s50);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .form-card { width:100%; max-width:420px; }
+  .form-eyebrow {
+    font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--s400); margin-bottom:20px; display:flex; align-items:center; gap:8px;
+  }
+  .form-eyebrow-line { width:20px; height:2px; background:var(--s300); }
+  .form-h { font-size:30px; font-weight:800; letter-spacing:-.8px; color:var(--s900); margin-bottom:6px; }
+  .form-sub { font-size:14px; color:var(--s500); margin-bottom:32px; }
+
+  /* error banner */
+  .error-banner {
+    background:#fef2f2; border:1px solid #fecaca; border-radius:8px;
+    padding:12px 14px; margin-bottom:20px;
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:13px; color:#991b1b;
+  }
+  .error-icon { flex-shrink:0; margin-top:1px; }
+
+  /* form fields */
+  .field { margin-bottom:20px; }
+  .field-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  label { font-size:13px; font-weight:600; color:var(--s700); }
+  .field-hint { font-size:12px; color:var(--s400); cursor:pointer; }
+  .field-hint:hover { color:var(--s700); }
+  input[type=email], input[type=password], input[type=text] {
+    width:100%; padding:10px 14px;
+    background:var(--s0); border:1px solid var(--s200); border-radius:8px;
+    font-size:14px; color:var(--s900); font-family:var(--font);
+    transition:border-color .15s, box-shadow .15s; outline:none;
+  }
+  input:focus { border-color:var(--brand); box-shadow:0 0 0 3px rgba(20,184,166,.12); }
+  input.has-error { border-color:#f87171; }
+  input.has-error:focus { box-shadow:0 0 0 3px rgba(248,113,113,.15); }
+  .field-error { font-size:12px; color:#dc2626; margin-top:5px; }
+
+  /* submit */
+  .btn-submit {
+    width:100%; padding:12px; border-radius:8px;
+    background:var(--s900); color:#fff;
+    font-size:15px; font-weight:700; font-family:var(--font);
+    border:none; cursor:pointer; letter-spacing:-.2px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:opacity .15s; margin-top:4px;
+  }
+  .btn-submit:hover { opacity:.88; }
+  .btn-submit:disabled { opacity:.45; cursor:not-allowed; }
+
+  .form-foot { text-align:center; margin-top:24px; font-size:14px; color:var(--s500); }
+  .form-foot a { color:var(--s900); font-weight:700; text-decoration:none; }
+  .form-foot a:hover { text-decoration:underline; }
+
+  /* role switcher — a structural pattern from Variant B */
+  .role-switcher {
+    display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:28px;
+  }
+  .role-btn {
+    padding:10px 12px; border:1px solid var(--s200); border-radius:8px;
+    background:var(--s0); cursor:pointer;
+    display:flex; flex-direction:column; align-items:flex-start; gap:2px;
+    transition:border-color .15s, background .15s;
+    text-align:left;
+  }
+  .role-btn.active { border-color:var(--s900); background:var(--s900); }
+  .role-btn-icon { font-size:16px; margin-bottom:4px; }
+  .role-btn-title { font-size:13px; font-weight:700; color:var(--s800); }
+  .role-btn.active .role-btn-title { color:#fff; }
+  .role-btn-desc { font-size:11px; color:var(--s400); }
+  .role-btn.active .role-btn-desc { color:var(--s400); }
+
+  /* divider line */
+  .or-divider { display:flex; align-items:center; gap:12px; margin:20px 0; }
+  .or-line { flex:1; height:1px; background:var(--s200); }
+  .or-text { font-size:12px; color:var(--s400); font-weight:500; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo"><span class="logo-dot"></span> LocalPro</a>
+  <div class="nav-r">
+    <a href="#" class="btn-ghost">Back to home</a>
+    <a href="#" class="btn-dark">Create account</a>
+  </div>
+</nav>
+
+<div class="page-body">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="panel-logo"><span class="panel-logo-dot"></span> LocalPro</div>
+
+    <div class="panel-mid">
+      <div class="panel-tag"><span class="panel-tag-line"></span> Secure login</div>
+      <h2 class="panel-h">Welcome<br>back.</h2>
+      <p class="panel-sub">Access your account. Post jobs, find work, or track your active projects — all in one place.</p>
+      <div class="panel-features">
+        <div class="feature-row">
+          <div class="feature-icon">🎯</div>
+          <div class="feature-text">
+            <div class="feature-title">Post or browse jobs</div>
+            <div class="feature-desc">Clients post, providers bid — real-time matching across 10 city areas.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-text">
+            <div class="feature-title">Live notifications</div>
+            <div class="feature-desc">WebSocket-powered — you hear about new jobs the moment they're posted.</div>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-icon">✅</div>
+          <div class="feature-text">
+            <div class="feature-title">End-to-end tracking</div>
+            <div class="feature-desc">Pending → Accepted → In Progress → Completed. Every step in your dashboard.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-bottom">
+      <div class="panel-stat-row">
+        <div><div class="p-stat-num"><span>10</span></div><div class="p-stat-lbl">City areas</div></div>
+        <div><div class="p-stat-num"><span>8</span></div><div class="p-stat-lbl">Categories</div></div>
+        <div><div class="p-stat-num">&lt;1h</div><div class="p-stat-lbl">Response</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RIGHT PANEL: FORM -->
+  <div class="right-panel">
+    <div class="form-card">
+      <div class="form-eyebrow"><span class="form-eyebrow-line"></span> Sign in</div>
+      <h1 class="form-h">Log in to your account</h1>
+      <p class="form-sub">Enter your email and password below.</p>
+
+      <!-- Error banner (shown state) -->
+      <div class="error-banner" style="display:none">
+        <svg class="error-icon" width="16" height="16" fill="none" stroke="#991b1b" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Invalid email or password. Please try again.
+      </div>
+
+      <form>
+        <div class="field">
+          <div class="field-row">
+            <label for="email">Email</label>
+          </div>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+        </div>
+
+        <div class="field">
+          <div class="field-row">
+            <label for="password">Password</label>
+            <span class="field-hint">Forgot password?</span>
+          </div>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-submit">
+          Sign in
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </form>
+
+      <p class="form-foot">No account? <a href="#">Create one — it's free →</a></p>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

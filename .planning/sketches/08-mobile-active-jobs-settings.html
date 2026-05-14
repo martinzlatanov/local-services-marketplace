@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalPro Mobile — Active Jobs + Settings</title>
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  :root {
+    --s0:#ffffff; --s50:#f8fafc; --s100:#f1f5f9; --s200:#e2e8f0;
+    --s400:#94a3b8; --s500:#64748b; --s600:#475569; --s700:#334155; --s800:#1e293b; --s900:#0f172a;
+    --brand:#14b8a6; --brand-light:#f0fdf9; --brand-muted:#0f766e; --brand-border:#99f6df;
+    --r-card:12px; --r-btn:8px; --r-pill:9999px;
+    --font:'Inter',system-ui,sans-serif;
+  }
+  html { -webkit-font-smoothing:antialiased; }
+  body { font-family:var(--font); background:#e2e8f0; display:flex; align-items:center; justify-content:center; padding:48px 24px; gap:48px; flex-wrap:wrap; min-height:100vh; }
+
+  .phone-group { display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .phone-label { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#9ca3af; }
+
+  .phone {
+    width:390px; min-height:844px;
+    background:var(--s50); border-radius:48px; overflow:hidden;
+    box-shadow:0 24px 80px rgba(0,0,0,.22), 0 0 0 1px rgba(0,0,0,.07) inset;
+    display:flex; flex-direction:column; position:relative;
+  }
+
+  /* status bar */
+  .status-bar { padding:14px 28px 8px; display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:600; color:var(--s800); flex-shrink:0; }
+  .s-icons { display:flex; gap:5px; align-items:center; }
+
+  /* app bar */
+  .app-bar { padding:4px 20px 14px; background:var(--s0); border-bottom:1px solid var(--s200); flex-shrink:0; }
+  .app-bar-row { display:flex; justify-content:space-between; align-items:center; }
+  .app-bar-title { font-size:22px; font-weight:800; letter-spacing:-.6px; color:var(--s900); }
+  .app-bar-sub { font-size:13px; color:var(--s400); margin-top:2px; }
+  .app-bar-action { width:34px; height:34px; border-radius:9px; background:var(--s100); border:1px solid var(--s200); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .app-bar-action svg { width:16px; height:16px; stroke:var(--s600); fill:none; stroke-width:2; }
+
+  /* scroll area */
+  .scroll-area { flex:1; overflow-y:auto; padding:14px 16px 100px; display:flex; flex-direction:column; gap:10px; scrollbar-width:none; }
+  .scroll-area::-webkit-scrollbar { display:none; }
+
+  /* ─── ACTIVE JOBS CARDS ─── */
+  .active-card {
+    background:var(--s0); border:1px solid var(--s200); border-radius:var(--r-card);
+    overflow:hidden;
+  }
+  .active-card-header { padding:14px 16px 10px; }
+  .ac-row1 { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+  .ac-cat { font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--s400); display:flex; align-items:center; gap:6px; }
+  .ac-cat-icon { font-size:14px; }
+  .badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:var(--r-pill); letter-spacing:.03em; }
+  .badge-accepted { background:#dbeafe; color:#1e40af; border:1px solid #bfdbfe; }
+  .badge-progress { background:#ede9fe; color:#5b21b6; border:1px solid #ddd6fe; }
+  .ac-desc { font-size:15px; font-weight:700; color:var(--s900); line-height:1.35; margin-bottom:8px; }
+  .ac-meta { display:flex; gap:12px; }
+  .ac-meta-item { font-size:12px; color:var(--s400); display:flex; align-items:center; gap:4px; }
+  .ac-meta-item svg { width:12px; height:12px; stroke:var(--s400); fill:none; stroke-width:2; }
+
+  /* progress track inside card */
+  .progress-section { border-top:1px solid var(--s100); padding:12px 16px; }
+  .progress-track { display:flex; align-items:center; }
+  .track-step { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .track-dot { width:10px; height:10px; border-radius:50%; border:2px solid var(--s200); background:var(--s0); flex-shrink:0; }
+  .track-dot.done { border-color:var(--brand); background:var(--brand); }
+  .track-dot.active { border-color:var(--s900); background:var(--s900); box-shadow:0 0 0 3px rgba(15,23,42,.12); }
+  .track-lbl { font-size:9px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--s300); text-align:center; width:54px; }
+  .track-dot.done + .track-lbl,
+  .track-dot.active + .track-lbl { color:var(--s600); }
+  .track-line { flex:1; height:2px; background:var(--s200); margin-bottom:16px; }
+  .track-line.done { background:var(--brand); }
+
+  /* status CTA strip */
+  .card-cta { border-top:1px solid var(--s100); padding:10px 16px; display:flex; gap:8px; }
+  .btn-sm-dark { font-size:13px; font-weight:700; padding:9px 14px; background:var(--s900); color:#fff; border:none; border-radius:8px; cursor:pointer; flex:1; }
+  .btn-sm-outline { font-size:13px; font-weight:600; padding:9px 14px; background:var(--s0); color:var(--s700); border:1px solid var(--s200); border-radius:8px; cursor:pointer; }
+
+  /* empty state */
+  .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:48px 24px; text-align:center; gap:10px; }
+  .empty-icon { font-size:36px; opacity:.5; }
+  .empty-title { font-size:18px; font-weight:800; letter-spacing:-.4px; color:var(--s700); }
+  .empty-sub { font-size:14px; color:var(--s400); line-height:1.5; }
+
+  /* ─── SETTINGS SCREEN ─── */
+  .settings-list { flex:1; overflow-y:auto; scrollbar-width:none; }
+  .settings-list::-webkit-scrollbar { display:none; }
+  .section-header { padding:20px 20px 8px; font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--s400); display:flex; align-items:center; gap:8px; }
+  .section-header-line { width:14px; height:2px; background:var(--s200); }
+  .settings-group { background:var(--s0); border-top:1px solid var(--s200); border-bottom:1px solid var(--s200); margin-bottom:8px; }
+  .settings-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px; border-bottom:1px solid var(--s100); cursor:pointer;
+    transition:background .12s;
+  }
+  .settings-row:last-child { border-bottom:none; }
+  .settings-row:hover { background:var(--s50); }
+  .settings-row-left { display:flex; align-items:center; gap:12px; }
+  .settings-row-icon { width:32px; height:32px; border-radius:8px; background:var(--s100); display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+  .settings-row-label { font-size:15px; font-weight:600; color:var(--s800); }
+  .settings-row-sub { font-size:12px; color:var(--s400); margin-top:1px; }
+  .settings-row-right { display:flex; align-items:center; gap:8px; }
+  .settings-row-value { font-size:13px; color:var(--s400); }
+  .settings-row-chevron svg { width:16px; height:16px; stroke:var(--s300); fill:none; stroke-width:2; }
+
+  .danger-row { padding:14px 20px; cursor:pointer; }
+  .danger-btn { font-size:15px; font-weight:600; color:#dc2626; }
+
+  /* area picker sheet overlay */
+  .sheet-backdrop { position:absolute; inset:0; background:rgba(0,0,0,.3); z-index:10; display:flex; align-items:flex-end; }
+  .sheet {
+    width:100%; background:var(--s0); border-radius:20px 20px 0 0;
+    padding-bottom:34px; max-height:70%;
+    display:flex; flex-direction:column;
+  }
+  .sheet-handle { width:36px; height:4px; border-radius:2px; background:var(--s200); margin:12px auto 16px; flex-shrink:0; }
+  .sheet-title { font-size:18px; font-weight:800; letter-spacing:-.4px; color:var(--s900); padding:0 20px 14px; border-bottom:1px solid var(--s200); flex-shrink:0; }
+  .sheet-list { overflow-y:auto; flex:1; scrollbar-width:none; }
+  .sheet-list::-webkit-scrollbar { display:none; }
+  .sheet-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:13px 20px; border-bottom:1px solid var(--s100);
+    cursor:pointer; transition:background .12s;
+  }
+  .sheet-item:hover { background:var(--s50); }
+  .sheet-item.selected { background:var(--s900); }
+  .sheet-item-label { font-size:15px; font-weight:500; color:var(--s800); }
+  .sheet-item.selected .sheet-item-label { color:#fff; font-weight:700; }
+  .sheet-item-check { width:18px; height:18px; border-radius:50%; border:1.5px solid var(--s200); }
+  .sheet-item.selected .sheet-item-check { background:var(--brand); border-color:var(--brand); display:flex; align-items:center; justify-content:center; }
+  .sheet-item.selected .sheet-item-check::after { content:'✓'; font-size:11px; color:#fff; font-weight:700; }
+
+  /* tab bar */
+  .tab-bar {
+    position:absolute; bottom:0; left:0; right:0; height:84px;
+    background:var(--s0); border-top:1px solid var(--s200);
+    display:flex; align-items:flex-start; justify-content:space-around; padding-top:10px;
+  }
+  .tab-item { display:flex; flex-direction:column; align-items:center; gap:3px; flex:1; cursor:pointer; padding-top:2px; }
+  .tab-icon svg { width:20px; height:20px; stroke-width:2; fill:none; }
+  .tab-item.active .tab-icon svg { stroke:var(--s900); }
+  .tab-item .tab-icon svg { stroke:var(--s400); }
+  .tab-lbl { font-size:10px; font-weight:600; }
+  .tab-item.active .tab-lbl { color:var(--s900); }
+  .tab-item .tab-lbl { color:var(--s400); }
+</style>
+</head>
+<body>
+
+<!-- PHONE 1: ACTIVE JOBS — with content -->
+<div class="phone-group">
+  <div class="phone">
+    <!-- status bar -->
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="s-icons">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--s800)"><rect x="0" y="10" width="3" height="6" rx=".5"/><rect x="4.5" y="7" width="3" height="9" rx=".5"/><rect x="9" y="4" width="3" height="12" rx=".5"/><rect x="13.5" y="1" width="2.5" height="15" rx=".5"/></svg>
+        <svg width="20" height="14" viewBox="0 0 24 16" fill="none" stroke="var(--s800)" stroke-width="2.5"><path d="M5 8a11 11 0 0114 0"/><path d="M2 5a15 15 0 0120 0"/><path d="M8.5 11a6 6 0 017 0"/><circle cx="12" cy="14" r="1" fill="var(--s800)" stroke="none"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12"><rect x=".5" y=".5" width="20" height="11" rx="2" stroke="var(--s800)" stroke-width="1" fill="none"/><rect x="1.5" y="1.5" width="16" height="9" rx="1.2" fill="var(--s800)"/><path d="M21.5 4v4a2 2 0 000-4z" fill="var(--s800)"/></svg>
+      </div>
+    </div>
+
+    <!-- app bar -->
+    <div class="app-bar">
+      <div class="app-bar-row">
+        <div>
+          <div class="app-bar-title">My jobs</div>
+          <div class="app-bar-sub">2 active</div>
+        </div>
+        <div class="app-bar-action">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- feed -->
+    <div class="scroll-area">
+
+      <!-- Card 1: In Progress -->
+      <div class="active-card">
+        <div class="active-card-header">
+          <div class="ac-row1">
+            <span class="ac-cat"><span class="ac-cat-icon">🔨</span>Handyman</span>
+            <span class="badge badge-progress">In Progress</span>
+          </div>
+          <div class="ac-desc">IKEA PAX wardrobe assembly — 3 doors, mirrored</div>
+          <div class="ac-meta">
+            <span class="ac-meta-item">
+              <svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Uptown
+            </span>
+            <span class="ac-meta-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              ASAP
+            </span>
+          </div>
+        </div>
+        <div class="progress-section">
+          <div class="progress-track">
+            <div class="track-step"><div class="track-dot done"></div><div class="track-lbl">Pending</div></div>
+            <div class="track-line done"></div>
+            <div class="track-step"><div class="track-dot done"></div><div class="track-lbl">Accepted</div></div>
+            <div class="track-line done"></div>
+            <div class="track-step"><div class="track-dot active"></div><div class="track-lbl">In Progress</div></div>
+            <div class="track-line"></div>
+            <div class="track-step"><div class="track-dot"></div><div class="track-lbl">Done</div></div>
+          </div>
+        </div>
+        <div class="card-cta">
+          <button class="btn-sm-dark">Mark complete</button>
+          <button class="btn-sm-outline">Details</button>
+        </div>
+      </div>
+
+      <!-- Card 2: Accepted -->
+      <div class="active-card">
+        <div class="active-card-header">
+          <div class="ac-row1">
+            <span class="ac-cat"><span class="ac-cat-icon">🎨</span>Painting</span>
+            <span class="badge badge-accepted">Accepted</span>
+          </div>
+          <div class="ac-desc">Living room walls — two coats white emulsion</div>
+          <div class="ac-meta">
+            <span class="ac-meta-item">
+              <svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Downtown
+            </span>
+            <span class="ac-meta-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Flexible
+            </span>
+          </div>
+        </div>
+        <div class="progress-section">
+          <div class="progress-track">
+            <div class="track-step"><div class="track-dot done"></div><div class="track-lbl">Pending</div></div>
+            <div class="track-line done"></div>
+            <div class="track-step"><div class="track-dot active"></div><div class="track-lbl">Accepted</div></div>
+            <div class="track-line"></div>
+            <div class="track-step"><div class="track-dot"></div><div class="track-lbl">In Progress</div></div>
+            <div class="track-line"></div>
+            <div class="track-step"><div class="track-dot"></div><div class="track-lbl">Done</div></div>
+          </div>
+        </div>
+        <div class="card-cta">
+          <button class="btn-sm-dark">Start job</button>
+          <button class="btn-sm-outline">Details</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item">
+        <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <span class="tab-lbl">Feed</span>
+      </div>
+      <div class="tab-item active">
+        <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></div>
+        <span class="tab-lbl">My Jobs</span>
+      </div>
+      <div class="tab-item">
+        <div class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div>
+        <span class="tab-lbl">Profile</span>
+      </div>
+    </div>
+  </div>
+  <div class="phone-label">Active Jobs tab</div>
+</div>
+
+<!-- PHONE 2: SETTINGS + AREA PICKER SHEET -->
+<div class="phone-group">
+  <div class="phone">
+    <div class="status-bar">
+      <span>9:41</span>
+      <div class="s-icons">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="var(--s800)"><rect x="0" y="10" width="3" height="6" rx=".5"/><rect x="4.5" y="7" width="3" height="9" rx=".5"/><rect x="9" y="4" width="3" height="12" rx=".5"/><rect x="13.5" y="1" width="2.5" height="15" rx=".5"/></svg>
+        <svg width="20" height="14" viewBox="0 0 24 16" fill="none" stroke="var(--s800)" stroke-width="2.5"><path d="M5 8a11 11 0 0114 0"/><path d="M2 5a15 15 0 0120 0"/><path d="M8.5 11a6 6 0 017 0"/><circle cx="12" cy="14" r="1" fill="var(--s800)" stroke="none"/></svg>
+        <svg width="25" height="12" viewBox="0 0 25 12"><rect x=".5" y=".5" width="20" height="11" rx="2" stroke="var(--s800)" stroke-width="1" fill="none"/><rect x="1.5" y="1.5" width="16" height="9" rx="1.2" fill="var(--s800)"/><path d="M21.5 4v4a2 2 0 000-4z" fill="var(--s800)"/></svg>
+      </div>
+    </div>
+
+    <div class="app-bar">
+      <div class="app-bar-row">
+        <div class="app-bar-title">Settings</div>
+      </div>
+    </div>
+
+    <div class="settings-list">
+      <div class="section-header"><span class="section-header-line"></span>Service area</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <div class="settings-row-icon">📍</div>
+            <div>
+              <div class="settings-row-label">Current area</div>
+              <div class="settings-row-sub">Jobs shown in your feed</div>
+            </div>
+          </div>
+          <div class="settings-row-right">
+            <span class="settings-row-value">Downtown</span>
+            <div class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header"><span class="section-header-line"></span>Account</div>
+      <div class="settings-group">
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <div class="settings-row-icon">✉️</div>
+            <div>
+              <div class="settings-row-label">Email</div>
+              <div class="settings-row-sub">jane.smith@example.com</div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <div class="settings-row-icon">🔒</div>
+            <div>
+              <div class="settings-row-label">Password</div>
+              <div class="settings-row-sub">Last changed 30 days ago</div>
+            </div>
+          </div>
+          <div class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-left">
+            <div class="settings-row-icon">⭐</div>
+            <div>
+              <div class="settings-row-label">Reviews</div>
+              <div class="settings-row-sub">4.8 avg · 9 reviews</div>
+            </div>
+          </div>
+          <div class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="section-header"><span class="section-header-line"></span>Session</div>
+      <div class="settings-group">
+        <div class="danger-row">
+          <span class="danger-btn">Log out</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Area picker bottom sheet -->
+    <div class="sheet-backdrop">
+      <div class="sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-title">Choose service area</div>
+        <div class="sheet-list">
+          <div class="sheet-item selected"><span class="sheet-item-label">Downtown</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Uptown</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Midtown</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Riverside</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Old Town</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Harbor</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Hillcrest</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Westside</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Eastside</span><div class="sheet-item-check"></div></div>
+          <div class="sheet-item"><span class="sheet-item-label">Midtown Heights</span><div class="sheet-item-check"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item">
+        <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <span class="tab-lbl">Feed</span>
+      </div>
+      <div class="tab-item">
+        <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/></svg></div>
+        <span class="tab-lbl">My Jobs</span>
+      </div>
+      <div class="tab-item active">
+        <div class="tab-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg></div>
+        <span class="tab-lbl">Profile</span>
+      </div>
+    </div>
+  </div>
+  <div class="phone-label">Settings + area picker sheet</div>
+</div>
+
+</body>
+</html>

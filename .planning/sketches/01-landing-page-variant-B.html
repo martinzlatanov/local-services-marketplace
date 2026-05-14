@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalPro — Variant B: Structured Editorial</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --surface-0:   #ffffff;
+    --surface-50:  #f8fafc;
+    --surface-100: #f1f5f9;
+    --surface-200: #e2e8f0;
+    --surface-300: #cbd5e1;
+    --surface-400: #94a3b8;
+    --surface-500: #64748b;
+    --surface-600: #475569;
+    --surface-700: #334155;
+    --surface-800: #1e293b;
+    --surface-900: #0f172a;
+
+    --brand:       #14b8a6;
+    --brand-light: #f0fdf9;
+    --brand-dim:   #0d9488;
+    --brand-muted: #0f766e;
+    --brand-border: #99f6df;
+
+    --grid-line: var(--surface-100);
+    --font: 'Inter', system-ui, -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body { font-family: var(--font); background: var(--surface-0); color: var(--surface-900); line-height: 1.5; }
+
+  /* NAV — very minimal */
+  nav {
+    border-bottom: 1px solid var(--surface-200);
+    padding: 0 64px;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { font-weight: 800; font-size: 16px; letter-spacing: -0.5px; color: var(--surface-900); text-decoration: none; display: flex; align-items: center; gap: 6px; }
+  .logo-dot { width: 8px; height: 8px; background: var(--brand); border-radius: 50%; margin-bottom: 1px; }
+  .nav-center { display: flex; gap: 36px; }
+  .nav-center a { font-size: 13px; font-weight: 500; color: var(--surface-500); text-decoration: none; letter-spacing: 0.01em; }
+  .nav-center a:hover { color: var(--surface-900); }
+  .nav-right { display: flex; gap: 8px; align-items: center; }
+  .btn-text { font-size: 13px; font-weight: 500; color: var(--surface-600); background: none; border: none; cursor: pointer; padding: 7px 12px; border-radius: 6px; }
+  .btn-dark { font-size: 13px; font-weight: 600; color: #fff; background: var(--surface-900); border: none; cursor: pointer; padding: 7px 14px; border-radius: 6px; letter-spacing: -0.1px; }
+  .btn-dark:hover { opacity: 0.88; }
+
+  /* ANNOUNCEMENT BAR */
+  .announce-bar {
+    background: var(--surface-900); color: #fff;
+    text-align: center; padding: 10px 48px;
+    font-size: 13px; font-weight: 500;
+    display: flex; justify-content: center; align-items: center; gap: 12px;
+  }
+  .announce-bar a { color: var(--brand); text-decoration: none; font-weight: 600; }
+
+  /* HERO — full-width asymmetric */
+  .hero-wrapper {
+    display: grid; grid-template-columns: 1fr 1px 1fr;
+    min-height: 640px;
+    border-bottom: 1px solid var(--surface-200);
+  }
+  .hero-divider { background: var(--surface-200); }
+  .hero-left {
+    padding: 80px 64px;
+    display: flex; flex-direction: column; justify-content: center;
+    border-right: none;
+  }
+  .hero-right {
+    padding: 80px 64px;
+    background: var(--surface-50);
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--brand-muted);
+    margin-bottom: 24px;
+  }
+  .tag-line { width: 24px; height: 2px; background: var(--brand); }
+  .hero-h1 {
+    font-size: clamp(44px, 4.5vw, 68px);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -2.5px;
+    color: var(--surface-900);
+    margin-bottom: 20px;
+  }
+  .hero-h1 em { font-style: normal; color: var(--brand); }
+  .hero-p { font-size: 17px; color: var(--surface-500); line-height: 1.65; max-width: 400px; margin-bottom: 40px; }
+  .hero-ctas { display: flex; gap: 12px; }
+  .cta-main {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface-900); color: #fff;
+    font-size: 14px; font-weight: 600;
+    padding: 12px 22px; border-radius: 8px;
+    text-decoration: none; transition: opacity 0.15s;
+  }
+  .cta-main:hover { opacity: 0.85; }
+  .cta-outline {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: var(--surface-700);
+    font-size: 14px; font-weight: 500;
+    padding: 12px 22px; border-radius: 8px; border: 1px solid var(--surface-200);
+    text-decoration: none; transition: border-color 0.15s;
+  }
+  .cta-outline:hover { border-color: var(--surface-300); }
+
+  /* RIGHT SIDE — METRICS + LIVE ACTIVITY */
+  .metrics-row { display: flex; gap: 0; margin-bottom: 32px; border: 1px solid var(--surface-200); border-radius: 10px; overflow: hidden; }
+  .metric-cell {
+    flex: 1; padding: 20px 20px;
+    border-right: 1px solid var(--surface-200);
+    background: var(--surface-0);
+  }
+  .metric-cell:last-child { border-right: none; }
+  .metric-val { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--surface-900); margin-bottom: 4px; }
+  .metric-val span { color: var(--brand); }
+  .metric-lbl { font-size: 12px; color: var(--surface-400); font-weight: 500; }
+
+  .live-section { }
+  .live-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .live-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--surface-400); display: flex; align-items: center; gap: 8px; }
+  .pulse-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .live-count { font-size: 12px; color: var(--surface-400); }
+
+  .activity-list { display: flex; flex-direction: column; gap: 8px; }
+  .activity-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px;
+    background: var(--surface-0); border: 1px solid var(--surface-200);
+    border-radius: 8px; transition: border-color 0.15s;
+  }
+  .activity-row:first-child { border-color: var(--brand); background: var(--brand-light); }
+  .activity-icon {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: var(--surface-100);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+  }
+  .activity-row:first-child .activity-icon { background: rgba(20,184,166,0.12); }
+  .activity-body { flex: 1; min-width: 0; }
+  .activity-title { font-size: 13px; font-weight: 600; color: var(--surface-800); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .activity-meta { font-size: 11px; color: var(--surface-400); margin-top: 2px; }
+  .activity-badge {
+    font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 20px; flex-shrink: 0;
+    background: var(--brand-light); color: var(--brand-muted); border: 1px solid var(--brand-border);
+  }
+  .activity-badge.pending { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+
+  /* FEATURE STRIP */
+  .feature-strip { border-top: 1px solid var(--surface-200); border-bottom: 1px solid var(--surface-200); }
+  .feature-strip-inner {
+    max-width: 1200px; margin: 0 auto; padding: 0 64px;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+  }
+  .feature-cell {
+    padding: 48px 40px;
+    border-right: 1px solid var(--surface-200);
+  }
+  .feature-cell:last-child { border-right: none; }
+  .feature-num { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--surface-300); font-family: var(--mono); margin-bottom: 16px; }
+  .feature-heading { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: var(--surface-900); margin-bottom: 10px; }
+  .feature-body { font-size: 14px; color: var(--surface-500); line-height: 1.6; }
+
+  /* CATEGORIES TABLE */
+  .cats-section { max-width: 1200px; margin: 0 auto; padding: 80px 64px; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  .section-h { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--surface-400); }
+  .section-h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; color: var(--surface-900); }
+  .cats-table { border: 1px solid var(--surface-200); border-radius: 10px; overflow: hidden; }
+  .cats-table-row {
+    display: grid; grid-template-columns: 48px 1fr 120px 100px;
+    align-items: center; padding: 14px 20px;
+    border-bottom: 1px solid var(--surface-100);
+    transition: background 0.12s; cursor: pointer;
+  }
+  .cats-table-row:last-child { border-bottom: none; }
+  .cats-table-row:hover { background: var(--surface-50); }
+  .cats-table-row.header { background: var(--surface-50); padding: 10px 20px; border-bottom: 1px solid var(--surface-200); cursor: default; }
+  .cats-table-row.header span { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--surface-400); }
+  .cat-icon-cell { font-size: 18px; }
+  .cat-name-cell { font-size: 14px; font-weight: 600; color: var(--surface-800); }
+  .cat-jobs-cell { font-size: 13px; color: var(--surface-500); }
+  .cat-action { font-size: 12px; font-weight: 600; color: var(--brand-muted); }
+
+  /* FOOTER */
+  .site-footer { border-top: 1px solid var(--surface-200); padding: 40px 64px; display: flex; align-items: center; justify-content: space-between; }
+  .footer-logo { font-weight: 800; font-size: 15px; letter-spacing: -0.3px; color: var(--surface-900); }
+  .footer-copy { font-size: 12px; color: var(--surface-400); }
+  .footer-links a { font-size: 12px; color: var(--surface-500); text-decoration: none; margin-left: 20px; }
+</style>
+</head>
+<body>
+
+<!-- ANNOUNCE BAR -->
+<div class="announce-bar">
+  <span>Now live across 10 city areas</span>
+  <span>·</span>
+  <a href="#">View coverage map →</a>
+</div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo"><span class="logo-dot"></span> LocalPro</a>
+  <div class="nav-center">
+    <a href="#">Services</a>
+    <a href="#">How it works</a>
+    <a href="#">For providers</a>
+  </div>
+  <div class="nav-right">
+    <button class="btn-text">Log in</button>
+    <button class="btn-dark">Post a job</button>
+  </div>
+</nav>
+
+<!-- HERO — SPLIT -->
+<div class="hero-wrapper">
+  <div class="hero-left">
+    <div class="tag"><span class="tag-line"></span> Local services marketplace</div>
+    <h1 class="hero-h1">Trusted help,<br><em>done fast.</em></h1>
+    <p class="hero-p">Post any home or local task in under 60 seconds. Verified professionals in your area respond within the hour.</p>
+    <div class="hero-ctas">
+      <a href="#" class="cta-main">Post a job <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+      <a href="#" class="cta-outline">Find work →</a>
+    </div>
+  </div>
+  <div class="hero-divider"></div>
+  <div class="hero-right">
+    <div class="metrics-row">
+      <div class="metric-cell"><div class="metric-val"><span>10</span></div><div class="metric-lbl">City areas</div></div>
+      <div class="metric-cell"><div class="metric-val"><span>8</span></div><div class="metric-lbl">Categories</div></div>
+      <div class="metric-cell"><div class="metric-val">&lt;1h</div><div class="metric-lbl">Response</div></div>
+    </div>
+    <div class="live-section">
+      <div class="live-header">
+        <span class="live-title"><span class="pulse-dot"></span> Live job feed</span>
+        <span class="live-count">3 new in the last hour</span>
+      </div>
+      <div class="activity-list">
+        <div class="activity-row">
+          <div class="activity-icon">🔧</div>
+          <div class="activity-body">
+            <div class="activity-title">Kitchen sink leak repair</div>
+            <div class="activity-meta">Downtown · Within a week</div>
+          </div>
+          <span class="activity-badge">New</span>
+        </div>
+        <div class="activity-row">
+          <div class="activity-icon">✨</div>
+          <div class="activity-body">
+            <div class="activity-title">End of tenancy deep clean</div>
+            <div class="activity-meta">Midtown · Today</div>
+          </div>
+          <span class="activity-badge pending">Pending</span>
+        </div>
+        <div class="activity-row">
+          <div class="activity-icon">⚡</div>
+          <div class="activity-body">
+            <div class="activity-title">4 new outlets in home office</div>
+            <div class="activity-meta">Riverside · This weekend</div>
+          </div>
+          <span class="activity-badge pending">Pending</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE STRIP -->
+<div class="feature-strip">
+  <div class="feature-strip-inner">
+    <div class="feature-cell">
+      <div class="feature-num">01 /</div>
+      <div class="feature-heading">Describe your job</div>
+      <div class="feature-body">Pick a category, add your location and timeframe. No calls, no quotes — just submit and wait.</div>
+    </div>
+    <div class="feature-cell">
+      <div class="feature-num">02 /</div>
+      <div class="feature-heading">Real-time matching</div>
+      <div class="feature-body">Local professionals see your listing the moment you post. WebSocket-powered live updates.</div>
+    </div>
+    <div class="feature-cell">
+      <div class="feature-num">03 /</div>
+      <div class="feature-heading">Track and complete</div>
+      <div class="feature-body">Follow status from Pending to In Progress to Complete. Review when done.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES TABLE -->
+<div class="cats-section">
+  <div class="section-header">
+    <div>
+      <div class="section-h">Service categories</div>
+      <div class="section-h2">What we cover</div>
+    </div>
+  </div>
+  <div class="cats-table">
+    <div class="cats-table-row header">
+      <span></span>
+      <span>Category</span>
+      <span>Active jobs</span>
+      <span></span>
+    </div>
+    <div class="cats-table-row"><div class="cat-icon-cell">🔧</div><div class="cat-name-cell">Plumbing</div><div class="cat-jobs-cell">12 open</div><div class="cat-action">Browse →</div></div>
+    <div class="cats-table-row"><div class="cat-icon-cell">⚡</div><div class="cat-name-cell">Electrical</div><div class="cat-jobs-cell">8 open</div><div class="cat-action">Browse →</div></div>
+    <div class="cats-table-row"><div class="cat-icon-cell">✨</div><div class="cat-name-cell">Cleaning</div><div class="cat-jobs-cell">21 open</div><div class="cat-action">Browse →</div></div>
+    <div class="cats-table-row"><div class="cat-icon-cell">🌿</div><div class="cat-name-cell">Gardening</div><div class="cat-jobs-cell">6 open</div><div class="cat-action">Browse →</div></div>
+    <div class="cats-table-row"><div class="cat-icon-cell">📦</div><div class="cat-name-cell">Moving</div><div class="cat-jobs-cell">4 open</div><div class="cat-action">Browse →</div></div>
+    <div class="cats-table-row"><div class="cat-icon-cell">🔨</div><div class="cat-name-cell">Handyman</div><div class="cat-jobs-cell">15 open</div><div class="cat-action">Browse →</div></div>
+    <div class="cats-table-row"><div class="cat-icon-cell">🎨</div><div class="cat-name-cell">Painting</div><div class="cat-jobs-cell">9 open</div><div class="cat-action">Browse →</div></div>
+    <div class="cats-table-row"><div class="cat-icon-cell">···</div><div class="cat-name-cell">Other</div><div class="cat-jobs-cell">7 open</div><div class="cat-action">Browse →</div></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div style="border-top:1px solid var(--surface-200)">
+<div class="site-footer">
+  <div class="footer-logo">LocalPro</div>
+  <div class="footer-copy">© 2026 LocalPro. All rights reserved.</div>
+  <div><a href="#" class="footer-links" style="margin:0">Home</a><a href="#" class="footer-links">Log in</a><a href="#" class="footer-links">Get started</a></div>
+</div>
+</div>
+
+</body>
+</html>

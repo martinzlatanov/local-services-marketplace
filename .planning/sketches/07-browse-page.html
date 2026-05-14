@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LocalPro — Browse Jobs (Variant B language)</title>
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  :root {
+    --s0:#ffffff; --s50:#f8fafc; --s100:#f1f5f9; --s200:#e2e8f0; --s300:#cbd5e1;
+    --s400:#94a3b8; --s500:#64748b; --s600:#475569; --s700:#334155; --s800:#1e293b; --s900:#0f172a;
+    --brand:#14b8a6; --brand-light:#f0fdf9; --brand-muted:#0f766e; --brand-border:#99f6df;
+    --font:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  html { -webkit-font-smoothing:antialiased; }
+  body { font-family:var(--font); background:var(--s50); color:var(--s900); }
+
+  /* NAV */
+  nav {
+    border-bottom:1px solid var(--s200); padding:0 40px; height:56px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:20;
+    background:rgba(255,255,255,.92); backdrop-filter:blur(12px);
+  }
+  .logo { font-weight:800; font-size:15px; letter-spacing:-.4px; color:var(--s900); display:flex; align-items:center; gap:6px; text-decoration:none; }
+  .logo-dot { width:7px; height:7px; background:var(--brand); border-radius:50%; }
+  .nav-mid { display:flex; gap:28px; }
+  .nav-mid a { font-size:13px; font-weight:500; color:var(--s400); text-decoration:none; }
+  .nav-mid a.active { color:var(--s900); }
+  .live-pill { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; background:var(--brand-light); border:1px solid var(--brand-border); color:var(--brand-muted); padding:4px 10px; border-radius:9999px; }
+  .live-dot { width:6px; height:6px; border-radius:50%; background:var(--brand); animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .avatar { width:32px; height:32px; border-radius:8px; background:var(--s200); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--s600); border:1px solid var(--s300); }
+
+  /* LAYOUT: left sidebar + right feed */
+  .page { display:grid; grid-template-columns:260px 1fr; min-height:calc(100vh - 56px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-right:1px solid var(--s200); padding:32px 24px;
+    background:var(--s0); position:sticky; top:56px; height:calc(100vh - 56px);
+    overflow-y:auto;
+  }
+  .sidebar-section { margin-bottom:28px; }
+  .sidebar-label { font-size:11px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--s400); margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .sidebar-label-line { width:14px; height:2px; background:var(--s200); }
+  .filter-list { display:flex; flex-direction:column; gap:2px; }
+  .filter-item {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:7px 10px; border-radius:7px;
+    font-size:13px; font-weight:500; color:var(--s600);
+    cursor:pointer; transition:background .12s;
+  }
+  .filter-item:hover { background:var(--s50); }
+  .filter-item.active { background:var(--s900); color:#fff; font-weight:600; }
+  .filter-count { font-size:11px; font-weight:600; color:var(--s400); background:var(--s100); padding:1px 7px; border-radius:9999px; }
+  .filter-item.active .filter-count { background:rgba(255,255,255,.15); color:rgba(255,255,255,.7); }
+  .filter-item-icon { margin-right:6px; font-size:14px; }
+
+  /* FEED AREA */
+  .feed-area { padding:32px 40px; }
+  .feed-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:24px; }
+  .feed-header-left { }
+  .feed-eyebrow { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--s400); margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .eyebrow-line { width:14px; height:2px; background:var(--s300); }
+  .feed-title { font-size:24px; font-weight:800; letter-spacing:-.6px; color:var(--s900); }
+  .feed-sub { font-size:13px; color:var(--s500); margin-top:3px; }
+  .feed-controls { display:flex; gap:8px; align-items:center; }
+  .search-wrap {
+    display:flex; align-items:center; gap:8px;
+    background:var(--s0); border:1px solid var(--s200); border-radius:8px;
+    padding:7px 12px;
+  }
+  .search-wrap svg { width:14px; height:14px; stroke:var(--s400); fill:none; stroke-width:2; flex-shrink:0; }
+  .search-input { font-size:13px; color:var(--s700); border:none; outline:none; background:transparent; font-family:var(--font); width:180px; }
+  .sort-btn { font-size:13px; font-weight:600; color:var(--s600); background:var(--s0); border:1px solid var(--s200); border-radius:8px; padding:7px 12px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+  .sort-btn svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; }
+
+  /* Active filters strip */
+  .active-filters { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+  .active-filter-tag {
+    display:flex; align-items:center; gap:6px;
+    font-size:12px; font-weight:600; color:var(--s700);
+    background:var(--s0); border:1px solid var(--s200); border-radius:6px;
+    padding:4px 10px;
+  }
+  .active-filter-tag .remove { color:var(--s400); cursor:pointer; font-size:14px; line-height:1; }
+  .clear-all { font-size:12px; font-weight:600; color:var(--s400); cursor:pointer; margin-left:4px; }
+  .clear-all:hover { color:var(--s700); }
+
+  /* JOB CARDS — table-row style consistent with dashboards */
+  .job-table { background:var(--s0); border:1px solid var(--s200); border-radius:10px; overflow:hidden; }
+  .job-table-header {
+    display:grid; grid-template-columns:40px 1fr 120px 110px 90px;
+    gap:12px; padding:10px 20px; border-bottom:1px solid var(--s200);
+    background:var(--s50);
+  }
+  .th { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--s400); }
+
+  .job-row {
+    display:grid; grid-template-columns:40px 1fr 120px 110px 90px;
+    gap:12px; align-items:center;
+    padding:14px 20px; border-bottom:1px solid var(--s100);
+    cursor:pointer; transition:background .12s;
+  }
+  .job-row:last-child { border-bottom:none; }
+  .job-row:hover { background:var(--s50); }
+  .job-row.new-job { background:var(--brand-light); border-left:3px solid var(--brand); padding-left:17px; }
+  .job-row.new-job:hover { background:#e0fdf4; }
+
+  .job-icon-cell { width:36px; height:36px; border-radius:8px; background:var(--s100); border:1px solid var(--s200); display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .new-job .job-icon-cell { background:rgba(20,184,166,.1); border-color:var(--brand-border); }
+
+  .job-body { min-width:0; }
+  .job-cat-label { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--s400); margin-bottom:2px; }
+  .new-job .job-cat-label { color:var(--brand-muted); }
+  .job-desc-text { font-size:14px; font-weight:600; color:var(--s800); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .job-area { font-size:13px; color:var(--s500); display:flex; align-items:center; gap:5px; }
+  .job-area svg { width:12px; height:12px; stroke:var(--s400); fill:none; stroke-width:2; flex-shrink:0; }
+  .job-time-cell { font-size:13px; color:var(--s500); display:flex; align-items:center; gap:5px; }
+  .job-time-cell svg { width:12px; height:12px; stroke:var(--s400); fill:none; stroke-width:2; flex-shrink:0; }
+
+  .btn-accept { font-size:12px; font-weight:700; padding:6px 14px; border-radius:7px; background:var(--s900); color:#fff; border:none; cursor:pointer; transition:opacity .15s; white-space:nowrap; }
+  .btn-accept:hover { opacity:.88; }
+  .badge-new { font-size:10px; font-weight:700; padding:3px 8px; border-radius:9999px; background:var(--brand-light); color:var(--brand-muted); border:1px solid var(--brand-border); display:flex; align-items:center; gap:4px; white-space:nowrap; }
+  .badge-new-dot { width:5px; height:5px; border-radius:50%; background:var(--brand); animation:pulse 1.5s infinite; flex-shrink:0; }
+
+  .table-footer { padding:12px 20px; border-top:1px solid var(--s100); display:flex; justify-content:space-between; align-items:center; }
+  .table-footer-txt { font-size:12px; color:var(--s400); }
+  .table-footer-pages { display:flex; gap:4px; }
+  .page-btn { font-size:12px; font-weight:600; padding:4px 8px; border-radius:5px; border:1px solid var(--s200); background:var(--s0); color:var(--s600); cursor:pointer; }
+  .page-btn.active { background:var(--s900); color:#fff; border-color:var(--s900); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo"><span class="logo-dot"></span> LocalPro</a>
+  <div class="nav-mid">
+    <a href="#">Dashboard</a>
+    <a href="#" class="active">Browse</a>
+    <a href="#">Active Jobs</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="live-pill"><span class="live-dot"></span> Live</div>
+    <div class="avatar">J</div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label"><span class="sidebar-label-line"></span> Location</div>
+      <div class="filter-list">
+        <div class="filter-item active"><span><span class="filter-item-icon">📍</span>All areas</span><span class="filter-count">47</span></div>
+        <div class="filter-item"><span>Downtown</span><span class="filter-count">12</span></div>
+        <div class="filter-item"><span>Uptown</span><span class="filter-count">6</span></div>
+        <div class="filter-item"><span>Midtown</span><span class="filter-count">8</span></div>
+        <div class="filter-item"><span>Riverside</span><span class="filter-count">5</span></div>
+        <div class="filter-item"><span>Old Town</span><span class="filter-count">3</span></div>
+        <div class="filter-item"><span>Harbor</span><span class="filter-count">4</span></div>
+        <div class="filter-item"><span>Hillcrest</span><span class="filter-count">3</span></div>
+        <div class="filter-item"><span>Westside</span><span class="filter-count">2</span></div>
+        <div class="filter-item"><span>Eastside</span><span class="filter-count">2</span></div>
+        <div class="filter-item"><span>Midtown Heights</span><span class="filter-count">2</span></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label"><span class="sidebar-label-line"></span> Category</div>
+      <div class="filter-list">
+        <div class="filter-item"><span><span class="filter-item-icon">🔧</span>Plumbing</span><span class="filter-count">12</span></div>
+        <div class="filter-item"><span><span class="filter-item-icon">⚡</span>Electrical</span><span class="filter-count">8</span></div>
+        <div class="filter-item"><span><span class="filter-item-icon">✨</span>Cleaning</span><span class="filter-count">21</span></div>
+        <div class="filter-item"><span><span class="filter-item-icon">🌿</span>Gardening</span><span class="filter-count">6</span></div>
+        <div class="filter-item"><span><span class="filter-item-icon">📦</span>Moving</span><span class="filter-count">4</span></div>
+        <div class="filter-item"><span><span class="filter-item-icon">🔨</span>Handyman</span><span class="filter-count">15</span></div>
+        <div class="filter-item"><span><span class="filter-item-icon">🎨</span>Painting</span><span class="filter-count">9</span></div>
+        <div class="filter-item"><span><span class="filter-item-icon">···</span>Other</span><span class="filter-count">7</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEED -->
+  <div class="feed-area">
+    <div class="feed-header">
+      <div class="feed-header-left">
+        <div class="feed-eyebrow"><span class="eyebrow-line"></span> Provider view</div>
+        <div class="feed-title">Browse jobs</div>
+        <div class="feed-sub">47 pending jobs across all areas</div>
+      </div>
+      <div class="feed-controls">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input class="search-input" type="text" placeholder="Search descriptions…">
+        </div>
+        <button class="sort-btn">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+          Newest first
+        </button>
+      </div>
+    </div>
+
+    <!-- Active filters -->
+    <div class="active-filters">
+      <span style="font-size:12px;font-weight:700;color:var(--s400);text-transform:uppercase;letter-spacing:.06em">Filters:</span>
+      <div class="active-filter-tag">All areas <span class="remove">×</span></div>
+      <div class="active-filter-tag">All categories <span class="remove">×</span></div>
+      <span class="clear-all">Clear all</span>
+    </div>
+
+    <!-- TABLE -->
+    <div class="job-table">
+      <div class="job-table-header">
+        <div class="th"></div>
+        <div class="th">Job</div>
+        <div class="th">Location</div>
+        <div class="th">Timeframe</div>
+        <div class="th"></div>
+      </div>
+
+      <!-- New jobs (featured) -->
+      <div class="job-row new-job">
+        <div class="job-icon-cell">🔧</div>
+        <div class="job-body">
+          <div class="job-cat-label">Plumbing</div>
+          <div class="job-desc-text">Kitchen sink leak — under-cabinet pipe repair</div>
+        </div>
+        <div class="job-area"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Downtown</div>
+        <div class="job-time-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Within a week</div>
+        <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+          <span class="badge-new"><span class="badge-new-dot"></span>New</span>
+          <button class="btn-accept">Accept →</button>
+        </div>
+      </div>
+
+      <div class="job-row new-job">
+        <div class="job-icon-cell">✨</div>
+        <div class="job-body">
+          <div class="job-cat-label">Cleaning</div>
+          <div class="job-desc-text">End of tenancy deep clean — 2-bed flat, oven + windows</div>
+        </div>
+        <div class="job-area"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Midtown</div>
+        <div class="job-time-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Today</div>
+        <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+          <span class="badge-new"><span class="badge-new-dot"></span>New</span>
+          <button class="btn-accept">Accept →</button>
+        </div>
+      </div>
+
+      <!-- Older jobs -->
+      <div class="job-row">
+        <div class="job-icon-cell">⚡</div>
+        <div class="job-body">
+          <div class="job-cat-label">Electrical</div>
+          <div class="job-desc-text">4 new outlets in home office, cable management preferred</div>
+        </div>
+        <div class="job-area"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Riverside</div>
+        <div class="job-time-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>This weekend</div>
+        <button class="btn-accept">Accept →</button>
+      </div>
+
+      <div class="job-row">
+        <div class="job-icon-cell">🌿</div>
+        <div class="job-body">
+          <div class="job-cat-label">Gardening</div>
+          <div class="job-desc-text">Lawn mowing and hedge trimming — small back garden ~40m²</div>
+        </div>
+        <div class="job-area"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Downtown</div>
+        <div class="job-time-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Next week</div>
+        <button class="btn-accept">Accept →</button>
+      </div>
+
+      <div class="job-row">
+        <div class="job-icon-cell">🔨</div>
+        <div class="job-body">
+          <div class="job-cat-label">Handyman</div>
+          <div class="job-desc-text">Assemble IKEA wardrobe (PAX) — 3 doors, mirrored finish</div>
+        </div>
+        <div class="job-area"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Uptown</div>
+        <div class="job-time-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>ASAP</div>
+        <button class="btn-accept">Accept →</button>
+      </div>
+
+      <div class="job-row">
+        <div class="job-icon-cell">🎨</div>
+        <div class="job-body">
+          <div class="job-cat-label">Painting</div>
+          <div class="job-desc-text">Living room walls, two coats white emulsion, no ceiling</div>
+        </div>
+        <div class="job-area"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Harbor</div>
+        <div class="job-time-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Flexible</div>
+        <button class="btn-accept">Accept →</button>
+      </div>
+
+      <div class="job-row">
+        <div class="job-icon-cell">📦</div>
+        <div class="job-body">
+          <div class="job-cat-label">Moving</div>
+          <div class="job-desc-text">1-bed flat move, 3rd floor no lift, 2 helpers needed</div>
+        </div>
+        <div class="job-area"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Hillcrest</div>
+        <div class="job-time-cell"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Weekend only</div>
+        <button class="btn-accept">Accept →</button>
+      </div>
+
+      <div class="table-footer">
+        <span class="table-footer-txt">Showing 7 of 47 jobs</span>
+        <div class="table-footer-pages">
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
