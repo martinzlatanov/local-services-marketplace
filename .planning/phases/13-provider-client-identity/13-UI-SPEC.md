@@ -53,13 +53,15 @@ Source: Phase 12 locked tokens — pre-populated, not re-asked.
 |------|------|--------|-------------|
 | Body | 14px | 400 | 1.5 |
 | Label / meta | 12px | 400 | 1.4 |
-| Eyebrow | 11px | 700 | 1 (uppercase, 0.06–0.1em letter-spacing) |
+| Eyebrow | 11px | 600 | 1 (uppercase, 0.06–0.1em letter-spacing) |
 | Heading | 20px | 600 | 1.2 (tight negative letter-spacing: −0.5px) |
+
+Avatar initials (profile header): 28px, weight 600, color white — component-local override, not part of the type scale.
 
 Avatar initials typography:
 - Inline web (32px circle): 12px, weight 600, color white
 - Inline mobile (40dp circle): 14sp, weight 600, color white (Paper theme)
-- Profile page header (80px circle): 28px, weight 700, color white
+- Profile page header (80px circle): 28px, weight 600, color white — component-local override
 
 Source: Phase 12 locked tokens — pre-populated.
 
@@ -104,7 +106,7 @@ A reusable presentational component used in both inline identity sections and th
 |---------|------|-----------|
 | Inline web (job card) | 32×32px | 12px / weight 600 |
 | Inline mobile (job detail) | 40×40dp | 14sp / weight 600 |
-| Profile page header | 80×80px | 28px / weight 700 |
+| Profile page header | 80×80px | 28px / weight 600 (component-local override) |
 
 ### 2 — Inline Identity Section — Web (inside existing job card)
 
@@ -113,7 +115,7 @@ Shown within the existing `JobCard` / `JobDetailCard` component when `job.provid
 **Structure:**
 ```
 [eyebrow label: "PROVIDER"]
-[Avatar 32px] [Name if non-null — 14px/500/surface-800]
+[Avatar 32px] [Name if non-null — 14px/400/surface-800]
               [Email — 12px/400/surface-500]
               ["View profile" link → /providers/[id]]
 ```
@@ -173,7 +175,7 @@ New page at `apps/web/app/providers/[id]/page.tsx`.
 - Section eyebrow: "REVIEWS" (`.eyebrow` utility class)
 - Reviews stacked as surface-0 cards, `mt-4 flex flex-col gap-3`
 - Each review card: `bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-4`
-  - Top row: reviewer email (`text-[13px] font-medium text-surface-700`) + date (`text-[11px] text-surface-400`) — space-between
+  - Top row: reviewer email (`text-[12px] text-surface-700`) + date (`text-[11px] text-surface-400`) — space-between
   - Star row: 5 Star icons at 14px using same fill/stroke contract as header
   - Review text: `text-[14px] text-surface-600 mt-2 leading-relaxed`
   - Photo (if `photoUrl` set): `<img>` with `w-full max-h-48 object-cover rounded-lg mt-3`
