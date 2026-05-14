@@ -33,7 +33,7 @@ describe('JobDetailCard', () => {
       // PENDING jobs don't show provider messaging
     })
 
-    it('shows ACCEPTED status with provider assignment message', () => {
+    it('shows ACCEPTED status', () => {
       const acceptedJob: JobDto = {
         ...mockJob,
         status: JobStatus.ACCEPTED,
@@ -43,10 +43,8 @@ describe('JobDetailCard', () => {
       render(<JobDetailCard job={acceptedJob} userRole={Role.CLIENT} />)
 
       expect(screen.getByText('Accepted')).toBeInTheDocument()
-      expect(screen.getByText('Provider Assigned')).toBeInTheDocument()
-      expect(
-        screen.getByText(/service professional has accepted your job/i)
-      ).toBeInTheDocument()
+      // Provider identity section is shown when providerId is set (not status-gated)
+      expect(screen.getByText('Provider')).toBeInTheDocument()
     })
 
     it('shows IN_PROGRESS status with work message', () => {
@@ -79,10 +77,11 @@ describe('JobDetailCard', () => {
       expect(screen.getByText(/consider leaving a review/i)).toBeInTheDocument()
     })
 
-    it('does not show provider info for PENDING jobs', () => {
+    it('does not show provider section for PENDING jobs without providerId', () => {
       render(<JobDetailCard job={mockJob} userRole={Role.CLIENT} />)
 
-      expect(screen.queryByText('Provider Assigned')).not.toBeInTheDocument()
+      // mockJob has providerId: null so provider section should not render
+      expect(screen.queryByText('Provider')).not.toBeInTheDocument()
     })
   })
 
@@ -94,7 +93,7 @@ describe('JobDetailCard', () => {
       expect(screen.getByText('Fix leaking pipe')).toBeInTheDocument()
     })
 
-    it('does not show provider-specific messages for provider role', () => {
+    it('shows provider identity section when providerId is set (not role-gated)', () => {
       const acceptedJob: JobDto = {
         ...mockJob,
         status: JobStatus.ACCEPTED,
@@ -103,7 +102,8 @@ describe('JobDetailCard', () => {
 
       render(<JobDetailCard job={acceptedJob} userRole={Role.PROVIDER} />)
 
-      expect(screen.queryByText('Provider Assigned')).not.toBeInTheDocument()
+      // Provider identity section renders for all roles when providerId is set
+      expect(screen.getByText('Provider')).toBeInTheDocument()
     })
   })
 
