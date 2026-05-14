@@ -1,11 +1,58 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { FlatList, RefreshControl, StyleSheet, View } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { FlatList, RefreshControl, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Appbar, Card, Text, ActivityIndicator, useTheme } from 'react-native-paper'
 import { JobDto, JobStatus } from '@local/types'
 import { useAuth, TOKEN_KEY } from '../../../contexts/AuthContext'
 import { getMyJobs } from '../../../lib/api'
 import { storage } from '../../../lib/storage'
+
+const STEPS = ['Pending', 'Accepted', 'In Progress', 'Completed'] as const
+type Step = (typeof STEPS)[number]
+const STEP_INDEX: Record<string, number> = { PENDING: 0, ACCEPTED: 1, IN_PROGRESS: 2, COMPLETED: 3 }
+
+function ProgressTrack({ status }: { status: string }) {
+  const current = STEP_INDEX[status] ?? 0
+  return (
+    <View style={ptStyles.track}>
+      {STEPS.map((step, i) => (
+        <React.Fragment key={step}>
+          <View
+            style={[
+              ptStyles.dot,
+              i < current && ptStyles.dotDone,
+              i === current && ptStyles.dotActive,
+            ]}
+          >
+            {i < current && <Text style={ptStyles.check}>✓</Text>}
+          </View>
+          {i < STEPS.length - 1 && (
+            <View style={[ptStyles.line, i < current && ptStyles.lineDone]} />
+          )}
+        </React.Fragment>
+      ))}
+    </View>
+  )
+}
+
+const ptStyles = StyleSheet.create({
+  track: { flexDirection: 'row', alignItems: 'center', marginVertical: 12 },
+  dot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dotDone: { backgroundColor: '#14b8a6', borderColor: '#14b8a6' },
+  dotActive: { backgroundColor: '#0f172a', borderColor: '#0f172a' },
+  check: { color: '#fff', fontSize: 10, fontWeight: 'bold' },
+  line: { flex: 1, height: 2, backgroundColor: '#e2e8f0' },
+  lineDone: { backgroundColor: '#14b8a6' },
+})
 
 export default function ActiveJobsScreen() {
   const { user } = useAuth()
@@ -82,7 +129,7 @@ export default function ActiveJobsScreen() {
 
   const renderItem = ({ item }: { item: JobDto }) => (
     <Card
-      mode="elevated"
+      mode="outlined"
       style={styles.card}
       onPress={() => router.push(`/(app)/jobs/${item.id}`)}
     >
@@ -94,6 +141,31 @@ export default function ActiveJobsScreen() {
         <Text variant="labelLarge" style={styles.meta}>
           Status: {item.status} • {item.timeframe}
         </Text>
+        <ProgressTrack status={item.status} />
+        {item.status === JobStatus.ACCEPTED && (
+          <TouchableOpacity
+            style={activeStyles.btnPrimary}
+            onPress={() => router.push(`/(app)/jobs/${item.id}`)}
+          >
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Start job →</Text>
+          </TouchableOpacity>
+        )}
+        {item.status === JobStatus.IN_PROGRESS && (
+          <TouchableOpacity
+            style={activeStyles.btnPrimary}
+            onPress={() => router.push(`/(app)/jobs/${item.id}`)}
+          >
+            <Text style={{ color: '#fff', fontWeight: '600' }}>Mark complete →</Text>
+          </TouchableOpacity>
+        )}
+        {item.status !== JobStatus.ACCEPTED && item.status !== JobStatus.IN_PROGRESS && (
+          <TouchableOpacity
+            style={activeStyles.btnSecondary}
+            onPress={() => router.push(`/(app)/jobs/${item.id}`)}
+          >
+            <Text style={{ color: '#0f172a', fontWeight: '600' }}>Details</Text>
+          </TouchableOpacity>
+        )}
       </Card.Content>
     </Card>
   )
@@ -172,5 +244,25 @@ const styles = StyleSheet.create({
   emptyHeading: {
     marginBottom: 12,
     fontWeight: '600',
+  },
+})
+
+const activeStyles = StyleSheet.create({
+  btnPrimary: {
+    backgroundColor: '#0f172a',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  btnSecondary: {
+    borderWidth: 1,
+    borderColor: '#0f172a',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 6,
+    alignItems: 'center',
+    marginTop: 8,
   },
 })
