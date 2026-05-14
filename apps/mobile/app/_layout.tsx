@@ -1,9 +1,21 @@
 import { useEffect } from 'react'
 import { Stack, useRouter, useSegments } from 'expo-router'
-import { PaperProvider } from 'react-native-paper'
+import { MD3LightTheme, PaperProvider } from 'react-native-paper'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
 import { useServiceArea } from '../hooks/useServiceArea'
+
+const appTheme = {
+  ...MD3LightTheme,
+  colors: {
+    ...MD3LightTheme.colors,
+    primary: '#0f172a',
+    secondary: '#14b8a6',
+    surface: '#ffffff',
+    surfaceVariant: '#f8fafc',
+    outline: '#e2e8f0',
+  },
+}
 
 function NavigationGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
@@ -46,7 +58,7 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <PaperProvider>
+      <PaperProvider theme={appTheme}>
         <AuthProvider>
           <NavigationGuard>
             <Stack screenOptions={{ headerShown: false }} />
