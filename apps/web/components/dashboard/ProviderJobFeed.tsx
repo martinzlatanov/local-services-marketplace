@@ -36,25 +36,32 @@ export default function ProviderJobFeed({ jobs, onAccept }: ProviderJobFeedProps
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-800 p-3 rounded-[var(--radius-btn)] text-sm">
           {error}
         </div>
       )}
-      {jobs.map((job) => (
-        <div key={job.id}>
-          <JobCard job={job} />
-          <div className="mt-2">
+      {jobs.map((job, i) => (
+        <div
+          key={job.id}
+          className={`border border-surface-200 rounded-[var(--radius-card)] overflow-hidden ${
+            i === 0 ? 'border-l-[3px] border-l-brand-500' : ''
+          }`}
+        >
+          <div className="flex items-center gap-3 p-3">
+            <div className="flex-1 min-w-0">
+              <JobCard job={job} />
+            </div>
             <button
               onClick={() => handleAccept(job)}
               disabled={acceptingId === job.id}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-[var(--radius-btn)] hover:bg-brand-700 disabled:bg-brand-300 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-surface-900 text-white text-[13px] font-semibold rounded-[var(--radius-btn)] hover:opacity-[0.88] disabled:opacity-50 transition-opacity flex-shrink-0"
             >
-              {acceptingId === job.id && (
+              {acceptingId === job.id ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-              )}
-              Accept Job
+              ) : null}
+              Accept →
             </button>
           </div>
         </div>
