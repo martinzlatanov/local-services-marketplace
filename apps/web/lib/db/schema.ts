@@ -7,6 +7,8 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   role: varchar("role", { length: 32 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  name: varchar("name", { length: 100 }),
+  avatarUrl: text("avatar_url"),
 })
 
 // Note: unique index applied via SQL migration in apps/web/drizzle/0000_initial_user.sql

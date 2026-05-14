@@ -100,6 +100,15 @@ export interface AuthUserDto {
   createdAt: string
 }
 
+export interface PublicUserDto {
+  id: string
+  email: string
+  name: string | null
+  avatarUrl: string | null
+  role: Role
+  createdAt: string
+}
+
 export interface AuthRegisterResponse {
   user: AuthUserDto
 }
