@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { type FormEvent, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
-import { Wrench, Loader2, XCircle } from 'lucide-react'
+import { Loader2, XCircle } from 'lucide-react'
 import type { ApiErrorResponse } from '@/lib/types'
 
 const TOP_LEVEL_ERROR = 'Something went wrong. Please check your details and try again.'
@@ -62,120 +62,119 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-stretch">
-      {/* Left Panel - Brand */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-brand-700 to-brand-900 text-white flex-col justify-center px-12">
-        <div className="max-w-md">
-          <div className="flex items-center gap-3 mb-8">
-            <Wrench className="h-8 w-8" aria-hidden="true" />
-            <span className="text-3xl font-bold">LocalPro</span>
-          </div>
-          <h2 className="text-4xl font-bold mb-6">Welcome back</h2>
-          <p className="text-brand-100 text-lg mb-8">
-            Access your account to post jobs, find work, or manage your services.
+      {/* LEFT PANEL */}
+      <div className="hidden lg:flex lg:w-1/2 bg-surface-900 text-white flex-col justify-between px-16 py-20">
+        <div className="flex items-center gap-1.5 font-extrabold text-lg tracking-[-0.4px]">
+          <span className="w-2.5 h-2.5 rounded-full bg-brand-500 inline-block" />
+          LocalPro
+        </div>
+        <div>
+          <p className="eyebrow eyebrow-brand mb-4 text-surface-500">Sign in</p>
+          <h2 className="text-[clamp(32px,3.5vw,48px)] font-extrabold tracking-[-1.5px] leading-[1.1] mb-4">
+            Welcome back.
+          </h2>
+          <p className="text-[16px] text-surface-400 leading-relaxed max-w-[360px] mb-10">
+            Access your jobs, track progress, and connect with local professionals.
           </p>
-          <div className="space-y-4 text-brand-100">
-            <p className="flex items-start gap-3">
-              <span className="text-2xl mt-1">🎯</span>
-              <span>Post jobs and connect with local professionals</span>
-            </p>
-            <p className="flex items-start gap-3">
-              <span className="text-2xl mt-1">⚡</span>
-              <span>Real-time notifications when pros respond</span>
-            </p>
-            <p className="flex items-start gap-3">
-              <span className="text-2xl mt-1">✨</span>
-              <span>Track your jobs from start to finish</span>
-            </p>
+          <div className="flex flex-col gap-4">
+            {[
+              { icon: '🎯', title: 'Post & track jobs', desc: 'Manage the full lifecycle from one dashboard.' },
+              { icon: '⚡', title: 'Real-time updates', desc: 'Live status changes via WebSocket.' },
+              { icon: '✨', title: 'Trusted providers', desc: 'Verified local professionals in 10 areas.' },
+            ].map((f) => (
+              <div key={f.icon} className="flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-lg bg-surface-800 border border-surface-700 flex items-center justify-center flex-shrink-0 text-sm">
+                  {f.icon}
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-white mb-0.5">{f.title}</p>
+                  <p className="text-[13px] text-surface-400">{f.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
+        </div>
+        <div className="flex gap-8 pt-8 border-t border-surface-800">
+          {[{ num: '10', label: 'City areas' }, { num: '8', label: 'Categories' }, { num: '<1h', label: 'Response' }].map((s) => (
+            <div key={s.label}>
+              <p className="text-[24px] font-extrabold tracking-[-1px] font-mono"><span className="text-brand-500">{s.num}</span></p>
+              <p className="text-[12px] text-surface-500 mt-0.5">{s.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Right Panel - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center py-16 px-4 bg-surface-50">
-        <div className="w-full max-w-md">
-          <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-8 shadow-[var(--shadow-auth)]">
-            {/* Header */}
-            <div className="flex lg:hidden items-center gap-2 mb-8">
-              <Wrench className="h-6 w-6 text-brand-600" aria-hidden="true" />
-              <span className="text-2xl font-bold text-brand-700">LocalPro</span>
+      {/* RIGHT PANEL */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center py-16 px-8 bg-surface-50">
+        <div className="w-full max-w-[440px]">
+          <p className="eyebrow mb-5">Step 1 of 1</p>
+          <h1 className="text-[30px] font-extrabold tracking-[-0.8px] text-surface-900 mb-1.5">Sign in</h1>
+          <p className="text-[14px] text-surface-500 mb-7">Enter your credentials to continue.</p>
+
+          {topError && (
+            <div role="alert" className="mb-6 flex gap-3 bg-red-50 border border-red-200 text-red-800 rounded-[var(--radius-btn)] p-4">
+              <XCircle className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <span>{topError}</span>
             </div>
+          )}
 
-            <h1 className="text-3xl font-bold text-surface-900 mb-2">Welcome back</h1>
-            <p className="text-surface-600 mb-6">Sign in to your account to continue</p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-[12px] font-bold tracking-[0.04em] uppercase text-surface-600 mb-1.5" htmlFor="email">
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                placeholder="you@example.com"
+                aria-invalid={!!emailError}
+                aria-describedby={emailError ? 'email-error' : undefined}
+                className="w-full bg-surface-0 border border-surface-200 text-surface-900 rounded-[var(--radius-input)] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-brand-500 focus:ring-[3px] focus:ring-brand-500/10 transition-all"
+              />
+              {emailError && <span id="email-error" className="text-red-600 text-sm mt-1 block">{emailError}</span>}
+            </div>
+            <div>
+              <label className="block text-[12px] font-bold tracking-[0.04em] uppercase text-surface-600 mb-1.5" htmlFor="password">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                placeholder="Your password"
+                aria-invalid={!!passwordError}
+                aria-describedby={passwordError ? 'password-error' : undefined}
+                className="w-full bg-surface-0 border border-surface-200 text-surface-900 rounded-[var(--radius-input)] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-brand-500 focus:ring-[3px] focus:ring-brand-500/10 transition-all"
+              />
+              {passwordError && <span id="password-error" className="text-red-600 text-sm mt-1 block">{passwordError}</span>}
+            </div>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-surface-900 text-white py-3 px-4 rounded-[var(--radius-btn)] hover:opacity-[0.88] disabled:opacity-50 font-bold text-[15px] tracking-[-0.2px] transition-opacity flex items-center justify-center gap-2 mt-2"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  Signing in…
+                </>
+              ) : (
+                'Sign in →'
+              )}
+            </button>
+          </form>
 
-            {topError && (
-              <div role="alert" className="mb-6 flex gap-3 bg-red-50 border border-red-200 text-red-800 rounded-[var(--radius-btn)] p-4">
-                <XCircle className="h-5 w-5 flex-shrink-0 mt-0.5" aria-hidden="true" />
-                <span>{topError}</span>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5" htmlFor="email">
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  autoComplete="email"
-                  aria-invalid={!!emailError}
-                  aria-describedby={emailError ? 'email-error' : undefined}
-                  className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
-                {emailError && (
-                  <span id="email-error" className="text-red-600 text-sm mt-1 block">
-                    {emailError}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-surface-700 mb-1.5" htmlFor="password">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  autoComplete="current-password"
-                  aria-invalid={!!passwordError}
-                  aria-describedby={passwordError ? 'password-error' : undefined}
-                  className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
-                {passwordError && (
-                  <span id="password-error" className="text-red-600 text-sm mt-1 block">
-                    {passwordError}
-                  </span>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full bg-brand-600 text-white py-2.5 px-4 rounded-[var(--radius-btn)] hover:bg-brand-700 disabled:bg-brand-300 font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign in'
-                )}
-              </button>
-            </form>
-
-            <p className="mt-6 text-center text-surface-600">
-              Don&apos;t have an account?{' '}
-              <Link href="/register" className="text-brand-600 hover:text-brand-700 font-semibold">
-                Create one →
-              </Link>
-            </p>
-          </div>
+          <p className="mt-5 text-center text-[14px] text-surface-500">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-surface-900 font-bold hover:underline">
+              Create one →
+            </Link>
+          </p>
         </div>
       </div>
     </div>
