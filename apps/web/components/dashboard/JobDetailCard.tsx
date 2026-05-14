@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { JobDto, JobStatus, Role, PublicUserDto } from '@/lib/types'
 import { MapPin, User, Clock, AlertCircle } from 'lucide-react'
 import ReviewForm from '../ReviewForm'
@@ -48,15 +49,15 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
 
     const checkReviewStatus = async () => {
       try {
-        const jobId = typeof job.id === 'string' ? parseInt(job.id, 10) : job.id
+        const jobId = parseInt(job.id, 10)
         const res = await fetch(`/api/reviews?jobId=${jobId}`, { credentials: 'include' })
         if (res.ok) {
           const data = await res.json()
           const userReview = (data.data || []).find((r: any) => String(r.reviewerId) === String(user.id))
           setHasReviewed(!!userReview)
         }
-      } catch (err) {
-        console.error('Failed to fetch reviews:', err)
+      } catch {
+        // silently omit on error
       }
     }
 
@@ -66,22 +67,29 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
   useEffect(() => {
     if (!job.providerId) return
 
+    const controller = new AbortController()
     const fetchProvider = async () => {
       setIsProviderLoading(true)
       try {
-        const res = await fetch(`/api/users/${job.providerId}`, { credentials: 'include' })
+        const res = await fetch(`/api/users/${job.providerId}`, {
+          credentials: 'include',
+          signal: controller.signal,
+        })
         if (res.ok) {
           const data = await res.json()
           setProviderUser(data.data)
         }
-      } catch {
-        // silently omit section on error
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          // silently omit section on error
+        }
       } finally {
         setIsProviderLoading(false)
       }
     }
 
-    fetchProvider()
+    void fetchProvider()
+    return () => controller.abort()
   }, [job.providerId])
 
   const handleReviewSuccess = () => {
@@ -143,12 +151,12 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
                   <p className="text-[14px] font-medium text-surface-900">{providerUser.name}</p>
                 )}
                 <p className="text-[13px] text-surface-600">{providerUser.email}</p>
-                <a
+                <Link
                   href={`/providers/${job.providerId}`}
                   className="text-[12px] text-surface-900 underline underline-offset-2 hover:text-surface-600 transition-colors"
                 >
                   View profile
-                </a>
+                </Link>
               </div>
             </div>
           ) : null}

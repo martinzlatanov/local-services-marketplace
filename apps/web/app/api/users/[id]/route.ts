@@ -20,6 +20,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ errors: { user: 'not_found' } }, { status: 404 })
   }
 
+  const validRoles = Object.values(Role) as string[]
+  if (!validRoles.includes(row.role)) {
+    return NextResponse.json({ errors: { user: 'invalid_data' } }, { status: 500 })
+  }
+
   const dto: PublicUserDto = {
     id: String(row.id),
     email: row.email,

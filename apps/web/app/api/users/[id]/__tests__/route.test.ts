@@ -109,6 +109,20 @@ describe('GET /api/users/[id]', () => {
       expect(body.data.createdAt).toBeDefined()
       // passwordHash must never appear in the DTO
       expect(body.data.passwordHash).toBeUndefined()
+      // identity fields must be present in response
+      expect(body.data.name).toBe('Jane Smith')
+      expect(body.data.avatarUrl).toBeNull()
+    })
+
+    it('returns 200 with name: null when user has no name', async () => {
+      mockGetAuth.mockResolvedValueOnce(mockAuthUser)
+      const mockUserRowNoName = { ...mockUserRow, name: null }
+      dbModule.db.limit.mockResolvedValueOnce([mockUserRowNoName])
+      const req = makeRequest('42')
+      const res = await GET(req, { params: Promise.resolve({ id: '42' }) })
+      expect(res.status).toBe(200)
+      const body = await res.json()
+      expect(body.data.name).toBeNull()
     })
   })
 })

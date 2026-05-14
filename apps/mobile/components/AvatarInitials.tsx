@@ -8,9 +8,11 @@ interface AvatarInitialsProps {
 }
 
 export default function AvatarInitials({ name, email, avatarUrl, size }: AvatarInitialsProps) {
-  const initials = name
-    ? name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
-    : email[0].toUpperCase()
+  const trimmedName = name?.trim() ?? ''
+  const trimmedEmail = email?.trim() ?? ''
+  const initials = trimmedName
+    ? trimmedName.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+    : (trimmedEmail[0]?.toUpperCase() ?? '?')
 
   if (avatarUrl) {
     return <Avatar.Image size={size} source={{ uri: avatarUrl }} />

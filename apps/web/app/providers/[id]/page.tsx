@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { PublicUserDto, ReviewDTO } from '@/lib/types'
+import { PublicUserDto, ReviewDTO, Role } from '@/lib/types'
 import AvatarInitials from '@/components/ui/AvatarInitials'
 import ReviewDisplay from '@/components/ReviewDisplay'
 import { Star } from 'lucide-react'
@@ -18,27 +18,41 @@ export default function ProviderProfilePage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    const controller = new AbortController()
     const fetchData = async () => {
       setIsLoading(true)
       setError(null)
       try {
         const [userRes, reviewsRes] = await Promise.all([
-          fetch(`/api/users/${providerId}`, { credentials: 'include' }),
-          fetch(`/api/reviews?userId=${providerId}&approved=true`, { credentials: 'include' }),
+          fetch(`/api/users/${providerId}`, {
+            credentials: 'include',
+            signal: controller.signal,
+          }),
+          fetch(`/api/reviews?userId=${providerId}&approved=true`, {
+            credentials: 'include',
+            signal: controller.signal,
+          }),
         ])
         if (!userRes.ok || !reviewsRes.ok) throw new Error('fetch_failed')
         const userData = await userRes.json()
         const reviewsData = await reviewsRes.json()
+        if (userData.data.role !== Role.PROVIDER) {
+          setError('Provider not found.')
+          return
+        }
         setProviderUser(userData.data)
         setReviews(reviewsData.data?.reviews || [])
         setAverageRatings(reviewsData.data?.averageRatings || {})
-      } catch {
-        setError("Couldn't load this profile. Refresh to try again.")
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          setError("Couldn't load this profile. Refresh to try again.")
+        }
       } finally {
         setIsLoading(false)
       }
     }
-    fetchData()
+    void fetchData()
+    return () => controller.abort()
   }, [providerId])
 
   const avgRating =
