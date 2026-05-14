@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { JobDto, JobStatus, Role } from '@/lib/types'
+import { JobDto, JobStatus, Role, PublicUserDto } from '@/lib/types'
 import { MapPin, User, Clock, AlertCircle } from 'lucide-react'
 import ReviewForm from '../ReviewForm'
 import { useAuth } from '@/contexts/AuthContext'
+import AvatarInitials from '@/components/ui/AvatarInitials'
 
 interface JobDetailCardProps {
   job: JobDto
@@ -39,6 +40,8 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
   const { user } = useAuth()
   const [hasReviewed, setHasReviewed] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
+  const [providerUser, setProviderUser] = useState<PublicUserDto | null>(null)
+  const [isProviderLoading, setIsProviderLoading] = useState(false)
 
   useEffect(() => {
     if (!user || job.status !== JobStatus.COMPLETED) return
@@ -59,6 +62,27 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
 
     checkReviewStatus()
   }, [job.id, user, job.status])
+
+  useEffect(() => {
+    if (!job.providerId) return
+
+    const fetchProvider = async () => {
+      setIsProviderLoading(true)
+      try {
+        const res = await fetch(`/api/users/${job.providerId}`, { credentials: 'include' })
+        if (res.ok) {
+          const data = await res.json()
+          setProviderUser(data.data)
+        }
+      } catch {
+        // silently omit section on error
+      } finally {
+        setIsProviderLoading(false)
+      }
+    }
+
+    fetchProvider()
+  }, [job.providerId])
 
   const handleReviewSuccess = () => {
     setHasReviewed(true)
@@ -94,14 +118,40 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
         </div>
       </div>
 
-      {/* Status-specific info */}
-      {job.status === JobStatus.ACCEPTED && job.providerId && userRole === Role.CLIENT && (
-        <div className="mt-4 pt-4 border-t border-current border-opacity-20 flex items-start gap-3">
-          <User className="h-5 w-5 flex-shrink-0 mt-0.5 opacity-75" aria-hidden="true" />
-          <div>
-            <p className="text-sm font-medium">Provider Assigned</p>
-            <p className="text-xs opacity-75 mt-0.5">A service professional has accepted your job and will be in touch soon.</p>
-          </div>
+      {/* Provider identity section */}
+      {job.providerId && (
+        <div className="mt-4 pt-4 border-t border-surface-200">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-surface-400 mb-3">Provider</p>
+          {isProviderLoading ? (
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-surface-100 animate-pulse flex-shrink-0" />
+              <div className="space-y-1.5 flex-1">
+                <div className="h-3 bg-surface-100 rounded animate-pulse w-1/3" />
+                <div className="h-3 bg-surface-100 rounded animate-pulse w-1/2" />
+              </div>
+            </div>
+          ) : providerUser ? (
+            <div className="flex items-center gap-3">
+              <AvatarInitials
+                name={providerUser.name}
+                email={providerUser.email}
+                avatarUrl={providerUser.avatarUrl}
+                size="sm"
+              />
+              <div>
+                {providerUser.name && (
+                  <p className="text-[14px] font-medium text-surface-900">{providerUser.name}</p>
+                )}
+                <p className="text-[13px] text-surface-600">{providerUser.email}</p>
+                <a
+                  href={`/providers/${job.providerId}`}
+                  className="text-[12px] text-surface-900 underline underline-offset-2 hover:text-surface-600 transition-colors"
+                >
+                  View profile
+                </a>
+              </div>
+            </div>
+          ) : null}
         </div>
       )}
 
