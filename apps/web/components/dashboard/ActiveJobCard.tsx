@@ -56,51 +56,50 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
     }
   }
 
-  const currentIndex = statusOrder.indexOf(job.status as JobStatus)
-
   return (
-    <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-4 shadow-[var(--shadow-card)]">
-      <div className="flex justify-between items-start gap-4">
-        <div className="flex-1">
-          <h3 className="font-medium text-surface-900">{job.category}</h3>
-          <p className="text-sm text-surface-600 mt-1">{job.description}</p>
-          <p className="flex items-center gap-1 text-xs text-surface-500 mt-2">
+    <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-4 hover:shadow-[var(--shadow-card-hover)] transition-shadow">
+      <div className="flex items-start gap-3">
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-400 mb-0.5">{job.category}</p>
+          <p className="text-[14px] font-medium text-surface-800 truncate">{job.description}</p>
+          <p className="flex items-center gap-1 text-[12px] text-surface-500 mt-1">
             <MapPin className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
-            {job.cityArea} • {job.timeframe}
+            {job.cityArea} · {job.timeframe}
           </p>
         </div>
+        <span className={`text-[11px] px-2.5 py-1 rounded-[var(--radius-badge)] font-medium flex-shrink-0 ${statusColors[job.status] || 'bg-surface-100 text-surface-800'}`}>
+          {job.status.replace('_', ' ')}
+        </span>
       </div>
 
-      {/* Status timeline */}
-      <div className="mt-4 flex items-center gap-1">
-        {statusOrder.map((status, idx) => (
-          <div key={status} className="flex items-center gap-1 flex-1">
-            <div className={`flex-1 h-1 rounded-full transition-colors ${
-              idx <= currentIndex ? 'bg-brand-500' : 'bg-surface-200'
-            }`} />
-            {idx < statusOrder.length - 1 && (
-              <div className={`flex-1 h-1 rounded-full transition-colors ${
-                idx < currentIndex ? 'bg-brand-500' : 'bg-surface-200'
-              }`} />
-            )}
-          </div>
-        ))}
+      {/* 4-step progress track using globals.css utilities */}
+      <div className="progress-track mt-4 mb-1">
+        {[JobStatus.PENDING, JobStatus.ACCEPTED, JobStatus.IN_PROGRESS, JobStatus.COMPLETED].map((step, i, arr) => {
+          const currentIdx = [JobStatus.PENDING, JobStatus.ACCEPTED, JobStatus.IN_PROGRESS, JobStatus.COMPLETED].indexOf(job.status)
+          const isDone   = i < currentIdx
+          const isActive = i === currentIdx
+          return (
+            <div key={step} className="flex items-center" style={{ flex: i < arr.length - 1 ? 1 : undefined }}>
+              <span className={`progress-dot${isDone ? ' done' : isActive ? ' active' : ''}`} />
+              {i < arr.length - 1 && (
+                <span className={`progress-line${isDone ? ' done' : ''}`} />
+              )}
+            </div>
+          )
+        })}
+      </div>
+      <div className="flex justify-between text-[11px] text-surface-400 mb-4 px-0.5">
+        <span>Pending</span><span>Accepted</span><span>In Progress</span><span>Done</span>
       </div>
 
-      <div className="mt-2 flex justify-between text-xs font-medium text-surface-600 px-0.5">
-        <span>Accepted</span>
-        <span>In Progress</span>
-        <span>Complete</span>
-      </div>
+      {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
 
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-
-      <div className="mt-4 flex gap-2">
+      <div className="flex gap-2">
         {job.status === JobStatus.ACCEPTED && (
           <button
             onClick={() => handleAdvance(JobStatus.IN_PROGRESS)}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-[var(--radius-btn)] hover:bg-brand-700 disabled:bg-brand-300 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-surface-900 text-white text-[13px] font-semibold rounded-[var(--radius-btn)] hover:opacity-[0.88] disabled:opacity-50 transition-opacity"
           >
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
             Start Work
@@ -110,7 +109,7 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
           <button
             onClick={() => handleAdvance(JobStatus.COMPLETED)}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-[var(--radius-btn)] hover:bg-brand-700 disabled:bg-brand-300 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-surface-900 text-white text-[13px] font-semibold rounded-[var(--radius-btn)] hover:opacity-[0.88] disabled:opacity-50 transition-opacity"
           >
             {loading && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
             Mark Complete
