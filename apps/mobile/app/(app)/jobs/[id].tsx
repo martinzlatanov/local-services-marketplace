@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Appbar, ActivityIndicator, Button, Snackbar, Text, useTheme } from 'react-native-paper'
+import { Appbar, ActivityIndicator, Snackbar, Text, useTheme } from 'react-native-paper'
 import { JobDto, JobStatus } from '@local/types'
 import { TOKEN_KEY } from '../../../contexts/AuthContext'
 import { acceptJob, getJob, updateJobStatus } from '../../../lib/api'
@@ -115,86 +115,88 @@ export default function JobDetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Appbar.Header>
+    <View style={detailStyles.container}>
+      <Appbar.Header style={detailStyles.appBar}>
         <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Job details" />
+        <Appbar.Content title="Job details" titleStyle={detailStyles.appBarTitle} />
       </Appbar.Header>
 
       {isLoading ? (
-        <View style={styles.loadingContainer}>
+        <View style={detailStyles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
       ) : errorMessage ? (
-        <View style={styles.errorBanner}>
-          <Text style={{ color: theme.colors.error }}>{errorMessage}</Text>
+        <View style={detailStyles.errorBanner}>
+          <Text style={detailStyles.errorText}>{errorMessage}</Text>
         </View>
       ) : job ? (
-        <ScrollView contentContainerStyle={styles.content}>
-          <Text variant="headlineSmall" style={styles.heading}>
-            {job.category}
-          </Text>
+        <>
+          <ScrollView contentContainerStyle={detailStyles.content}>
+            {/* Category heading */}
+            <Text style={detailStyles.heading}>{job.category}</Text>
 
-          <Text variant="labelLarge" style={styles.label}>
-            Description
-          </Text>
-          <Text variant="bodyLarge" style={styles.value}>
-            {job.description}
-          </Text>
+            {/* 2-column meta grid */}
+            <View style={detailStyles.metaGrid}>
+              <View style={detailStyles.metaCell}>
+                <Text style={detailStyles.metaLabel}>Area</Text>
+                <Text style={detailStyles.metaValue}>{job.cityArea}</Text>
+              </View>
+              <View style={detailStyles.metaCell}>
+                <Text style={detailStyles.metaLabel}>Timeframe</Text>
+                <Text style={detailStyles.metaValue}>{job.timeframe}</Text>
+              </View>
+              <View style={detailStyles.metaCell}>
+                <Text style={detailStyles.metaLabel}>Status</Text>
+                <Text style={detailStyles.metaValue}>{job.status.replace('_', ' ')}</Text>
+              </View>
+              <View style={detailStyles.metaCell}>
+                <Text style={detailStyles.metaLabel}>Posted</Text>
+                <Text style={detailStyles.metaValue}>{new Date(job.createdAt).toLocaleDateString()}</Text>
+              </View>
+            </View>
 
-          <Text variant="labelLarge" style={styles.label}>
-            Timeframe
-          </Text>
-          <Text variant="bodyLarge" style={styles.value}>
-            {job.timeframe}
-          </Text>
+            <Text style={detailStyles.descLabel}>Description</Text>
+            <Text style={detailStyles.descValue}>{job.description}</Text>
+          </ScrollView>
 
-          <Text variant="labelLarge" style={styles.label}>
-            Area
-          </Text>
-          <Text variant="bodyLarge" style={styles.value}>
-            {job.cityArea}
-          </Text>
-
+          {/* Pinned CTA */}
           {job.status === JobStatus.PENDING && (
-            <Button
-              mode="contained"
-              onPress={handleAccept}
-              loading={isSubmitting}
-              disabled={isSubmitting}
-              style={styles.actionButton}
-              contentStyle={styles.actionButtonContent}
-            >
-              {isSubmitting ? 'Accepting...' : 'Accept job'}
-            </Button>
+            <View style={detailStyles.pinnedCta}>
+              <TouchableOpacity
+                style={[detailStyles.ctaBtn, isSubmitting && detailStyles.ctaBtnDisabled]}
+                onPress={handleAccept}
+                disabled={isSubmitting}
+                accessibilityRole="button"
+              >
+                <Text style={detailStyles.ctaBtnText}>{isSubmitting ? 'Accepting…' : 'Accept job'}</Text>
+              </TouchableOpacity>
+            </View>
           )}
-
           {job.status === JobStatus.ACCEPTED && (
-            <Button
-              mode="contained"
-              onPress={handleStartWork}
-              loading={isSubmitting}
-              disabled={isSubmitting}
-              style={styles.actionButton}
-              contentStyle={styles.actionButtonContent}
-            >
-              {isSubmitting ? 'Starting...' : 'Start Work'}
-            </Button>
+            <View style={detailStyles.pinnedCta}>
+              <TouchableOpacity
+                style={[detailStyles.ctaBtn, isSubmitting && detailStyles.ctaBtnDisabled]}
+                onPress={handleStartWork}
+                disabled={isSubmitting}
+                accessibilityRole="button"
+              >
+                <Text style={detailStyles.ctaBtnText}>{isSubmitting ? 'Starting…' : 'Start Work'}</Text>
+              </TouchableOpacity>
+            </View>
           )}
-
           {job.status === JobStatus.IN_PROGRESS && (
-            <Button
-              mode="contained"
-              onPress={handleFinishWork}
-              loading={isSubmitting}
-              disabled={isSubmitting}
-              style={styles.actionButton}
-              contentStyle={styles.actionButtonContent}
-            >
-              {isSubmitting ? 'Finishing...' : 'Finish Work'}
-            </Button>
+            <View style={detailStyles.pinnedCta}>
+              <TouchableOpacity
+                style={[detailStyles.ctaBtn, isSubmitting && detailStyles.ctaBtnDisabled]}
+                onPress={handleFinishWork}
+                disabled={isSubmitting}
+                accessibilityRole="button"
+              >
+                <Text style={detailStyles.ctaBtnText}>{isSubmitting ? 'Finishing…' : 'Finish Work'}</Text>
+              </TouchableOpacity>
+            </View>
           )}
-        </ScrollView>
+        </>
       ) : null}
 
       <Snackbar visible={Boolean(snackbar)} onDismiss={() => setSnackbar(null)} duration={3000}>
@@ -204,31 +206,23 @@ export default function JobDetailScreen() {
   )
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1 },
+const detailStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#f8fafc' },
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  errorBanner: {
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-  },
-  content: {
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-  },
-  heading: {
-    marginBottom: 16,
-    fontWeight: '600',
-  },
-  label: {
-    marginTop: 16,
-  },
-  value: {
-    marginTop: 8,
-  },
-  actionButton: {
-    marginTop: 32,
-  },
-  actionButtonContent: {
-    minHeight: 44,
-  },
+  appBar: { backgroundColor: '#ffffff', elevation: 0, borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
+  appBarTitle: { fontSize: 16, fontWeight: '800', color: '#0f172a' },
+  errorBanner: { paddingHorizontal: 24, paddingVertical: 16, backgroundColor: '#fef2f2' },
+  errorText: { color: '#b91c1c', fontSize: 13 },
+  content: { paddingHorizontal: 20, paddingVertical: 24, paddingBottom: 100 },
+  heading: { fontSize: 22, fontWeight: '800', color: '#0f172a', letterSpacing: -0.8, marginBottom: 20 },
+  metaGrid: { flexDirection: 'row', flexWrap: 'wrap', borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 10, overflow: 'hidden', marginBottom: 20 },
+  metaCell: { width: '50%', padding: 14, borderBottomWidth: 1, borderBottomColor: '#e2e8f0', borderRightWidth: 1, borderRightColor: '#e2e8f0' },
+  metaLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 },
+  metaValue: { fontSize: 14, fontWeight: '600', color: '#1e293b' },
+  descLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 0.6, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 8 },
+  descValue: { fontSize: 15, color: '#334155', lineHeight: 22 },
+  pinnedCta: { paddingHorizontal: 16, paddingVertical: 12, borderTopWidth: 1, borderTopColor: '#e2e8f0', backgroundColor: '#ffffff' },
+  ctaBtn: { backgroundColor: '#0f172a', borderRadius: 10, paddingVertical: 14, alignItems: 'center' },
+  ctaBtnDisabled: { opacity: 0.5 },
+  ctaBtnText: { color: '#ffffff', fontSize: 15, fontWeight: '700' },
 })
