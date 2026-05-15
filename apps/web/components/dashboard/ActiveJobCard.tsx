@@ -246,11 +246,12 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
             <ReviewForm
               jobId={job.id}
               reviewType="provider"
+              reviewerUserId={job.providerId ?? ''}
+              revieweeUserId={job.clientId}
               onSuccess={() => {
                 setShowReviewForm(false)
                 setHasProvidedReview(true)
               }}
-              onCancel={() => setShowReviewForm(false)}
             />
           </div>
         )}
