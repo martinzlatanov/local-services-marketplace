@@ -57,6 +57,12 @@ export default function Navbar() {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  href="/providers"
+                  className="text-surface-600 hover:text-surface-900 font-medium transition-colors"
+                >
+                  Find Providers
+                </Link>
                 {user.roles.includes(Role.PROVIDER) && (
                   <Link
                     href="/browse"
@@ -132,6 +138,13 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Dashboard
+                </Link>
+                <Link
+                  href="/providers"
+                  className="text-surface-600 hover:text-surface-900 font-medium transition-colors px-4 py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Find Providers
                 </Link>
                 {user.roles.includes(Role.PROVIDER) && (
                   <Link

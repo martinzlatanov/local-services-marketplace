@@ -1,5 +1,5 @@
 import { db } from './client'
-import { jobs, jobCategories, locations } from './schema'
+import { jobs, jobCategories, locations, users } from './schema'
 import { eq } from 'drizzle-orm'
 import { JobDto, JobStatus } from '../types'
 
@@ -15,6 +15,8 @@ export const JOB_JOIN_SHAPE = {
   providerId: jobs.providerId,
   createdAt: jobs.createdAt,
   updatedAt: jobs.updatedAt,
+  clientEmail: users.email,
+  clientName: users.name,
 }
 
 export function buildJobQuery() {
@@ -23,6 +25,7 @@ export function buildJobQuery() {
     .from(jobs)
     .innerJoin(jobCategories, eq(jobs.categoryId, jobCategories.id))
     .innerJoin(locations, eq(jobs.locationId, locations.id))
+    .leftJoin(users, eq(jobs.clientId, users.id))
 }
 
 export function rowToJobDto(row: {
@@ -37,6 +40,8 @@ export function rowToJobDto(row: {
   providerId: number | null
   createdAt: Date
   updatedAt: Date
+  clientEmail?: string | null
+  clientName?: string | null
 }): JobDto {
   return {
     id: String(row.id),
@@ -50,5 +55,7 @@ export function rowToJobDto(row: {
     providerId: row.providerId != null ? String(row.providerId) : null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
+    clientName: row.clientName || undefined,
+    clientEmail: row.clientEmail || undefined,
   }
 }

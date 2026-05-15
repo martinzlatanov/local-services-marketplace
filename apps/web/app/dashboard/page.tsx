@@ -37,7 +37,8 @@ export default function DashboardPage() {
       const tokenCookie = cookies.find(c => c.startsWith('token='))
       const token = tokenCookie ? tokenCookie.substring(6) : ''
 
-      ws = new WebSocket(`ws://${window.location.host}?token=${token}`)
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      ws = new WebSocket(`${protocol}//${window.location.host}?token=${token}`)
 
       ws.onopen = () => setWsStatus('connected')
 
@@ -99,14 +100,6 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between mb-2">
           <div>
             <h1 className="text-2xl font-bold text-surface-900">Dashboard</h1>
-            {user && (
-              <div className="flex items-center gap-3 mt-1">
-                <p className="text-sm text-surface-600">{user.email}</p>
-                <span className="text-xs font-medium text-surface-600 bg-surface-100 px-2.5 py-1 rounded-[var(--radius-badge)]">
-                  {user.roles.includes(Role.CLIENT) ? 'Client' : 'Provider'}
-                </span>
-              </div>
-            )}
           </div>
           <div className="flex items-center gap-5">
             <LiveIndicator status={wsStatus} />

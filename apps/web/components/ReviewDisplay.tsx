@@ -99,16 +99,35 @@ function ReviewCard({ review, categoryLabels }: { review: ReviewDTO; categoryLab
   return (
     <>
       <div className="border border-surface-200 rounded-[var(--radius-card)] p-4 space-y-3">
+        {/* Job info header */}
+        {review.job && (
+          <div className="bg-surface-50 rounded-[var(--radius-input)] p-3 border border-surface-200">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex-1">
+                <p className="text-xs font-bold tracking-[0.06em] uppercase text-surface-500 mb-1">Job Details</p>
+                <p className="text-sm font-medium text-surface-900">{review.job.category}</p>
+                <p className="text-xs text-surface-600 mt-1">{review.job.cityArea}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-semibold text-surface-900">{averageRating}</p>
+                <StarRating rating={parseFloat(averageRating)} size="sm" />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-surface-900">Reviewer</p>
             <p className="text-xs text-surface-600 mt-0.5">{dateStr}</p>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-surface-900">{averageRating}</p>
-            <StarRating rating={parseFloat(averageRating)} size="sm" />
-          </div>
+          {!review.job && (
+            <div className="text-right">
+              <p className="text-lg font-semibold text-surface-900">{averageRating}</p>
+              <StarRating rating={parseFloat(averageRating)} size="sm" />
+            </div>
+          )}
         </div>
 
         {/* Category ratings */}

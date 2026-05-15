@@ -2,10 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { PublicUserDto, ReviewDTO, Role } from '@/lib/types'
+import { PublicUserDto, ReviewDTO, Role, JobDto } from '@/lib/types'
 import AvatarInitials from '@/components/ui/AvatarInitials'
 import ReviewDisplay from '@/components/ReviewDisplay'
 import { Star } from 'lucide-react'
+
+interface CompletedJob extends JobDto {
+  ratingCount?: number
+  averageRating?: number
+}
 
 export default function ProviderProfilePage() {
   const params = useParams()
@@ -13,6 +18,7 @@ export default function ProviderProfilePage() {
 
   const [providerUser, setProviderUser] = useState<PublicUserDto | null>(null)
   const [reviews, setReviews] = useState<ReviewDTO[]>([])
+  const [completedJobs, setCompletedJobs] = useState<CompletedJob[]>([])
   const [averageRatings, setAverageRatings] = useState<Record<string, number>>({})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,7 +29,7 @@ export default function ProviderProfilePage() {
       setIsLoading(true)
       setError(null)
       try {
-        const [userRes, reviewsRes] = await Promise.all([
+        const [userRes, reviewsRes, jobsRes] = await Promise.all([
           fetch(`/api/users/${providerId}`, {
             credentials: 'include',
             signal: controller.signal,
@@ -32,17 +38,40 @@ export default function ProviderProfilePage() {
             credentials: 'include',
             signal: controller.signal,
           }),
+          fetch(`/api/jobs?providerId=${providerId}&status=COMPLETED`, {
+            credentials: 'include',
+            signal: controller.signal,
+          }),
         ])
         if (!userRes.ok || !reviewsRes.ok) throw new Error('fetch_failed')
         const userData = await userRes.json()
         const reviewsData = await reviewsRes.json()
-        if (userData.data.role !== Role.PROVIDER) {
+        const jobsData = jobsRes.ok ? await jobsRes.json() : { data: [] }
+
+        if (!userData.data.roles.includes(Role.PROVIDER)) {
           setError('Provider not found.')
           return
         }
+
         setProviderUser(userData.data)
         setReviews(reviewsData.data?.reviews || [])
         setAverageRatings(reviewsData.data?.averageRatings || {})
+
+        // Enrich completed jobs with ratings from reviews
+        const jobsWithRatings = (jobsData.data || []).map((job: JobDto) => {
+          const jobReviews = reviewsData.data?.reviews?.filter(
+            (r: ReviewDTO) => r.jobId === parseInt(job.id, 10)
+          ) || []
+          const avgRating = jobReviews.length > 0
+            ? (jobReviews.reduce((sum: number, r: ReviewDTO) => sum + (r.clientCommunication || 0) + (r.clientQuality || 0) + (r.clientPunctuality || 0), 0) / (jobReviews.length * 3))
+            : 0
+          return {
+            ...job,
+            ratingCount: jobReviews.length,
+            averageRating: avgRating,
+          }
+        })
+        setCompletedJobs(jobsWithRatings)
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
           setError("Couldn't load this profile. Refresh to try again.")
@@ -134,6 +163,66 @@ export default function ProviderProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Completed Jobs section */}
+      {completedJobs.length > 0 && (
+        <>
+          <p className="text-[11px] font-bold uppercase tracking-wider text-surface-400 mb-4">
+            Completed Jobs
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {completedJobs.map((job) => (
+              <div
+                key={job.id}
+                className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-4 hover:border-surface-300 transition-colors"
+              >
+                <div className="mb-3">
+                  <p className="text-[13px] font-semibold text-surface-800 truncate">
+                    {job.category}
+                  </p>
+                  <p className="text-[12px] text-surface-500 line-clamp-2 mt-1">
+                    {job.description}
+                  </p>
+                </div>
+
+                <div className="mb-3 pt-3 border-t border-surface-100">
+                  <p className="text-[12px] text-surface-600 mb-1">
+                    <span className="font-medium">Location:</span> {job.cityArea}
+                  </p>
+                  <p className="text-[12px] text-surface-600">
+                    <span className="font-medium">Timeframe:</span> {job.timeframe}
+                  </p>
+                </div>
+
+                {job.averageRating !== undefined && job.ratingCount !== undefined && (
+                  <div className="pt-3 border-t border-surface-100">
+                    {job.ratingCount > 0 ? (
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-3.5 h-3.5 ${
+                              star <= Math.round(job.averageRating || 0)
+                                ? 'fill-accent-500 stroke-accent-500'
+                                : 'stroke-surface-300 fill-none'
+                            }`}
+                            aria-hidden="true"
+                          />
+                        ))}
+                        <span className="text-[12px] text-surface-600 ml-1">
+                          {(job.averageRating || 0).toFixed(1)}
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="text-[12px] text-surface-400">No rating</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* Reviews section */}
       <p className="text-[11px] font-bold uppercase tracking-wider text-surface-400 mb-4">

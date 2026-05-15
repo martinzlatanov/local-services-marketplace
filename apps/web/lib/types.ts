@@ -52,6 +52,8 @@ export interface JobDto {
   providerId: string | null
   createdAt: string
   updatedAt: string
+  clientName?: string
+  clientEmail?: string
 }
 
 export interface ApiSuccessResponse<T> {
@@ -169,4 +171,10 @@ export interface ReviewDTO {
   approvedAt?: string | null
   createdAt: string
   updatedAt: string
+  job?: {
+    id: number
+    category: string
+    description: string
+    cityArea: string
+  }
 }

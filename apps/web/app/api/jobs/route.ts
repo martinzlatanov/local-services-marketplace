@@ -14,6 +14,16 @@ export async function GET(req: Request) {
   const cityArea = url.searchParams.get('cityArea')
   const category = url.searchParams.get('category')
   const browse = url.searchParams.get('browse')
+  const providerId = url.searchParams.get('providerId')
+  const status = url.searchParams.get('status')
+
+  // If providerId is specified, return jobs for that provider
+  if (providerId) {
+    const filters = [eq(jobs.providerId, parseInt(providerId, 10))]
+    if (status) filters.push(eq(jobs.status, status as JobStatus))
+    const jobList = await buildJobQuery().where(and(...filters))
+    return NextResponse.json({ data: jobList.map(rowToJobDto) } as ApiSuccessResponse<JobDto[]>)
+  }
 
   // browse=1 signals the provider job market feed (PENDING jobs only)
   // cityArea/category filters also trigger browse mode for backwards compatibility

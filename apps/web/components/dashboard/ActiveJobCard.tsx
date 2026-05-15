@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { JobDto, JobStatus, ReviewDTO } from '@/lib/types'
-import { MapPin, Loader2, CheckCircle2, Star } from 'lucide-react'
+import { MapPin, Loader2, CheckCircle2, Star, MessageSquare } from 'lucide-react'
+import ReviewForm from '../ReviewForm'
 
 interface ActiveJobCardProps {
   job: JobDto
@@ -23,6 +24,8 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
   const [error, setError] = useState('')
   const [reviews, setReviews] = useState<ReviewDTO[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(false)
+  const [showReviewForm, setShowReviewForm] = useState(false)
+  const [hasProvidedReview, setHasProvidedReview] = useState(false)
 
   useEffect(() => {
     if (job.status === JobStatus.COMPLETED) {
@@ -66,6 +69,9 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
             <MapPin className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
             {job.cityArea} · {job.timeframe}
           </p>
+          {job.clientName && (
+            <p className="text-[12px] text-surface-600 font-medium mt-2">Client: {job.clientName}</p>
+          )}
         </div>
         <span className={`text-[11px] px-2.5 py-1 rounded-[var(--radius-badge)] font-medium flex-shrink-0 ${statusColors[job.status] || 'bg-surface-100 text-surface-800'}`}>
           {job.status.replace('_', ' ')}
@@ -120,7 +126,7 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
       {/* Reviews section for completed jobs */}
       {job.status === JobStatus.COMPLETED && (
         <div className="mt-6 pt-6 border-t border-surface-200">
-          <h4 className="text-sm font-semibold text-surface-900 mb-4">Client Reviews</h4>
+          <h4 className="text-sm font-semibold text-surface-900 mb-4">Client Review</h4>
           {reviewsLoading ? (
             <div className="flex items-center justify-center py-6">
               <Loader2 className="h-4 w-4 animate-spin text-surface-400" aria-hidden="true" />
@@ -129,67 +135,125 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
             <p className="text-sm text-surface-500">No reviews yet. Check back later.</p>
           ) : (
             <div className="space-y-3">
-              {reviews.filter(r => r.approvedAt).map((review) => (
-                <div key={review.id} className="bg-surface-50 rounded-[var(--radius-btn)] p-3 border border-surface-200">
-                  {review.reviewType === 'provider' && review.providerPaymentReliability && (
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-surface-600">Payment Reliability</span>
+              {reviews.map((review) => {
+                const ratings = {
+                  payment: review.clientCommunication || 0,
+                  communication: review.clientQuality || 0,
+                  professionalism: review.clientPunctuality || 0,
+                }
+                const avgRatingNum = ratings.payment && ratings.communication && ratings.professionalism
+                  ? (ratings.payment + ratings.communication + ratings.professionalism) / 3
+                  : 0
+                const avgRatingStr = avgRatingNum.toFixed(1)
+
+                return (
+                  <div key={review.id} className="bg-surface-50 rounded-[var(--radius-input)] p-3 border border-surface-200 space-y-3">
+                    {/* Category ratings - horizontal layout */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="flex flex-col items-center gap-1 p-2 bg-white rounded-[var(--radius-input)]">
+                        <span className="text-xs font-medium text-surface-600 text-center">Communication</span>
                         <div className="flex gap-0.5">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
                               className={`h-3 w-3 ${
-                                star <= (review.providerPaymentReliability || 0)
-                                  ? 'fill-brand-500 text-brand-500'
+                                star <= ratings.payment
+                                  ? 'fill-yellow-400 text-yellow-400'
                                   : 'text-surface-300'
                               }`}
                               aria-hidden="true"
                             />
                           ))}
                         </div>
+                        <span className="text-xs font-semibold text-surface-900">{ratings.payment}</span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-surface-600">Communication</span>
+                      <div className="flex flex-col items-center gap-1 p-2 bg-white rounded-[var(--radius-input)]">
+                        <span className="text-xs font-medium text-surface-600 text-center">Quality</span>
                         <div className="flex gap-0.5">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
                               className={`h-3 w-3 ${
-                                star <= (review.providerCommunicationClarity || 0)
-                                  ? 'fill-brand-500 text-brand-500'
+                                star <= ratings.communication
+                                  ? 'fill-yellow-400 text-yellow-400'
                                   : 'text-surface-300'
                               }`}
                               aria-hidden="true"
                             />
                           ))}
                         </div>
+                        <span className="text-xs font-semibold text-surface-900">{ratings.communication}</span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-surface-600">Professionalism</span>
+                      <div className="flex flex-col items-center gap-1 p-2 bg-white rounded-[var(--radius-input)]">
+                        <span className="text-xs font-medium text-surface-600 text-center">Punctuality</span>
                         <div className="flex gap-0.5">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
                               key={star}
                               className={`h-3 w-3 ${
-                                star <= (review.providerProfessionalism || 0)
-                                  ? 'fill-brand-500 text-brand-500'
+                                star <= ratings.professionalism
+                                  ? 'fill-yellow-400 text-yellow-400'
                                   : 'text-surface-300'
                               }`}
                               aria-hidden="true"
                             />
                           ))}
                         </div>
+                        <span className="text-xs font-semibold text-surface-900">{ratings.professionalism}</span>
                       </div>
                     </div>
-                  )}
-                  {review.text && (
-                    <p className="text-sm text-surface-700 mt-2">{review.text}</p>
-                  )}
-                </div>
-              ))}
+
+                    {/* Review text */}
+                    {review.text && (
+                      <p className="text-sm text-surface-700 bg-white rounded-[var(--radius-input)] p-2">{review.text}</p>
+                    )}
+
+                    {/* Photo */}
+                    {review.photoUrl && (
+                      <button
+                        onClick={() => window.open(review.photoUrl, '_blank')}
+                        className="h-16 w-16 rounded-[var(--radius-input)] overflow-hidden border border-surface-300 hover:border-brand-400 transition-colors cursor-pointer"
+                      >
+                        <img
+                          src={review.photoUrl}
+                          alt="Review"
+                          className="h-full w-full object-cover"
+                        />
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           )}
+
+        {/* Review submission section */}
+        {!hasProvidedReview && !showReviewForm && (
+          <div className="mt-4">
+            <button
+              onClick={() => setShowReviewForm(true)}
+              className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium text-brand-600 hover:text-brand-700 hover:bg-brand-50 rounded-[var(--radius-btn)] transition-colors"
+            >
+              <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
+              Leave Review for Client
+            </button>
+          </div>
+        )}
+
+        {/* Review form */}
+        {showReviewForm && (
+          <div className="mt-4 pt-4 border-t border-surface-200">
+            <ReviewForm
+              jobId={job.id}
+              reviewType="provider"
+              onSuccess={() => {
+                setShowReviewForm(false)
+                setHasProvidedReview(true)
+              }}
+              onCancel={() => setShowReviewForm(false)}
+            />
+          </div>
+        )}
         </div>
       )}
     </div>

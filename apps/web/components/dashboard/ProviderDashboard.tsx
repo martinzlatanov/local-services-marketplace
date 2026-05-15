@@ -137,7 +137,6 @@ export default function ProviderDashboard() {
     <div>
       {/* Page header */}
       <div className="mb-8">
-        <p className="eyebrow mb-3">Provider Dashboard</p>
         <h1 className="text-[32px] font-extrabold tracking-[-1px] text-surface-900">My Work</h1>
         <p className="text-[14px] text-surface-500 mt-1">Browse available jobs and manage your active work.</p>
       </div>
