@@ -59,10 +59,19 @@ const jobs = [
   { clientId: admin.id,  category: 'CLEANING',   description: 'Weekly domestic cleaning for a 4-bed house. 3 hours per visit, every Thursday morning.',                timeframe: 'Ongoing from Monday',city: 'Shoreditch, London' },
 ]
 
+const catResult = await client.query(`SELECT id, name FROM job_categories`)
+const categoryMap = Object.fromEntries(catResult.rows.map(r => [r.name, r.id]))
+const locResult = await client.query(`SELECT id, name FROM locations`)
+const locationMap = Object.fromEntries(locResult.rows.map(r => [r.name, r.id]))
+
 for (const j of jobs) {
+  const categoryId = categoryMap[j.category]
+  const locationId = locationMap[j.city]
+  if (!categoryId) throw new Error(`Unknown category: ${j.category}`)
+  if (!locationId) throw new Error(`Unknown city area: ${j.city}`)
   await client.query(
-    `INSERT INTO jobs (category, description, timeframe, city_area, client_id) VALUES ($1, $2, $3, $4, $5)`,
-    [j.category, j.description, j.timeframe, j.city, String(j.clientId)]
+    `INSERT INTO jobs (category_id, location_id, description, timeframe, client_id) VALUES ($1, $2, $3, $4, $5)`,
+    [categoryId, locationId, j.description, j.timeframe, String(j.clientId)]
   )
   console.log(`  + [${j.category}] ${j.description.substring(0, 60)}...`)
 }

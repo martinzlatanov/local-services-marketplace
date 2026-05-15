@@ -103,7 +103,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-3 mt-1">
                 <p className="text-sm text-surface-600">{user.email}</p>
                 <span className="text-xs font-medium text-surface-600 bg-surface-100 px-2.5 py-1 rounded-[var(--radius-badge)]">
-                  {user.role === Role.CLIENT ? 'Client' : 'Provider'}
+                  {user.roles.includes(Role.CLIENT) ? 'Client' : 'Provider'}
                 </span>
               </div>
             )}
@@ -120,7 +120,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Role-split dashboard content */}
-        {user?.role === Role.CLIENT ? (
+        {user?.roles.includes(Role.CLIENT) ? (
           <ClientDashboard
             jobs={jobs}
             onJobPosted={handleJobPosted}

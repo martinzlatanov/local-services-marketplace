@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
-import { jobs } from '@/lib/db/schema'
-import { getAuthenticatedUser, verifyJwt } from '@/lib/auth'
-import { CreateJobRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@/lib/types'
-import { JOB_CATEGORIES } from '@/lib/db/categories'
+import { jobs, jobCategories, locations } from '@/lib/db/schema'
+import { buildJobQuery, rowToJobDto } from '@/lib/db/job-query'
+import { getAuthenticatedUser } from '@/lib/auth'
+import { CreateJobRequest, JobDto, ApiSuccessResponse, JobStatus, Role } from '@/lib/types'
 import { eq, and } from 'drizzle-orm'
 
 export async function GET(req: Request) {
@@ -22,35 +22,21 @@ export async function GET(req: Request) {
 
   const filters = isBrowsing
     ? [eq(jobs.status, JobStatus.PENDING)]
-    : [eq(jobs.clientId, String(user.id))]
+    : [eq(jobs.clientId, parseInt(user.id, 10))]
 
-  if (cityArea) filters.push(eq(jobs.cityArea, cityArea))
-  if (category) filters.push(eq(jobs.category, category as any))
+  if (cityArea) filters.push(eq(locations.name, cityArea))
+  if (category) filters.push(eq(jobCategories.name, category))
 
-  const jobList = await db.select().from(jobs).where(and(...filters))
+  const jobList = await buildJobQuery().where(and(...filters))
 
-  const jobDtos: JobDto[] = jobList.map(job => ({
-    id: String(job.id),
-    status: job.status as JobStatus,
-    version: job.version,
-    category: job.category,
-    description: job.description,
-    timeframe: job.timeframe,
-    cityArea: job.cityArea,
-    clientId: job.clientId,
-    providerId: job.providerId,
-    createdAt: job.createdAt.toISOString(),
-    updatedAt: job.updatedAt.toISOString(),
-  }))
-
-  return NextResponse.json({ data: jobDtos } as ApiSuccessResponse<JobDto[]>)
+  return NextResponse.json({ data: jobList.map(rowToJobDto) } as ApiSuccessResponse<JobDto[]>)
 }
 
 export async function POST(req: Request) {
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
 
-  if (user.role !== 'CLIENT') {
+  if (!user.roles.includes(Role.CLIENT)) {
     return NextResponse.json({ errors: { role: 'only_clients_can_post_jobs' } }, { status: 403 })
   }
 
@@ -70,16 +56,30 @@ export async function POST(req: Request) {
     }, { status: 400 })
   }
 
-  if (!JOB_CATEGORIES.includes(payload.category as any)) {
+  const [catRow] = await db
+    .select({ id: jobCategories.id })
+    .from(jobCategories)
+    .where(eq(jobCategories.name, payload.category))
+    .limit(1)
+  if (!catRow) {
     return NextResponse.json({ errors: { category: 'invalid_category' } }, { status: 400 })
   }
 
+  const [locRow] = await db
+    .select({ id: locations.id })
+    .from(locations)
+    .where(eq(locations.name, payload.cityArea))
+    .limit(1)
+  if (!locRow) {
+    return NextResponse.json({ errors: { cityArea: 'invalid_city_area' } }, { status: 400 })
+  }
+
   const [newJob] = await db.insert(jobs).values({
-    category: payload.category as any,
+    categoryId: catRow.id,
+    locationId: locRow.id,
     description: payload.description,
     timeframe: payload.timeframe,
-    cityArea: payload.cityArea,
-    clientId: String(user.id),
+    clientId: parseInt(user.id, 10),
     status: JobStatus.PENDING,
     version: 1,
   }).returning()
@@ -88,12 +88,12 @@ export async function POST(req: Request) {
     id: String(newJob.id),
     status: newJob.status as JobStatus,
     version: newJob.version,
-    category: newJob.category,
+    category: payload.category,
     description: newJob.description,
     timeframe: newJob.timeframe,
-    cityArea: newJob.cityArea,
-    clientId: newJob.clientId,
-    providerId: newJob.providerId,
+    cityArea: payload.cityArea,
+    clientId: String(newJob.clientId),
+    providerId: null,
     createdAt: newJob.createdAt.toISOString(),
     updatedAt: newJob.updatedAt.toISOString(),
   }

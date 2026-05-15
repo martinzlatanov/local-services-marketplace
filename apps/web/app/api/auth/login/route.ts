@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { findUserByEmail, verifyPassword, signJwt } from '../../../../lib/auth'
+import { findUserByEmail, verifyPassword, signJwt, toAuthUserDto } from '../../../../lib/auth'
 import { AuthLoginRequest } from '@/lib/types'
 
 export async function OPTIONS() {
@@ -16,8 +16,10 @@ export async function POST(req: Request) {
   const ok = await verifyPassword(payload.password, user.passwordHash)
   if (!ok) return NextResponse.json({ errors: { credentials: 'invalid' } }, { status: 401 })
   const token = signJwt({ sub: String(user.id), email: user.email })
+  // Fetch roles from user_roles table
+  const authUserDto = await toAuthUserDto(user)
   // Set httpOnly cookie via NextResponse
-  const res = NextResponse.json({ user: { id: String(user.id), email: user.email, role: user.role, createdAt: user.createdAt }, token })
+  const res = NextResponse.json({ user: authUserDto, token })
   res.cookies.set('token', token, { httpOnly: true, sameSite: 'none', secure: false })
   return res
 }

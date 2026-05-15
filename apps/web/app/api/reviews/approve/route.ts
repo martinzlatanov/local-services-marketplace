@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
 
-  if (user.role !== Role.ADMIN) {
+  if (!user.roles.includes(Role.ADMIN)) {
     return NextResponse.json(
       { errors: { role: 'admin_only' } },
       { status: 403 }

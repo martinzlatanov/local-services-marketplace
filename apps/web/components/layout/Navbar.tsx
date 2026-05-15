@@ -57,7 +57,7 @@ export default function Navbar() {
                 >
                   Dashboard
                 </Link>
-                {user.role === Role.PROVIDER && (
+                {user.roles.includes(Role.PROVIDER) && (
                   <Link
                     href="/browse"
                     className="text-surface-600 hover:text-surface-900 font-medium transition-colors"
@@ -65,9 +65,18 @@ export default function Navbar() {
                     Browse Jobs
                   </Link>
                 )}
+                {user.roles.includes(Role.ADMIN) && (
+                  <Link
+                    href="/admin/dashboard"
+                    className="text-surface-600 hover:text-surface-900 font-medium transition-colors"
+                  >
+                    Admin
+                  </Link>
+                )}
                 <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-surface-700">{user.email}</span>
                   <span className="text-sm font-medium text-surface-700 bg-surface-100 px-3 py-1.5 rounded-[var(--radius-badge)]">
-                    {user.role === Role.CLIENT ? 'Client' : 'Provider'}
+                    {user.roles.includes(Role.ADMIN) ? 'Admin' : user.roles.includes(Role.CLIENT) ? 'Client' : 'Provider'}
                   </span>
                 </div>
                 <button
@@ -124,7 +133,7 @@ export default function Navbar() {
                 >
                   Dashboard
                 </Link>
-                {user.role === Role.PROVIDER && (
+                {user.roles.includes(Role.PROVIDER) && (
                   <Link
                     href="/browse"
                     className="text-surface-600 hover:text-surface-900 font-medium transition-colors px-4 py-2"
@@ -133,10 +142,18 @@ export default function Navbar() {
                     Browse Jobs
                   </Link>
                 )}
+                {user.roles.includes(Role.ADMIN) && (
+                  <Link
+                    href="/admin/dashboard"
+                    className="text-surface-600 hover:text-surface-900 font-medium transition-colors px-4 py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Admin
+                  </Link>
+                )}
                 <div className="px-4 py-2">
-                  <p className="text-sm font-medium text-surface-700">{user.email}</p>
-                  <span className="inline-block text-xs font-medium text-surface-600 bg-surface-100 px-2 py-1 rounded-[var(--radius-badge)] mt-1">
-                    {user.role === Role.CLIENT ? 'Client' : 'Provider'}
+                  <span className="inline-block text-xs font-medium text-surface-600 bg-surface-100 px-2 py-1 rounded-[var(--radius-badge)]">
+                    {user.roles.includes(Role.ADMIN) ? 'Admin' : user.roles.includes(Role.CLIENT) ? 'Client' : 'Provider'}
                   </span>
                 </div>
                 <button

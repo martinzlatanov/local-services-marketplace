@@ -29,7 +29,7 @@ export default function AdminReviewsPage() {
         }
 
         const data = await response.json()
-        if (data.user?.role !== Role.ADMIN) {
+        if (!data.user?.roles?.includes(Role.ADMIN)) {
           router.push('/unauthorized')
           return
         }

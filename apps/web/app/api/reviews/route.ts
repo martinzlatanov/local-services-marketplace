@@ -90,9 +90,9 @@ export async function POST(req: Request) {
 
   const userId = parseInt(user.id, 10)
 
-  if (user.role === Role.CLIENT) {
+  if (user.roles.includes(Role.CLIENT)) {
     // Client reviewing provider
-    if (String(job.clientId) !== String(user.id)) {
+    if (job.clientId !== userId) {
       return NextResponse.json(
         { errors: { auth: 'not_job_participant' } },
         { status: 403 }
@@ -107,7 +107,7 @@ export async function POST(req: Request) {
     }
 
     reviewType = 'client'
-    revieweeId = parseInt(job.providerId || '0', 10)
+    revieweeId = job.providerId ?? 0
     if (!revieweeId) {
       return NextResponse.json(
         { errors: { job: 'no_provider_assigned' } },
@@ -122,9 +122,9 @@ export async function POST(req: Request) {
     providerPaymentReliability = null as any
     providerCommunicationClarity = null as any
     providerProfessionalism = null as any
-  } else if (user.role === Role.PROVIDER) {
+  } else if (user.roles.includes(Role.PROVIDER)) {
     // Provider reviewing client
-    if (String(job.providerId) !== String(user.id)) {
+    if (job.providerId !== userId) {
       return NextResponse.json(
         { errors: { auth: 'not_job_participant' } },
         { status: 403 }
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
     }
 
     reviewType = 'provider'
-    revieweeId = parseInt(job.clientId, 10)
+    revieweeId = job.clientId
 
     providerPaymentReliability = providerRating.paymentReliability
     providerCommunicationClarity = providerRating.communicationClarity
@@ -277,7 +277,7 @@ export async function GET(req: Request) {
   if (approved === 'false' && !jobId && !userId) {
     const user = await getAuthenticatedUser(req)
     if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
-    if (user.role !== Role.ADMIN) {
+    if (!user.roles.includes(Role.ADMIN)) {
       return NextResponse.json(
         { errors: { role: 'admin_only' } },
         { status: 403 }
@@ -329,7 +329,7 @@ export async function GET(req: Request) {
     }
 
     const userIdNum = parseInt(user.id, 10)
-    if (String(job.clientId) !== String(userIdNum) && String(job.providerId) !== String(userIdNum)) {
+    if (job.clientId !== userIdNum && job.providerId !== userIdNum) {
       return NextResponse.json(
         { errors: { auth: 'not_authorized' } },
         { status: 403 }

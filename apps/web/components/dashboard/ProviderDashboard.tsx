@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { JobDto, JobStatus, CITY_AREAS, ReviewDTO } from '@/lib/types'
-import { JOB_CATEGORIES } from '@/lib/db/categories'
+import { JobDto, JobStatus, CITY_AREAS, ReviewDTO, JOB_CATEGORIES } from '@/lib/types'
 import ProviderJobFeed from './ProviderJobFeed'
 import ActiveJobCard from './ActiveJobCard'
 import ReviewDisplay from '../ReviewDisplay'

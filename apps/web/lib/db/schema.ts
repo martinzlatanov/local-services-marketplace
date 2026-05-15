@@ -1,29 +1,40 @@
-import { pgTable, serial, varchar, text, timestamp, integer, pgEnum, uniqueIndex, index } from "drizzle-orm/pg-core"
-import { Role } from "@/lib/types"
+import { pgTable, serial, varchar, text, timestamp, integer, pgEnum, uniqueIndex, index, primaryKey } from "drizzle-orm/pg-core"
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: varchar("email", { length: 320 }).notNull(),
   passwordHash: text("password_hash").notNull(),
-  role: varchar("role", { length: 32 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   name: varchar("name", { length: 100 }),
   avatarUrl: text("avatar_url"),
+  status: varchar("status", { length: 16 }).notNull().default("active"),
 })
 
 // Note: unique index applied via SQL migration in apps/web/drizzle/0000_initial_user.sql
 
-// Job category enum for PostgreSQL
-export const jobCategoryEnum = pgEnum("job_category", [
-  "PLUMBING",
-  "ELECTRICAL",
-  "CLEANING",
-  "GARDENING",
-  "MOVING",
-  "HANDYMAN",
-  "PAINTING",
-  "OTHER",
-])
+// User roles junction table (D-01: multi-role support)
+export const userRoles = pgTable(
+  "user_roles",
+  {
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    role: varchar("role", { length: 32 }).notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.role] }),
+  })
+)
+
+// Job categories lookup table (replaces job_category pgEnum)
+export const jobCategories = pgTable("job_categories", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 64 }).notNull().unique(),
+})
+
+// Locations lookup table (replaces city_area varchar)
+export const locations = pgTable("locations", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+})
 
 // Rating category enums for reviews
 export const clientRatingCategories = pgEnum("client_rating_categories", [
@@ -43,12 +54,12 @@ export const jobs = pgTable("jobs", {
   id: serial("id").primaryKey(),
   status: varchar("status", { length: 32 }).notNull().default("PENDING"),
   version: integer("version").notNull().default(1),
-  category: jobCategoryEnum("category").notNull(),
+  categoryId: integer("category_id").notNull().references(() => jobCategories.id),
   description: text("description").notNull(),
   timeframe: varchar("timeframe", { length: 100 }).notNull(),
-  cityArea: varchar("city_area", { length: 100 }).notNull(),
-  clientId: varchar("client_id", { length: 320 }).notNull(),
-  providerId: varchar("provider_id", { length: 320 }),
+  locationId: integer("location_id").notNull().references(() => locations.id),
+  clientId: integer("client_id").notNull().references(() => users.id),
+  providerId: integer("provider_id").references(() => users.id),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 })
@@ -58,9 +69,9 @@ export const reviews = pgTable(
   "reviews",
   {
     id: serial("id").primaryKey(),
-    jobId: integer("job_id").notNull(),
-    reviewerId: integer("reviewer_id").notNull(),
-    revieweeId: integer("reviewee_id").notNull(),
+    jobId: integer("job_id").notNull().references(() => jobs.id),
+    reviewerId: integer("reviewer_id").notNull().references(() => users.id),
+    revieweeId: integer("reviewee_id").notNull().references(() => users.id),
     reviewType: varchar("review_type", { length: 32 }).notNull(), // 'client' or 'provider'
     // Client rating fields (when reviewType = 'client')
     clientCommunication: integer("client_communication"),

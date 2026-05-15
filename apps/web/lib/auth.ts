@@ -48,11 +48,13 @@ export async function getAuthenticatedUser(req: Request): Promise<AuthUserDto | 
   const payload = verifyJwt(token)
   if (!payload || !payload.sub) { ; return null }
   const { db } = await import("@/lib/db/client")
-  const { users } = await import("@/lib/db/schema")
+  const { users, userRoles } = await import("@/lib/db/schema")
   const { eq } = await import("drizzle-orm")
   const rows = await db.select().from(users).where((eq as any)(users.id, parseInt(payload.sub)))
   if (!rows[0]) return null
-  return toAuthUserDto(rows[0])
+  const row = rows[0]
+  if (row.status === 'suspended') return null
+  return toAuthUserDto(row)
 }
 
 export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUserDto> {
@@ -60,10 +62,11 @@ export async function createUser(payload: AuthRegisterRequest) : Promise<AuthUse
   const passwordHash = await hashPassword(password)
   const userRole = role ?? Role.CLIENT
   const { db } = await import("@/lib/db/client")
-  const { users } = await import("@/lib/db/schema")
-  const created = await db.insert(users).values({ email, passwordHash, role: userRole }).returning()
+  const { users, userRoles } = await import("@/lib/db/schema")
+  const created = await db.insert(users).values({ email, passwordHash, status: 'active' }).returning()
   const userRow = created[0]
-  return { id: String(userRow.id), email: userRow.email, role: userRow.role as any, createdAt: (userRow.createdAt instanceof Date) ? userRow.createdAt.toISOString() : String(userRow.createdAt) }
+  await db.insert(userRoles).values({ userId: userRow.id, role: userRole })
+  return { id: String(userRow.id), email: userRow.email, roles: [userRole], status: 'active', createdAt: (userRow.createdAt instanceof Date) ? userRow.createdAt.toISOString() : String(userRow.createdAt) }
 }
 
 export async function findUserByEmail(email: string) {
@@ -75,5 +78,10 @@ export async function findUserByEmail(email: string) {
 }
 
 export async function toAuthUserDto(row: any): Promise<AuthUserDto> {
-  return { id: String(row.id), email: row.email, role: row.role as any, createdAt: (row.createdAt instanceof Date) ? row.createdAt.toISOString() : String(row.createdAt) }
+  const { db } = await import("@/lib/db/client")
+  const { userRoles } = await import("@/lib/db/schema")
+  const { eq } = await import("drizzle-orm")
+  const roleRows = await db.select().from(userRoles).where((eq as any)(userRoles.userId, row.id))
+  const roles = roleRows.map((r: any) => r.role as Role)
+  return { id: String(row.id), email: row.email, roles, status: row.status, createdAt: (row.createdAt instanceof Date) ? row.createdAt.toISOString() : String(row.createdAt) }
 }

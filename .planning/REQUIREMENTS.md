@@ -85,6 +85,16 @@
 
 ---
 
+### DB Normalization — Categories & Locations (NORM)
+
+- [ ] **NORM-01**: A `job_categories` table is created with `id` and `name` columns; seeded with all 8 current category values (PLUMBING, ELECTRICAL, CLEANING, GARDENING, MOVING, HANDYMAN, PAINTING, OTHER)
+- [ ] **NORM-02**: `jobs.category` column is changed from the `job_category` pgEnum to a FK `integer` referencing `job_categories.id`; the `job_category` pgEnum is dropped
+- [ ] **NORM-03**: A `locations` table is created with `id` and `name` columns; seeded with common city/area values
+- [ ] **NORM-04**: `jobs.city_area` column is changed from `varchar(100)` to a FK `integer` referencing `locations.id`
+- [ ] **NORM-05**: Every DB change is in its own standalone numbered migration file so the full schema can be replayed from scratch; Drizzle schema (`apps/web/lib/db/schema.ts`) reflects the new tables and FK relations
+
+---
+
 ## v2 Requirements (Deferred)
 
 - In-app messaging between client and provider after job acceptance
@@ -152,3 +162,8 @@
 | UI-06 | Phase 12 | Complete |
 | UI-07 | Phase 12 | Complete |
 | UI-08 | Phase 12 | Complete |
+| NORM-01 | Phase 15 | Pending |
+| NORM-02 | Phase 15 | Pending |
+| NORM-03 | Phase 15 | Pending |
+| NORM-04 | Phase 15 | Pending |
+| NORM-05 | Phase 15 | Pending |

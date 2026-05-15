@@ -1,14 +1,20 @@
 import { NextResponse, type NextRequest } from 'next/server'
+import { db } from '@/lib/db/client'
+import { userRoles } from '@/lib/db/schema'
+import { eq } from 'drizzle-orm'
+import { verifyJwt } from '@/lib/auth'
 
 const PROTECTED_PATHS = ['/dashboard', '/jobs', '/post-job']
+const ADMIN_PATH_PREFIX = '/admin'
 const PUBLIC_AUTH_PATHS = ['/login', '/register']
 const PUBLIC_PATHS = ['/', '/api/auth']
 
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl
   const token = req.cookies.get('token')?.value
 
   const isProtected = PROTECTED_PATHS.some((path) => pathname.startsWith(path))
+  const isAdminPath = pathname.startsWith(ADMIN_PATH_PREFIX)
   const isPublicAuth = PUBLIC_AUTH_PATHS.some((path) => pathname.startsWith(path))
   const isPublic = PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(path))
 
@@ -29,8 +35,29 @@ export function proxy(req: NextRequest) {
   const isApiRoute = pathname.startsWith('/api/')
   let response: NextResponse
 
-  // Allow public paths
-  if (isPublic) {
+  // Admin path protection (D-17/D-18/D-19)
+  if (isAdminPath) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
+    const payload = verifyJwt(token)
+    if (!payload || !payload.sub) {
+      return NextResponse.redirect(new URL('/login', req.url))
+    }
+    const userId = parseInt(payload.sub, 10)
+    // D-18: Check DB for ADMIN role
+    const adminRoles = await db
+      .select({ role: userRoles.role })
+      .from(userRoles)
+      .where(eq(userRoles.userId, userId))
+    const isAdmin = adminRoles.some(r => r.role === 'ADMIN')
+    if (!isAdmin) {
+      // D-19: Non-admins redirected to /unauthorized
+      return NextResponse.redirect(new URL('/unauthorized', req.url))
+    }
+    response = NextResponse.next()
+  } else if (isPublic) {
+    // Allow public paths
     response = NextResponse.next()
   } else if (isProtected && !token) {
     // Redirect to login if trying to access protected path without token
@@ -52,13 +79,17 @@ export function proxy(req: NextRequest) {
   return response
 }
 
+export default proxy
+
 export const config = {
+  runtime: 'nodejs',
   matcher: [
     '/api/:path*',
     '/dashboard/:path*',
     '/jobs/:path*',
     '/post-job',
     '/login',
-    '/register'
+    '/register',
+    '/admin/:path*',
   ],
 }

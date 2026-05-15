@@ -218,3 +218,17 @@ Plans:
   3. Admins can add/remove CLIENT or PROVIDER roles from any user; users can hold multiple roles
   4. Users with ADMIN role can also be CLIENT or PROVIDER simultaneously
   5. `/admin/dashboard` page is accessible only to users with ADMIN role; redirects non-admins to unauthorized page
+
+### Phase 15: Job Categories & Locations DB Normalization
+**Goal**: Extract job categories and service locations from inline enums/varchars into dedicated lookup tables (`job_categories`, `locations`) with foreign keys; each migration is a standalone replayable SQL file
+**Depends on**: Phase 14
+**Requirements**: NORM-01, NORM-02, NORM-03, NORM-04, NORM-05
+**Status**: Ready to plan
+**Plans**: TBD
+
+**Success Criteria** (what must be TRUE):
+  1. A `job_categories` table exists with seeded rows for all 8 current category values; `jobs.category` column references it via FK
+  2. A `locations` table exists with seeded rows for common city/area values; `jobs.city_area` column references it via FK
+  3. Each DB change is in its own numbered migration file (e.g. `0004_add_job_categories.sql`, `0005_add_locations.sql`, etc.) so the schema can be fully replayed from scratch
+  4. All existing API routes (`POST /api/jobs`, `GET /api/jobs`, `PATCH /api/jobs/:id/status`, `PATCH /api/jobs/:id/accept`) pass TypeScript type-checks and return correct data after the schema change
+  5. The Drizzle schema (`apps/web/lib/db/schema.ts`) reflects the new tables and FK relations; the `jobCategoryEnum` pgEnum is removed

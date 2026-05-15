@@ -15,6 +15,55 @@
       "when": 1778331118107,
       "tag": "0001_lean_juggernaut",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1747353600000,
+      "tag": "0003_add_foreign_keys",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1747440000000,
+      "tag": "0004_add_job_categories_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1747440060000,
+      "tag": "0005_migrate_jobs_category_fk",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1747440120000,
+      "tag": "0006_add_locations_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1747440180000,
+      "tag": "0007_migrate_jobs_cityarea_fk",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1778429400000,
+      "tag": "0008_add_user_roles_and_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1778429460000,
+      "tag": "0009_drop_users_role_column",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { jobs } from '@/lib/db/schema'
+import { buildJobQuery, rowToJobDto } from '@/lib/db/job-query'
 import { getAuthenticatedUser } from '@/lib/auth'
 import { broadcastToUser } from '@/lib/ws/server'
 import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@/lib/types'
@@ -14,7 +15,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
 
   // 2. Enforce PROVIDER role
-  if (user.role !== Role.PROVIDER) {
+  if (!user.roles.includes(Role.PROVIDER)) {
     return NextResponse.json({ errors: { role: 'only_providers_can_update_status' } }, { status: 403 })
   }
 
@@ -42,7 +43,7 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
   }
 
   // 7. Verify the provider owns this job
-  if (currentJob.providerId !== String(user.id)) {
+  if (currentJob.providerId !== parseInt(user.id, 10)) {
     return NextResponse.json({ errors: { job: 'not_your_job' } }, { status: 403 })
   }
 
@@ -76,23 +77,11 @@ export async function PATCH(req: Request, context: { params: Promise<{ id: strin
     )
   }
 
-  // 10. Broadcast JOB_UPDATED event to the client
-  const jobDto: JobDto = {
-    id: String(updatedJob.id),
-    status: updatedJob.status as JobStatus,
-    version: updatedJob.version,
-    category: updatedJob.category,
-    description: updatedJob.description,
-    timeframe: updatedJob.timeframe,
-    cityArea: updatedJob.cityArea,
-    clientId: updatedJob.clientId,
-    providerId: String(updatedJob.providerId),
-    createdAt: updatedJob.createdAt.toISOString(),
-    updatedAt: updatedJob.updatedAt.toISOString(),
-  }
+  // 10. Fetch JOIN-resolved row, broadcast, and return
+  const [updatedRow] = await buildJobQuery().where(eq(jobs.id, jobId)).limit(1)
+  const jobDto = rowToJobDto(updatedRow)
 
-  // Broadcast to the client who posted the job
-  broadcastToUser(updatedJob.clientId, { type: 'JOB_UPDATED', payload: jobDto })
+  broadcastToUser(String(updatedRow.clientId), { type: 'JOB_UPDATED', payload: jobDto })
 
   return NextResponse.json({ data: jobDto } as ApiSuccessResponse<JobDto>)
 }

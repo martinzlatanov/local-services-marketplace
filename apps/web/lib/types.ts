@@ -20,6 +20,11 @@ export const CITY_AREAS = [
   'Islington, London',
   'Brixton, London',
   'Shoreditch, London',
+  'Camden, London',
+  'Peckham, London',
+  'Dalston, London',
+  'Bethnal Green, London',
+  'Stoke Newington, London',
 ] as const
 
 export const JOB_CATEGORIES = [
@@ -90,7 +95,8 @@ export interface AuthLoginRequest {
 export interface AuthUserDto {
   id: string
   email: string
-  role: Role
+  roles: Role[]
+  status: string
   createdAt: string
 }
 
@@ -99,7 +105,17 @@ export interface PublicUserDto {
   email: string
   name: string | null
   avatarUrl: string | null
-  role: Role
+  roles: Role[]
+  createdAt: string
+}
+
+export interface AdminUserDto {
+  id: string
+  email: string
+  name: string | null
+  avatarUrl: string | null
+  roles: Role[]
+  status: string
   createdAt: string
 }
 

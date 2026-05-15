@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server'
 import { db } from '@/lib/db/client'
 import { jobs } from '@/lib/db/schema'
+import { buildJobQuery, rowToJobDto } from '@/lib/db/job-query'
 import { getAuthenticatedUser } from '@/lib/auth'
-import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus } from '@/lib/types'
+import { UpdateJobStatusRequest, JobDto, ApiSuccessResponse, ApiErrorResponse, JobStatus, Role } from '@/lib/types'
 import { eq } from 'drizzle-orm'
 
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -15,26 +16,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     return NextResponse.json({ errors: { id: 'invalid' } }, { status: 400 })
   }
 
-  const [job] = await db.select().from(jobs).where(eq(jobs.id, jobId)).limit(1)
+  const [job] = await buildJobQuery().where(eq(jobs.id, jobId)).limit(1)
   if (!job) {
     return NextResponse.json({ errors: { job: 'not_found' } }, { status: 404 })
   }
 
-  const jobDto: JobDto = {
-    id: String(job.id),
-    status: job.status as JobStatus,
-    version: job.version,
-    category: job.category,
-    description: job.description,
-    timeframe: job.timeframe,
-    cityArea: job.cityArea,
-    clientId: job.clientId,
-    providerId: job.providerId,
-    createdAt: job.createdAt.toISOString(),
-    updatedAt: job.updatedAt.toISOString(),
-  }
-
-  return NextResponse.json({ data: jobDto } as ApiSuccessResponse<JobDto>)
+  return NextResponse.json({ data: rowToJobDto(job) } as ApiSuccessResponse<JobDto>)
 }
 
 // Valid state transitions
@@ -49,6 +36,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   // 1. Authenticate user
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
+
+  if (!user.roles.includes(Role.PROVIDER)) {
+    return NextResponse.json({ errors: { role: 'only_providers_can_update_job_status' } }, { status: 403 })
+  }
 
   // 2. Parse request body
   const body = await req.json().catch(() => null)
@@ -97,31 +88,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   
   // Set providerId when accepting job
   if (requestedStatus === JobStatus.ACCEPTED) {
-    updateData.providerId = String(user.id)
+    updateData.providerId = parseInt(user.id, 10)
   }
   
   // Increment version
   updateData.version = currentJob.version + 1
 
-  const [updatedJob] = await db.update(jobs)
+  await db.update(jobs)
     .set(updateData)
     .where(eq(jobs.id, jobId))
-    .returning()
 
-  // 7. Return updated JobDto
-  const jobDto: JobDto = {
-    id: String(updatedJob.id),
-    status: updatedJob.status as JobStatus,
-    version: updatedJob.version,
-    category: updatedJob.category,
-    description: updatedJob.description,
-    timeframe: updatedJob.timeframe,
-    cityArea: updatedJob.cityArea,
-    clientId: updatedJob.clientId,
-    providerId: updatedJob.providerId,
-    createdAt: updatedJob.createdAt.toISOString(),
-    updatedAt: updatedJob.updatedAt.toISOString(),
-  }
+  // 7. Return updated JobDto (JOIN to resolve category/location names)
+  const [updatedRow] = await buildJobQuery().where(eq(jobs.id, jobId)).limit(1)
 
-  return NextResponse.json({ data: jobDto } as ApiSuccessResponse<JobDto>)
+  return NextResponse.json({ data: rowToJobDto(updatedRow) } as ApiSuccessResponse<JobDto>)
 }

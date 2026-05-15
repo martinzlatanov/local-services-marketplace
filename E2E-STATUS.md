@@ -1,4 +1,4 @@
-# E2E Test Execution Status — 2026-05-08
+# E2E Test Execution Status — 2026-05-15
 
 ## Summary
 
@@ -101,3 +101,23 @@ vercel --prod
 
 **Total Time:** ~70 minutes
 **Status:** Ready to execute
+
+---
+
+## Schema Changes (2026-05-15)
+
+The following changes were made to align with capstone requirements:
+
+### Foreign Key Constraints Added
+- `jobs.client_id` → `users.id` (column type changed from `varchar(320)` to `integer`)
+- `jobs.provider_id` → `users.id` (column type changed from `varchar(320)` to `integer`)
+- `reviews.job_id` → `jobs.id`
+- `reviews.reviewer_id` → `users.id`
+- `reviews.reviewee_id` → `users.id`
+
+Migration file: `apps/web/drizzle/0003_add_foreign_keys.sql`
+
+**Action required before E2E testing:** Run migration `0003_add_foreign_keys.sql` against the production Neon DB after applying existing data (if any) or on a fresh database.
+
+### Security Fix
+- `PATCH /api/jobs/[id]` now enforces `PROVIDER` role — previously any authenticated user could drive job state transitions through this route.

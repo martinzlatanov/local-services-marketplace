@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { JobDto, CITY_AREAS, Role } from '@/lib/types'
-import { JOB_CATEGORIES } from '@/lib/db/categories'
+import { JobDto, CITY_AREAS, Role, JOB_CATEGORIES } from '@/lib/types'
 import JobCard from '@/components/dashboard/JobCard'
 import { Loader2 } from 'lucide-react'
 
@@ -50,7 +49,7 @@ export default function BrowsePage() {
     )
   }
 
-  if (user?.role !== Role.PROVIDER) {
+  if (!user?.roles.includes(Role.PROVIDER)) {
     return (
       <div className="min-h-screen bg-surface-50 flex items-center justify-center">
         <div className="text-center">
