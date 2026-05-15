@@ -35,4 +35,4 @@ npm-debug.log*
 apps/mobile/tsconfig.json.*
 
 # Placeholder directories
-apps/web/app/dashboard/provider/[id]/
+apps/web/app/dashboard/provider/
