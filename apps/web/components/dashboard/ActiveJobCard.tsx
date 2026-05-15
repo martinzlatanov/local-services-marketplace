@@ -211,7 +211,7 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
                     {/* Photo */}
                     {review.photoUrl && (
                       <button
-                        onClick={() => window.open(review.photoUrl, '_blank')}
+                        onClick={() => window.open(review.photoUrl ?? undefined, '_blank')}
                         className="h-16 w-16 rounded-[var(--radius-input)] overflow-hidden border border-surface-300 hover:border-brand-400 transition-colors cursor-pointer"
                       >
                         <img
