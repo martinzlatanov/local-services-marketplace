@@ -195,12 +195,26 @@ Plans:
 **Goal**: Surface who is involved in each job — providers see client info on job details, clients see provider info on job details — and give providers a public profile page showing all their approved reviews, an avatar, and profile metadata.
 **Depends on**: Phase 12
 **Requirements**: IDENTITY-01, IDENTITY-02, IDENTITY-03, IDENTITY-04, IDENTITY-05
-**Status**: Ready to plan
+**Status**: ✅ COMPLETE
+**Plans**: 4 plans
+
+**Success Criteria** (what must be TRUE):
+  1. ✅ Web job detail (client view) shows provider email and name when a job has `providerId` set
+  2. ✅ Mobile job detail (provider view) shows client email and name for every job
+  3. ✅ `GET /api/users/[id]` returns `{ id, email, name, avatarUrl, role, createdAt }` — no password hash
+  4. ✅ Provider profile page at `/providers/[id]` renders: avatar initials circle, email/name, member-since date, average star rating, and list of approved reviews with photos
+  5. ✅ `users` table has nullable `name` varchar(100) and `avatarUrl` text columns — migration applied without breaking existing rows
+
+### Phase 14: Advanced Admin Dashboard
+**Goal**: Admins can manage users (suspend/activate, change roles) in a dedicated admin-only dashboard. A single user can hold multiple roles (CLIENT, PROVIDER, ADMIN) simultaneously. Suspended users cannot log in but their data (jobs, reviews) persists.
+**Depends on**: Phase 13
+**Requirements**: ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04
+**Status**: Ready to spec
 **Plans**: TBD
 
 **Success Criteria** (what must be TRUE):
-  1. Web job detail (client view) shows provider email and name when a job has `providerId` set
-  2. Mobile job detail (provider view) shows client email and name for every job
-  3. `GET /api/users/[id]` returns `{ id, email, name, avatarUrl, role, createdAt }` — no password hash
-  4. Provider profile page at `/providers/[id]` renders: avatar initials circle, email/name, member-since date, average star rating, and list of approved reviews with photos
-  5. `users` table has nullable `name` varchar(100) and `avatarUrl` text columns — migration applied without breaking existing rows
+  1. Admins can list all users (email, role, status) with search and pagination
+  2. Admins can suspend/activate users; suspended users cannot log in but data persists
+  3. Admins can add/remove CLIENT or PROVIDER roles from any user; users can hold multiple roles
+  4. Users with ADMIN role can also be CLIENT or PROVIDER simultaneously
+  5. `/admin/dashboard` page is accessible only to users with ADMIN role; redirects non-admins to unauthorized page
