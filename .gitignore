@@ -26,3 +26,11 @@ npm-debug.log*
 .idea/
 .vercel
 .env*.local
+
+# Kilo agent worktrees
+.claude/
+.planning/
+
+# Mobile app
+apps/mobile/
+apps/web/app/dashboard/provider/
