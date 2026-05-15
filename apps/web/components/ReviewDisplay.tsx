@@ -231,9 +231,10 @@ export default function ReviewDisplay({
 
   // Set up WebSocket listener for real-time review approval notifications
   useEffect(() => {
-    // Initialize WebSocket connection
-    initWebSocket().catch((err) => {
-      console.warn('WebSocket initialization failed, updates will not be real-time:', err)
+    // Initialize WebSocket connection (fails gracefully in development without server)
+    initWebSocket().catch(() => {
+      // WebSocket connection failed - app will work without real-time updates
+      // This is expected in development when no WebSocket server is running
     })
 
     // Subscribe to review_approved events

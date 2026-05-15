@@ -22,7 +22,7 @@ export default function ProvidersPage() {
   // Filters
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedLocation, setSelectedLocation] = useState<string>('')
-  const [selectedRating, setSelectedRating] = useState<number>(0)
+  const [selectedRating, setSelectedRating] = useState<string>('0')
   const [sortBy, setSortBy] = useState<'rating' | 'name' | 'newest'>('rating')
 
   useEffect(() => {
@@ -46,9 +46,15 @@ export default function ProvidersPage() {
         const usersData = await usersRes.json()
         const reviewsData = reviewsRes.ok ? await reviewsRes.json() : { data: { reviews: [] } }
 
+        console.log('Reviews API response:', { status: reviewsRes.status, ok: reviewsRes.ok, reviewsData })
+
+        // Extract reviews from API response - handle both structures
+        const allReviews = (reviewsData.data?.reviews || reviewsData.data || []) as ReviewDTO[]
+        console.log('Extracted reviews:', allReviews, 'Count:', allReviews.length)
+
         // Calculate ratings for each provider
         const providersWithRatings = (usersData.data || []).map((provider: PublicUserDto) => {
-          const providerReviews = (reviewsData.data?.reviews || []).filter(
+          const providerReviews = allReviews.filter(
             (r: ReviewDTO) => r.revieweeId === parseInt(provider.id, 10) && r.reviewType === 'client'
           )
 
@@ -66,7 +72,7 @@ export default function ProvidersPage() {
         })
 
         setProviders(providersWithRatings)
-        setReviews(reviewsData.data?.reviews || [])
+        setReviews(allReviews)
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
           setError("Couldn't load providers. Please try again.")
@@ -95,8 +101,9 @@ export default function ProvidersPage() {
     }
 
     // Filter by rating
-    if (selectedRating > 0) {
-      filtered = filtered.filter((p) => (p.averageRating ?? 0) >= selectedRating)
+    const ratingThreshold = parseFloat(selectedRating)
+    if (ratingThreshold > 0) {
+      filtered = filtered.filter((p) => (p.averageRating ?? 0) >= ratingThreshold)
     }
 
     // Sort
@@ -162,14 +169,14 @@ export default function ProvidersPage() {
           <div className="relative">
             <select
               value={selectedRating}
-              onChange={(e) => setSelectedRating(Number(e.target.value))}
+              onChange={(e) => setSelectedRating(e.target.value)}
               className="w-full px-4 py-2 border border-surface-200 rounded-[var(--radius-input)] text-[14px] appearance-none focus:outline-none focus:border-accent-500 focus:ring-1 focus:ring-accent-500 bg-surface-0"
             >
-              <option value={0}>All Ratings</option>
-              <option value={4}>4+ stars</option>
-              <option value={3}>3+ stars</option>
-              <option value={2}>2+ stars</option>
-              <option value={1}>1+ stars</option>
+              <option value="0">All Ratings</option>
+              <option value="4">4+ stars</option>
+              <option value="3">3+ stars</option>
+              <option value="2">2+ stars</option>
+              <option value="1">1+ stars</option>
             </select>
             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-surface-400 pointer-events-none" />
           </div>

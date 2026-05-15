@@ -435,15 +435,7 @@ export async function GET(req: Request) {
 
     const averageRatings = computeAverages(profileReviews)
 
-    // Fetch job details for each review
-    const jobIds = profileReviews.map(r => r.jobId)
-    const jobsData = jobIds.length > 0
-      ? await db.select().from(jobs).where(jobs.id.inArray ? jobs.id.inArray(jobIds) : undefined as any)
-      : []
-    const jobMap = new Map(jobsData.map(j => [j.id, j]))
-
     const reviewDtos = profileReviews.map((r) => {
-      const job = jobMap.get(r.jobId)
       return {
         id: r.id,
         jobId: r.jobId,
@@ -461,12 +453,6 @@ export async function GET(req: Request) {
         approvedAt: r.approvedAt ? r.approvedAt.toISOString() : null,
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
-        job: job ? {
-          id: job.id,
-          category: job.category,
-          description: job.description,
-          cityArea: job.cityArea,
-        } : undefined,
       }
     })
 
@@ -476,6 +462,37 @@ export async function GET(req: Request) {
         averageRatings,
       },
     })
+  }
+
+  // Pattern 3: ?approved=true (get all approved reviews for public listing)
+  if (approved === 'true' && !jobId && !userId) {
+    const allApprovedReviews = await db
+      .select()
+      .from(reviews)
+      .where(isNotNull(reviews.approvedAt))
+
+    const reviewDtos = allApprovedReviews.map((r) => ({
+      id: r.id,
+      jobId: r.jobId,
+      reviewerId: r.reviewerId,
+      revieweeId: r.revieweeId,
+      reviewType: r.reviewType as 'client' | 'provider',
+      clientCommunication: r.clientCommunication || undefined,
+      clientQuality: r.clientQuality || undefined,
+      clientPunctuality: r.clientPunctuality || undefined,
+      providerPaymentReliability: r.providerPaymentReliability || undefined,
+      providerCommunicationClarity: r.providerCommunicationClarity || undefined,
+      providerProfessionalism: r.providerProfessionalism || undefined,
+      text: r.text,
+      photoUrl: r.photoUrl,
+      approvedAt: r.approvedAt ? r.approvedAt.toISOString() : null,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+    }))
+
+    return NextResponse.json({
+      data: { reviews: reviewDtos }
+    } as ApiSuccessResponse<{ reviews: ReviewDTO[] }>)
   }
 
   return NextResponse.json(

@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const token = signJwt({ sub: existing.id, email: existing.email })
     const response: AuthRegisterResponse = { user: existing }
     const res = NextResponse.json({ ...response, token }, { status: 201 })
-    res.cookies.set('token', token, { httpOnly: true, sameSite: 'none', secure: false })
+    res.cookies.set('token', token, { httpOnly: true, sameSite: 'lax' })
     return res
   } catch (e: any) {
     if (e?.code !== '23505') console.error('[register] createUser failed:', e)

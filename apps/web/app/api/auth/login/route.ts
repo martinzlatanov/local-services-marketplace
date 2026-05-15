@@ -20,6 +20,6 @@ export async function POST(req: Request) {
   const authUserDto = await toAuthUserDto(user)
   // Set httpOnly cookie via NextResponse
   const res = NextResponse.json({ user: authUserDto, token })
-  res.cookies.set('token', token, { httpOnly: true, sameSite: 'none', secure: false })
+  res.cookies.set('token', token, { httpOnly: true, sameSite: 'lax' })
   return res
 }

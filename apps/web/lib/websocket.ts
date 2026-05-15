@@ -49,9 +49,8 @@ class WebSocketClient {
           }
         }
 
-        this.ws.onerror = (error: Event) => {
-          console.error('WebSocket error:', error)
-          reject(error)
+        this.ws.onerror = () => {
+          reject(new Error('WebSocket connection failed'))
         }
 
         this.ws.onclose = () => {
@@ -84,17 +83,15 @@ class WebSocketClient {
 
   private attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('WebSocket: Max reconnection attempts reached')
       return
     }
 
     this.reconnectAttempts++
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1)
-    console.log(`WebSocket: Attempting reconnection in ${delay}ms (attempt ${this.reconnectAttempts})`)
 
     setTimeout(() => {
-      this.connect().catch((err) => {
-        console.error('WebSocket reconnection failed:', err)
+      this.connect().catch(() => {
+        // Reconnection failed - will retry or eventually give up
       })
     }, delay)
   }
@@ -165,8 +162,8 @@ export async function initWebSocket(): Promise<void> {
     try {
       await client.connect()
     } catch (err) {
-      console.error('Failed to initialize WebSocket:', err)
-      // Graceful degradation - continue without WebSocket
+      // WebSocket connection failed - expected in development without WebSocket server
+      // App continues without real-time updates (graceful degradation)
     }
   }
 }
