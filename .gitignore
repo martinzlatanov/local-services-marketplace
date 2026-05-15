@@ -33,3 +33,6 @@ npm-debug.log*
 
 # Mobile app temp files
 apps/mobile/tsconfig.json.*
+
+# Placeholder directories
+apps/web/app/dashboard/provider/[id]/
