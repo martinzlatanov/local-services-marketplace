@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { AdminUserDto, Role } from '@/lib/types'
 import UserCard from '@/components/admin/UserCard'
 import FilterPanel from '@/components/admin/FilterPanel'
@@ -132,6 +133,22 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-surface-50 p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Admin tabs */}
+        <div className="mb-6 border-b border-surface-200 flex gap-1">
+          <Link
+            href="/admin/dashboard"
+            className="px-4 py-2 text-sm font-medium text-brand-700 border-b-2 border-brand-600 -mb-px"
+          >
+            User Management
+          </Link>
+          <Link
+            href="/admin/reviews"
+            className="px-4 py-2 text-sm font-medium text-surface-600 hover:text-surface-900 border-b-2 border-transparent hover:border-surface-300 -mb-px transition-colors"
+          >
+            Review Moderation
+          </Link>
+        </div>
+
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-surface-900">User Management</h1>

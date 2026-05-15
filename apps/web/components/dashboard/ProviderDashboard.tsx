@@ -187,7 +187,7 @@ export default function ProviderDashboard() {
 
       {/* Find Jobs tab */}
       {activeTab === 'feed' && (
-        <div className="grid lg:grid-cols-[2fr_3fr] gap-0 border border-surface-200 rounded-[var(--radius-card)] overflow-hidden">
+        <div className="grid lg:grid-cols-[280px_1fr] gap-0 border border-surface-200 rounded-[var(--radius-card)] overflow-hidden">
           {/* Left: filters */}
           <div className="border-r border-surface-200 p-6">
             <p className="text-[11px] font-bold tracking-[0.06em] text-surface-400 mb-5">01 / Filters</p>
