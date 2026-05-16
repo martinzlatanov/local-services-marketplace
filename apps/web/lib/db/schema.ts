@@ -34,6 +34,8 @@ export const jobCategories = pgTable("job_categories", {
 export const locations = pgTable("locations", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 100 }).notNull().unique(),
+  city: varchar("city", { length: 100 }),
+  country: varchar("country", { length: 100 }),
 })
 
 // Rating category enums for reviews
