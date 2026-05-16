@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { JOB_CATEGORIES, CITY_AREAS, CreateJobRequest, JobDto, JobCategory } from '@/lib/types'
+import { useState, useEffect } from 'react'
+import { CreateJobRequest, JobDto } from '@/lib/types'
 import { Plus, Loader2 } from 'lucide-react'
 
 interface JobPostingFormProps {
@@ -10,13 +10,32 @@ interface JobPostingFormProps {
 
 export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
   const [formData, setFormData] = useState<CreateJobRequest>({
-    category: JOB_CATEGORIES[0],
+    category: '',
     description: '',
     timeframe: '',
-    cityArea: CITY_AREAS[0],
+    cityArea: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [areas, setAreas] = useState<string[]>([])
+  const [categories, setCategories] = useState<string[]>([])
+
+  useEffect(() => {
+    fetch('/api/locations').then(r => r.json()).then(d => {
+      if (d.data?.length) {
+        const names = d.data.map((l: { name: string }) => l.name)
+        setAreas(names)
+        setFormData(prev => prev.cityArea ? prev : { ...prev, cityArea: names[0] })
+      }
+    }).catch(() => {})
+    fetch('/api/categories').then(r => r.json()).then(d => {
+      if (d.data?.length) {
+        const names = d.data.map((c: { name: string }) => c.name)
+        setCategories(names)
+        setFormData(prev => prev.category ? prev : { ...prev, category: names[0] })
+      }
+    }).catch(() => {})
+  }, [])
 
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement>
@@ -43,10 +62,10 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
       if (res.ok) {
         setMessage({ type: 'success', text: 'Job posted successfully' })
         setFormData({
-          category: JOB_CATEGORIES[0],
+          category: categories[0] ?? '',
           description: '',
           timeframe: '',
-          cityArea: CITY_AREAS[0],
+          cityArea: areas[0] ?? '',
         })
         if (onSuccess && data.data) {
           onSuccess(data.data)
@@ -93,7 +112,7 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
           className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           required
         >
-          {JOB_CATEGORIES.map((cat: JobCategory) => (
+          {categories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>
@@ -145,7 +164,7 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
           className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           required
         >
-          {CITY_AREAS.map((area) => (
+          {areas.map((area) => (
             <option key={area} value={area}>
               {area}
             </option>

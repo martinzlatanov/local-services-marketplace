@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { JobDto, CITY_AREAS, Role, JOB_CATEGORIES } from '@/lib/types'
+import { JobDto, Role } from '@/lib/types'
 import JobCard from '@/components/dashboard/JobCard'
 import { Loader2 } from 'lucide-react'
 
@@ -14,6 +14,8 @@ export default function BrowsePage() {
   const [selectedArea, setSelectedArea] = useState<string>('All')
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [isLoadingJobs, setIsLoadingJobs] = useState(false)
+  const [areas, setAreas] = useState<string[]>([])
+  const [categories, setCategories] = useState<string[]>([])
 
   const fetchJobs = useCallback(async () => {
     setIsLoadingJobs(true)
@@ -37,6 +39,17 @@ export default function BrowsePage() {
   useEffect(() => {
     if (!isLoading && user) fetchJobs()
   }, [fetchJobs, isLoading, user])
+
+  useEffect(() => {
+    fetch('/api/locations')
+      .then(r => r.json())
+      .then(d => { if (d.data) setAreas(d.data.map((l: { name: string }) => l.name)) })
+      .catch(e => console.error('Failed to load locations', e))
+    fetch('/api/categories')
+      .then(r => r.json())
+      .then(d => { if (d.data) setCategories(d.data.map((c: { name: string }) => c.name)) })
+      .catch(e => console.error('Failed to load categories', e))
+  }, [])
 
   if (isLoading) {
     return (
@@ -85,7 +98,7 @@ export default function BrowsePage() {
                 <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-500">Location</p>
               </div>
               <div className="py-1">
-                {['All', ...CITY_AREAS].map((area) => (
+                {['All', ...areas].map((area) => (
                   <button
                     key={area}
                     onClick={() => setSelectedArea(area)}
@@ -103,7 +116,7 @@ export default function BrowsePage() {
                 <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-500">Category</p>
               </div>
               <div className="py-1">
-                {['All', ...JOB_CATEGORIES].map((cat) => (
+                {['All', ...categories].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}

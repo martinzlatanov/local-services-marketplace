@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { JobDto, JobStatus, CITY_AREAS, ReviewDTO, JOB_CATEGORIES } from '@/lib/types'
+import { JobDto, JobStatus, ReviewDTO } from '@/lib/types'
 import ProviderJobFeed from './ProviderJobFeed'
 import ActiveJobCard from './ActiveJobCard'
 import ReviewDisplay from '../ReviewDisplay'
@@ -18,6 +18,8 @@ export default function ProviderDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>('feed')
   const [selectedArea, setSelectedArea] = useState<string>('All')
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
+  const [areas, setAreas] = useState<string[]>([])
+  const [categories, setCategories] = useState<string[]>([])
   const [pendingJobs, setPendingJobs] = useState<JobDto[]>([])
   const [activeJobs, setActiveJobs] = useState<JobDto[]>([])
   const [completedJobs, setCompletedJobs] = useState<JobDto[]>([])
@@ -91,6 +93,11 @@ export default function ProviderDashboard() {
       fetchReceivedReviews()
     }
   }, [activeTab, userId, fetchReceivedReviews])
+
+  useEffect(() => {
+    fetch('/api/locations').then(r => r.json()).then(d => { if (d.data) setAreas(d.data.map((l: { name: string }) => l.name)) }).catch(() => {})
+    fetch('/api/categories').then(r => r.json()).then(d => { if (d.data) setCategories(d.data.map((c: { name: string }) => c.name)) }).catch(() => {})
+  }, [])
 
   const handleAccept = async (jobId: string, version: number) => {
     const res = await fetch(`/api/jobs/${jobId}/accept`, {
@@ -194,7 +201,7 @@ export default function ProviderDashboard() {
             <div className="mb-6">
               <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-500 mb-3">Location</p>
               <div className="flex flex-col gap-1">
-                {['All', ...CITY_AREAS].map((area) => (
+                {['All', ...areas].map((area) => (
                   <button
                     key={area}
                     onClick={() => setSelectedArea(area)}
@@ -212,7 +219,7 @@ export default function ProviderDashboard() {
             <div>
               <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-500 mb-3">Category</p>
               <div className="flex flex-col gap-1">
-                {['All', ...JOB_CATEGORIES].map((cat) => (
+                {['All', ...categories].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
