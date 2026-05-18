@@ -148,46 +148,25 @@ export default function ProviderDashboard() {
         <p className="text-[14px] text-surface-500 mt-1">Browse available jobs and manage your active work.</p>
       </div>
 
-      {/* Stats strip */}
-      <div className="border border-surface-200 rounded-[var(--radius-card)] overflow-hidden mb-8">
-        <div className="grid grid-cols-4">
-          {([
-            { label: 'Available', value: pendingJobs.length },
-            { label: 'Active',    value: activeJobs.length },
-            { label: 'Completed', value: completedJobs.length },
-            { label: 'Reviews',   value: receivedReviews.length },
-          ] as const).map((stat, i) => (
-            <div key={stat.label} className={`px-6 py-5 ${i < 3 ? 'border-r border-surface-200' : ''}`}>
-              <p className="text-[28px] font-extrabold tracking-[-1px] text-surface-900 font-mono">{stat.value}</p>
-              <p className="text-[12px] text-surface-500 mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Underline tab bar */}
-      <div className="flex border-b border-surface-200 mb-6 gap-0">
+      {/* Stats / Tab bar */}
+      <div className="flex flex-wrap gap-3 mb-8">
         {([
-          { key: 'feed',      label: 'Find Jobs',      count: pendingJobs.length },
-          { key: 'active',    label: 'Active Jobs',    count: activeJobs.length },
-          { key: 'completed', label: 'Completed',      count: completedJobs.length },
-          { key: 'reviews',   label: 'Reviews',        count: receivedReviews.length },
+          { key: 'feed',      label: 'Available', value: pendingJobs.length,     border: 'border-[#2a9d8f]', text: 'text-[#2a9d8f]', activeBg: 'bg-[#2a9d8f]', hover: 'hover:bg-[#2a9d8f]/8' },
+          { key: 'active',    label: 'Active',    value: activeJobs.length,      border: 'border-[#e9a800]', text: 'text-[#e9a800]', activeBg: 'bg-[#e9a800]', hover: 'hover:bg-[#e9a800]/8' },
+          { key: 'completed', label: 'Completed', value: completedJobs.length,   border: 'border-[#3a7d44]', text: 'text-[#3a7d44]', activeBg: 'bg-[#3a7d44]', hover: 'hover:bg-[#3a7d44]/8' },
+          { key: 'reviews',   label: 'Reviews',   value: receivedReviews.length, border: 'border-[#6b46c1]', text: 'text-[#6b46c1]', activeBg: 'bg-[#6b46c1]', hover: 'hover:bg-[#6b46c1]/8' },
         ] as const).map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px transition-colors ${
+            className={`inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border-[2.5px] transition-all duration-150 active:scale-95 ${
               activeTab === tab.key
-                ? 'border-surface-900 text-surface-900'
-                : 'border-transparent text-surface-500 hover:text-surface-700'
+                ? `${tab.activeBg} border-transparent text-white shadow-sm`
+                : `${tab.border} ${tab.text} ${tab.hover} bg-transparent`
             }`}
           >
-            {tab.label}
-            {tab.count > 0 && (
-              <span className="ml-1.5 text-[11px] bg-surface-100 text-surface-600 px-1.5 py-0.5 rounded-full">
-                {tab.count}
-              </span>
-            )}
+            <span className="text-[22px] font-extrabold tracking-[-1px] font-mono leading-none">{tab.value}</span>
+            <span className="text-[13px] font-semibold">{tab.label}</span>
           </button>
         ))}
       </div>

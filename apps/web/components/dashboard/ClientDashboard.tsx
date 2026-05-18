@@ -98,21 +98,24 @@ export default function ClientDashboard({ jobs, onJobPosted, onJobUpdate, userId
           </div>
 
           {/* Tab bar */}
-          <div className="flex border-b border-surface-200 mb-4 gap-0">
-            {(['jobs', 'reviews'] as const).map((tab) => (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {([
+              { key: 'jobs',    label: 'Jobs',    count: jobs.length,                border: 'border-[#e9a800]', text: 'text-[#e9a800]', activeBg: 'bg-[#e9a800]' },
+              { key: 'reviews', label: 'Reviews', count: receivedReviews.length,     border: 'border-[#6b46c1]', text: 'text-[#6b46c1]', activeBg: 'bg-[#6b46c1]' },
+            ] as const).map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px transition-colors ${
-                  activeTab === tab
-                    ? 'border-surface-900 text-surface-900'
-                    : 'border-transparent text-surface-500 hover:text-surface-700'
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border-[2.5px] text-[13px] font-semibold transition-all duration-150 active:scale-95 ${
+                  activeTab === tab.key
+                    ? `${tab.activeBg} border-transparent text-white shadow-sm`
+                    : `${tab.border} ${tab.text} bg-transparent hover:brightness-110`
                 }`}
               >
-                {tab === 'jobs' ? 'Jobs' : 'Reviews'}
-                {tab === 'reviews' && receivedReviews.length > 0 && (
-                  <span className="ml-1.5 text-[11px] bg-surface-100 text-surface-600 px-1.5 py-0.5 rounded-full">
-                    {receivedReviews.length}
+                {tab.label}
+                {tab.count > 0 && (
+                  <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full ${activeTab === tab.key ? 'bg-white/25 text-white' : 'bg-current/10'}`}>
+                    {tab.count}
                   </span>
                 )}
               </button>
@@ -122,18 +125,23 @@ export default function ClientDashboard({ jobs, onJobPosted, onJobUpdate, userId
           {activeTab === 'jobs' && (
             <>
               {/* Job sub-tabs */}
-              <div className="flex gap-1 mb-4">
-                {JOB_TABS.map((tab) => (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {([
+                  { tab: 'All' as const,       border: 'border-surface-400',  text: 'text-surface-600',  activeBg: 'bg-surface-800' },
+                  { tab: 'Active' as const,    border: 'border-[#e9a800]',    text: 'text-[#e9a800]',    activeBg: 'bg-[#e9a800]'   },
+                  { tab: 'Completed' as const, border: 'border-[#3a7d44]',    text: 'text-[#3a7d44]',    activeBg: 'bg-[#3a7d44]'   },
+                ] as const).map(({ tab, border, text, activeBg }) => (
                   <button
                     key={tab}
                     onClick={() => setActiveJobTab(tab)}
-                    className={`px-3 py-1.5 text-[12px] font-medium rounded-md transition-colors ${
+                    className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border-[2.5px] text-[12px] font-semibold transition-all duration-150 active:scale-95 ${
                       activeJobTab === tab
-                        ? 'bg-surface-900 text-white'
-                        : 'bg-surface-100 text-surface-600 hover:bg-surface-200'
+                        ? `${activeBg} border-transparent text-white shadow-sm`
+                        : `${border} ${text} bg-transparent hover:brightness-110`
                     }`}
                   >
-                    {tab} <span className="opacity-60">({counts[tab]})</span>
+                    {tab}
+                    <span className={`text-[11px] font-bold ${activeJobTab === tab ? 'opacity-75' : 'opacity-60'}`}>({counts[tab]})</span>
                   </button>
                 ))}
               </div>
