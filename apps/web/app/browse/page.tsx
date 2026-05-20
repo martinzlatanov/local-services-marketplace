@@ -43,11 +43,11 @@ export default function BrowsePage() {
   useEffect(() => {
     fetch('/api/locations')
       .then(r => r.json())
-      .then(d => { if (d.data) setAreas(d.data.map((l: { name: string }) => l.name)) })
+      .then(d => { if (Array.isArray(d)) setAreas(d.map((l: { name: string }) => l.name)) })
       .catch(e => console.error('Failed to load locations', e))
     fetch('/api/categories')
       .then(r => r.json())
-      .then(d => { if (d.data) setCategories(d.data.map((c: { name: string }) => c.name)) })
+      .then(d => { if (Array.isArray(d)) setCategories(d.map((c: { name: string }) => c.name)) })
       .catch(e => console.error('Failed to load categories', e))
   }, [])
 
