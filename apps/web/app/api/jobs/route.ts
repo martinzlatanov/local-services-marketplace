@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
 
   const url = new URL(req.url)
-  const cityArea = url.searchParams.get('cityArea')
+  const location = url.searchParams.get('location')
   const category = url.searchParams.get('category')
   const browse = url.searchParams.get('browse')
   const providerId = url.searchParams.get('providerId')
@@ -26,15 +26,15 @@ export async function GET(req: Request) {
   }
 
   // browse=1 signals the provider job market feed (PENDING jobs only)
-  // cityArea/category filters also trigger browse mode for backwards compatibility
+  // location/category filters also trigger browse mode for backwards compatibility
   // Without any of these, return the authenticated user's own jobs
-  const isBrowsing = browse || cityArea || category
+  const isBrowsing = browse || location || category
 
   const filters = isBrowsing
     ? [eq(jobs.status, JobStatus.PENDING)]
     : [eq(jobs.clientId, parseInt(user.id, 10))]
 
-  if (cityArea) filters.push(eq(locations.name, cityArea))
+  if (location) filters.push(eq(locations.name, location))
   if (category) filters.push(eq(jobCategories.name, category))
 
   const jobList = await buildJobQuery().where(and(...filters))
@@ -55,38 +55,27 @@ export async function POST(req: Request) {
 
   const payload = body as CreateJobRequest
 
-  if (!payload.category || !payload.description || !payload.timeframe || !payload.cityArea) {
-    return NextResponse.json({
-      errors: {
-        category: !payload.category ? 'required' : undefined,
-        description: !payload.description ? 'required' : undefined,
-        timeframe: !payload.timeframe ? 'required' : undefined,
-        cityArea: !payload.cityArea ? 'required' : undefined,
-      }
-    }, { status: 400 })
-  }
+  const categoryId = typeof payload.categoryId === 'number' && Number.isInteger(payload.categoryId) && payload.categoryId > 0
+    ? payload.categoryId : null
+  const locationId = typeof payload.locationId === 'number' && Number.isInteger(payload.locationId) && payload.locationId > 0
+    ? payload.locationId : null
 
-  const [catRow] = await db
-    .select({ id: jobCategories.id })
-    .from(jobCategories)
-    .where(eq(jobCategories.name, payload.category))
-    .limit(1)
-  if (!catRow) {
-    return NextResponse.json({ errors: { category: 'invalid_category' } }, { status: 400 })
+  if (!categoryId) {
+    return NextResponse.json({ errors: { categoryId: 'required_positive_integer' } }, { status: 400 })
   }
-
-  const [locRow] = await db
-    .select({ id: locations.id })
-    .from(locations)
-    .where(eq(locations.name, payload.cityArea))
-    .limit(1)
-  if (!locRow) {
-    return NextResponse.json({ errors: { cityArea: 'invalid_city_area' } }, { status: 400 })
+  if (!locationId) {
+    return NextResponse.json({ errors: { locationId: 'required_positive_integer' } }, { status: 400 })
+  }
+  if (!payload.description) {
+    return NextResponse.json({ errors: { description: 'required' } }, { status: 400 })
+  }
+  if (!payload.timeframe) {
+    return NextResponse.json({ errors: { timeframe: 'required' } }, { status: 400 })
   }
 
   const [newJob] = await db.insert(jobs).values({
-    categoryId: catRow.id,
-    locationId: locRow.id,
+    categoryId: categoryId,
+    locationId: locationId,
     description: payload.description,
     timeframe: payload.timeframe,
     clientId: parseInt(user.id, 10),
@@ -94,19 +83,7 @@ export async function POST(req: Request) {
     version: 1,
   }).returning()
 
-  const jobDto: JobDto = {
-    id: String(newJob.id),
-    status: newJob.status as JobStatus,
-    version: newJob.version,
-    category: payload.category,
-    description: newJob.description,
-    timeframe: newJob.timeframe,
-    cityArea: payload.cityArea,
-    clientId: String(newJob.clientId),
-    providerId: null,
-    createdAt: newJob.createdAt.toISOString(),
-    updatedAt: newJob.updatedAt.toISOString(),
-  }
+  const [jobRow] = await buildJobQuery().where(eq(jobs.id, newJob.id)).limit(1)
 
-  return NextResponse.json({ data: jobDto } as ApiSuccessResponse<JobDto>, { status: 201 })
+  return NextResponse.json({ data: rowToJobDto(jobRow) } as ApiSuccessResponse<JobDto>, { status: 201 })
 }
