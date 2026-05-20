@@ -24,6 +24,16 @@ Extended project documentation is in [`docs/`](docs/):
 **Scope:** A multi-platform full-stack application connecting Service Providers (Mobile) with Clients (Web).
 **Core Logic:** Job posting, real-time bidding/acceptance, and lifecycle management of local tasks.
 
+## Live Deployments
+
+| App | Platform | URL |
+|-----|----------|-----|
+| Web (Next.js) | Vercel | https://web-gules-six-7paux4gsbf.vercel.app |
+| Mobile (Expo web) | Netlify | https://local-services-marketplace.netlify.app |
+| Database | Neon serverless PostgreSQL | Managed via [neon.tech](https://neon.tech) — connection string in `DATABASE_URL` env var |
+
+**Database notes:** Schema migrations live in `apps/web/drizzle/`. Always use `npx drizzle-kit migrate` to apply changes — never modify the DB directly. Seed script at `apps/web/scripts/seed.mjs` populates 13 users, 30 curated jobs, and 10,000 bulk jobs for scalability testing.
+
 ## 2. Technology Stack
 Adhere to the following stack as defined in the course curriculum:
 *   **Language:** TypeScript (Strict Mode).
