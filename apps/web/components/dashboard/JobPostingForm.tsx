@@ -1,48 +1,42 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CreateJobRequest, JobDto } from '@/lib/types'
+import { JobDto } from '@/lib/types'
 import { Plus, Loader2 } from 'lucide-react'
+
+interface LookupItem {
+  id: number
+  name: string
+}
 
 interface JobPostingFormProps {
   onSuccess?: (job: JobDto) => void
 }
 
 export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
-  const [formData, setFormData] = useState<CreateJobRequest>({
-    category: '',
-    description: '',
-    timeframe: '',
-    cityArea: '',
-  })
+  const [categoryId, setCategoryId] = useState<number>(0)
+  const [locationId, setLocationId] = useState<number>(0)
+  const [description, setDescription] = useState('')
+  const [timeframe, setTimeframe] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
-  const [areas, setAreas] = useState<string[]>([])
-  const [categories, setCategories] = useState<string[]>([])
+  const [areas, setAreas] = useState<LookupItem[]>([])
+  const [categories, setCategories] = useState<LookupItem[]>([])
 
   useEffect(() => {
     fetch('/api/locations').then(r => r.json()).then(d => {
       if (d.data?.length) {
-        const names = d.data.map((l: { name: string }) => l.name)
-        setAreas(names)
-        setFormData(prev => prev.cityArea ? prev : { ...prev, cityArea: names[0] })
+        setAreas(d.data)
+        setLocationId((prev) => prev === 0 ? d.data[0].id : prev)
       }
     }).catch(() => {})
     fetch('/api/categories').then(r => r.json()).then(d => {
       if (d.data?.length) {
-        const names = d.data.map((c: { name: string }) => c.name)
-        setCategories(names)
-        setFormData(prev => prev.category ? prev : { ...prev, category: names[0] })
+        setCategories(d.data)
+        setCategoryId((prev) => prev === 0 ? d.data[0].id : prev)
       }
     }).catch(() => {})
   }, [])
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,19 +48,17 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ categoryId, locationId, description, timeframe }),
       })
 
       const data = await res.json()
 
       if (res.ok) {
         setMessage({ type: 'success', text: 'Job posted successfully' })
-        setFormData({
-          category: categories[0] ?? '',
-          description: '',
-          timeframe: '',
-          cityArea: areas[0] ?? '',
-        })
+        setDescription('')
+        setTimeframe('')
+        if (categories.length) setCategoryId(categories[0].id)
+        if (areas.length) setLocationId(areas[0].id)
         if (onSuccess && data.data) {
           onSuccess(data.data)
         }
@@ -101,20 +93,19 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
       )}
 
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-surface-700 mb-1.5">
+        <label htmlFor="categoryId" className="block text-sm font-medium text-surface-700 mb-1.5">
           Category
         </label>
         <select
-          id="category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
+          id="categoryId"
+          value={categoryId}
+          onChange={(e) => setCategoryId(parseInt(e.target.value, 10))}
           className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           required
         >
           {categories.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
             </option>
           ))}
         </select>
@@ -127,8 +118,8 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
         <textarea
           id="description"
           name="description"
-          value={formData.description}
-          onChange={handleChange}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           rows={4}
           className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
           placeholder="Describe the job details..."
@@ -144,8 +135,8 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
           type="text"
           id="timeframe"
           name="timeframe"
-          value={formData.timeframe}
-          onChange={handleChange}
+          value={timeframe}
+          onChange={(e) => setTimeframe(e.target.value)}
           className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           placeholder="e.g., Within 3 days"
           required
@@ -153,20 +144,19 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
       </div>
 
       <div>
-        <label htmlFor="cityArea" className="block text-sm font-medium text-surface-700 mb-1.5">
+        <label htmlFor="locationId" className="block text-sm font-medium text-surface-700 mb-1.5">
           City/Area
         </label>
         <select
-          id="cityArea"
-          name="cityArea"
-          value={formData.cityArea}
-          onChange={handleChange}
+          id="locationId"
+          value={locationId}
+          onChange={(e) => setLocationId(parseInt(e.target.value, 10))}
           className="w-full border border-surface-300 bg-surface-0 text-surface-900 rounded-[var(--radius-input)] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500"
           required
         >
           {areas.map((area) => (
-            <option key={area} value={area}>
-              {area}
+            <option key={area.id} value={area.id}>
+              {area.name}
             </option>
           ))}
         </select>

@@ -14,6 +14,7 @@ export enum Role {
   ADMIN = 'ADMIN',
 }
 
+/** @deprecated — use GET /api/locations instead */
 export const CITY_AREAS = [
   'Clapham, London',
   'Hackney, London',
@@ -27,6 +28,7 @@ export const CITY_AREAS = [
   'Stoke Newington, London',
 ] as const
 
+/** @deprecated — use GET /api/categories instead */
 export const JOB_CATEGORIES = [
   'PLUMBING',
   'ELECTRICAL',
@@ -44,10 +46,10 @@ export interface JobDto {
   id: string
   status: JobStatus
   version: number
-  category: string
+  category: { id: number; name: string }
   description: string
   timeframe: string
-  cityArea: string
+  location: { id: number; name: string }
   clientId: string
   providerId: string | null
   createdAt: string
@@ -67,10 +69,10 @@ export interface ApiErrorResponse {
 
 // Job-related request shapes
 export interface CreateJobRequest {
-  category: string
+  categoryId: number
   description: string
   timeframe: string
-  cityArea: string
+  locationId: number
 }
 
 export interface AcceptJobRequest {
@@ -173,8 +175,8 @@ export interface ReviewDTO {
   updatedAt: string
   job?: {
     id: number
-    category: string
+    category: { id: number; name: string }
     description: string
-    cityArea: string
+    location: { id: number; name: string }
   }
 }

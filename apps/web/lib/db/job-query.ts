@@ -7,10 +7,12 @@ export const JOB_JOIN_SHAPE = {
   id: jobs.id,
   status: jobs.status,
   version: jobs.version,
-  category: jobCategories.name,
+  categoryId: jobCategories.id,
+  categoryName: jobCategories.name,
   description: jobs.description,
   timeframe: jobs.timeframe,
-  cityArea: locations.name,
+  locationId: locations.id,
+  locationName: locations.name,
   clientId: jobs.clientId,
   providerId: jobs.providerId,
   createdAt: jobs.createdAt,
@@ -32,10 +34,12 @@ export function rowToJobDto(row: {
   id: number
   status: string
   version: number
-  category: string
+  categoryId: number
+  categoryName: string
   description: string
   timeframe: string
-  cityArea: string
+  locationId: number
+  locationName: string
   clientId: number
   providerId: number | null
   createdAt: Date
@@ -47,10 +51,10 @@ export function rowToJobDto(row: {
     id: String(row.id),
     status: row.status as JobStatus,
     version: row.version,
-    category: row.category,
+    category: { id: row.categoryId, name: row.categoryName },
     description: row.description,
     timeframe: row.timeframe,
-    cityArea: row.cityArea,
+    location: { id: row.locationId, name: row.locationName },
     clientId: String(row.clientId),
     providerId: row.providerId != null ? String(row.providerId) : null,
     createdAt: row.createdAt.toISOString(),

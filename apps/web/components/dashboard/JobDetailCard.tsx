@@ -102,14 +102,14 @@ export default function JobDetailCard({ job, userRole }: JobDetailCardProps) {
       <div className="flex justify-between items-start gap-4 mb-4">
         <div className="flex-1">
           <h3 className="font-semibold text-lg flex items-center gap-2">
-            {job.category}
+            {job.category.name}
           </h3>
           <p className="text-sm mt-2 opacity-90">{job.description}</p>
 
           <div className="flex flex-col gap-2 mt-3 text-sm">
             <p className="flex items-center gap-2">
               <MapPin className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-              {job.cityArea}
+              {job.location.name}
             </p>
             <p className="flex items-center gap-2">
               <Clock className="h-4 w-4 flex-shrink-0" aria-hidden="true" />

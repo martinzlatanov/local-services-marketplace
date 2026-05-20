@@ -63,11 +63,11 @@ export default function ActiveJobCard({ job, onStatusAdvance }: ActiveJobCardPro
     <div className="bg-surface-0 border border-surface-200 rounded-[var(--radius-card)] p-4 hover:shadow-[var(--shadow-card-hover)] transition-shadow">
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-400 mb-0.5">{job.category}</p>
+          <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-400 mb-0.5">{job.category.name}</p>
           <p className="text-[14px] font-medium text-surface-800 truncate">{job.description}</p>
           <p className="flex items-center gap-1 text-[12px] text-surface-500 mt-1">
             <MapPin className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
-            {job.cityArea} · {job.timeframe}
+            {job.location.name} · {job.timeframe}
           </p>
           {job.clientName && (
             <p className="text-[12px] text-surface-600 font-medium mt-2">Client: {job.clientName}</p>

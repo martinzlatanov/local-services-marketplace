@@ -32,7 +32,7 @@ export default function ProviderDashboard() {
   const fetchPendingJobs = useCallback(async () => {
     const params = new URLSearchParams()
     params.append('browse', '1')
-    if (selectedArea !== 'All') params.append('cityArea', selectedArea)
+    if (selectedArea !== 'All') params.append('location', selectedArea)
     if (selectedCategory !== 'All') params.append('category', selectedCategory)
     const url = `/api/jobs?${params.toString()}`
     try {

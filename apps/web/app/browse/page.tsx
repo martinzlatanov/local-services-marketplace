@@ -21,7 +21,7 @@ export default function BrowsePage() {
     setIsLoadingJobs(true)
     const params = new URLSearchParams()
     params.append('browse', '1')
-    if (selectedArea !== 'All') params.append('cityArea', selectedArea)
+    if (selectedArea !== 'All') params.append('location', selectedArea)
     if (selectedCategory !== 'All') params.append('category', selectedCategory)
     const url = `/api/jobs?${params.toString()}`
     try {
@@ -162,10 +162,10 @@ export default function BrowsePage() {
                         className={`${i < jobs.length - 1 ? 'border-b border-surface-200' : ''} hover:bg-surface-50 transition-colors`}
                       >
                         <td className="px-4 py-4">
-                          <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-400 mb-0.5">{job.category}</p>
+                          <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-400 mb-0.5">{job.category.name}</p>
                           <p className="text-[14px] font-medium text-surface-800 truncate max-w-xs">{job.description}</p>
                         </td>
-                        <td className="px-4 py-4 text-[13px] text-surface-600">{job.cityArea}</td>
+                        <td className="px-4 py-4 text-[13px] text-surface-600">{job.location.name}</td>
                         <td className="px-4 py-4 text-[13px] text-surface-600">{job.timeframe}</td>
                         <td className="px-4 py-4 text-right">
                           <JobCard key={job.id} job={job} />
