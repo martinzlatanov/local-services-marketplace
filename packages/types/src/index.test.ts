@@ -28,10 +28,10 @@ const _job: JobDto = {
   id: 'test-id',
   status: JobStatus.PENDING,
   version: 1,
-  category: 'plumbing',
+  category: { id: 1, name: 'PLUMBING' },
   description: 'fix leak',
   timeframe: '2h',
-  cityArea: 'downtown',
+  location: { id: 1, name: 'Clapham, London' },
   clientId: 'client-1',
   providerId: null,
   createdAt: new Date().toISOString(),
@@ -42,10 +42,10 @@ const _success: ApiSuccessResponse<JobDto> = { data: _job }
 const _error: ApiErrorResponse = { errors: { email: 'required' } }
 
 const _create: CreateJobRequest = {
-  category: 'plumbing',
+  categoryId: 1,
   description: 'fix leak',
   timeframe: '2h',
-  cityArea: 'downtown',
+  locationId: 1,
 }
 
 const _accept: AcceptJobRequest = { version: 1 }
@@ -54,7 +54,7 @@ const _updateStatus: UpdateJobStatusRequest = { status: JobStatus.ACCEPTED }
 // Auth DTO checks
 const _registerReq: AuthRegisterRequest = { email: 'a@b.com', password: 'secret', role: Role.CLIENT }
 const _loginReq: AuthLoginRequest = { email: 'a@b.com', password: 'secret' }
-const _user: AuthUserDto = { id: 'u1', email: 'a@b.com', role: Role.CLIENT, createdAt: new Date().toISOString() }
+const _user: AuthUserDto = { id: 'u1', email: 'a@b.com', roles: [Role.CLIENT], status: 'active', createdAt: new Date().toISOString() }
 
 // Suppress unused variable warnings
 void _pending; void _accepted; void _inProgress; void _completed

@@ -134,7 +134,7 @@ export default function ActiveJobsScreen() {
       onPress={() => router.push(`/(app)/jobs/${item.id}`)}
     >
       <Card.Content style={styles.cardContent}>
-        <Text variant="labelLarge">{item.category}</Text>
+        <Text variant="labelLarge">{item.category.name}</Text>
         <Text variant="bodyLarge" numberOfLines={2} style={styles.description}>
           {item.description}
         </Text>

@@ -27,7 +27,7 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
 
     const inAuthGroup = segments[0] === '(auth)'
     const inAppGroup = segments[0] === '(app)'
-    const inOnboarding = segments.includes('onboarding')
+    const inOnboarding = (segments as string[]).includes('onboarding')
 
     if (!user && !inAuthGroup) {
       router.replace('/(auth)/login')

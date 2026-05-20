@@ -12,7 +12,7 @@ export default function AppLayout() {
       return
     }
 
-    const inOnboarding = segments.includes('onboarding')
+    const inOnboarding = (segments as string[]).includes('onboarding')
 
     if (!serviceArea && !inOnboarding) {
       router.replace('/(app)/onboarding')
