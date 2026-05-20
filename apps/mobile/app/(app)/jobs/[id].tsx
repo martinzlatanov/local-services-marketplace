@@ -24,6 +24,7 @@ export default function JobDetailScreen() {
   useEffect(() => {
     async function loadJob() {
       if (!token || !id) {
+        setIsLoading(false)
         return
       }
 

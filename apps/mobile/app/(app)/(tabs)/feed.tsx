@@ -75,9 +75,6 @@ export default function FeedScreen() {
   useJobsWebSocket({
     token: token ?? '',
     onJobUpdated: handleJobUpdated,
-    onReconnect: () => {
-      void fetchJobs(true)
-    },
   })
 
   const displayedJobs = useMemo(() => {
