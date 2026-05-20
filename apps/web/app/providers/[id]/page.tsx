@@ -178,7 +178,7 @@ export default function ProviderProfilePage() {
               >
                 <div className="mb-3">
                   <p className="text-[13px] font-semibold text-surface-800 truncate">
-                    {job.category}
+                    {job.category.name}
                   </p>
                   <p className="text-[12px] text-surface-500 line-clamp-2 mt-1">
                     {job.description}
@@ -187,7 +187,7 @@ export default function ProviderProfilePage() {
 
                 <div className="mb-3 pt-3 border-t border-surface-100">
                   <p className="text-[12px] text-surface-600 mb-1">
-                    <span className="font-medium">Location:</span> {job.cityArea}
+                    <span className="font-medium">Location:</span> {job.location.name}
                   </p>
                   <p className="text-[12px] text-surface-600">
                     <span className="font-medium">Timeframe:</span> {job.timeframe}

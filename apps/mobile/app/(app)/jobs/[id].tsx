@@ -138,13 +138,13 @@ export default function JobDetailScreen() {
         <>
           <ScrollView contentContainerStyle={detailStyles.content}>
             {/* Category heading */}
-            <Text style={detailStyles.heading}>{job.category}</Text>
+            <Text style={detailStyles.heading}>{job.category.name}</Text>
 
             {/* 2-column meta grid */}
             <View style={detailStyles.metaGrid}>
               <View style={detailStyles.metaCell}>
                 <Text style={detailStyles.metaLabel}>Area</Text>
-                <Text style={detailStyles.metaValue}>{job.cityArea}</Text>
+                <Text style={detailStyles.metaValue}>{job.location.name}</Text>
               </View>
               <View style={detailStyles.metaCell}>
                 <Text style={detailStyles.metaLabel}>Timeframe</Text>

@@ -105,8 +105,8 @@ function ReviewCard({ review, categoryLabels }: { review: ReviewDTO; categoryLab
             <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
                 <p className="text-xs font-bold tracking-[0.06em] uppercase text-surface-500 mb-1">Job Details</p>
-                <p className="text-sm font-medium text-surface-900">{review.job.category}</p>
-                <p className="text-xs text-surface-600 mt-1">{review.job.cityArea}</p>
+                <p className="text-sm font-medium text-surface-900">{review.job.category.name}</p>
+                <p className="text-xs text-surface-600 mt-1">{review.job.location.name}</p>
               </div>
               <div className="text-right">
                 <p className="text-lg font-semibold text-surface-900">{averageRating}</p>

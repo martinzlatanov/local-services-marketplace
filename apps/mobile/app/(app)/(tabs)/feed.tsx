@@ -79,7 +79,7 @@ export default function FeedScreen() {
 
   const displayedJobs = useMemo(() => {
     if (activeFilter === 'All') return jobs
-    return jobs.filter((j) => j.category === activeFilter)
+    return jobs.filter((j) => j.category.name === activeFilter)
   }, [jobs, activeFilter])
 
   const renderItem = ({ item, index }: { item: JobDto; index: number }) => {
@@ -92,13 +92,13 @@ export default function FeedScreen() {
       >
         <Card.Content style={styles.cardContent}>
           <View style={styles.cardHeader}>
-            <Text variant="labelSmall" style={styles.categoryLabel}>{item.category}</Text>
+            <Text variant="labelSmall" style={styles.categoryLabel}>{item.category.name}</Text>
             <View style={[styles.badge, styles[`badge_${item.status.toLowerCase()}` as keyof typeof styles] as any]}>
               <Text style={styles.badgeText}>{item.status}</Text>
             </View>
           </View>
           <Text variant="bodyMedium" numberOfLines={2} style={styles.description}>{item.description}</Text>
-          <Text variant="labelSmall" style={styles.meta}>{item.cityArea} · {item.timeframe}</Text>
+          <Text variant="labelSmall" style={styles.meta}>{item.location.name} · {item.timeframe}</Text>
         </Card.Content>
       </Card>
     )
