@@ -95,8 +95,8 @@ export default function ProviderDashboard() {
   }, [activeTab, userId, fetchReceivedReviews])
 
   useEffect(() => {
-    fetch('/api/locations').then(r => r.json()).then(d => { if (d.data) setAreas(d.data.map((l: { name: string }) => l.name)) }).catch(() => {})
-    fetch('/api/categories').then(r => r.json()).then(d => { if (d.data) setCategories(d.data.map((c: { name: string }) => c.name)) }).catch(() => {})
+    fetch('/api/locations').then(r => r.json()).then(d => { if (Array.isArray(d)) setAreas(d.map((l: { name: string }) => l.name)) }).catch(() => {})
+    fetch('/api/categories').then(r => r.json()).then(d => { if (Array.isArray(d)) setCategories(d.map((c: { name: string }) => c.name)) }).catch(() => {})
   }, [])
 
   const handleAccept = async (jobId: string, version: number) => {
