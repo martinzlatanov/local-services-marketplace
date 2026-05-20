@@ -7,7 +7,7 @@ export const TOKEN_KEY = 'auth_token'
 export const SERVICE_AREA_KEY = 'service_area'
 function getApiBase(): string {
   if (!__DEV__) {
-    return 'https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app'
+    return 'https://web-gules-six-7paux4gsbf.vercel.app'
   }
   // hostUri location differs across Expo SDK versions and manifest types.
   // Check all known locations so physical devices resolve the dev machine IP.

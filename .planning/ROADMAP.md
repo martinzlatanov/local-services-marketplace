@@ -223,8 +223,8 @@ Plans:
 **Goal**: Extract job categories and service locations from inline enums/varchars into dedicated lookup tables (`job_categories`, `locations`) with foreign keys; each migration is a standalone replayable SQL file
 **Depends on**: Phase 14
 **Requirements**: NORM-01, NORM-02, NORM-03, NORM-04, NORM-05
-**Status**: Ready to plan
-**Plans**: TBD
+**Status**: Complete ✓ (2026-05-20)
+**Plans**: 4 plans — all complete
 
 **Success Criteria** (what must be TRUE):
   1. A `job_categories` table exists with seeded rows for all 8 current category values; `jobs.category` column references it via FK
