@@ -15,26 +15,28 @@ export default function FeedScreen() {
   const [jobs, setJobs] = useState<JobDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState<string>('All')
+  const [page, setPage] = useState(0)
+  const [hasNextPage, setHasNextPage] = useState(false)
 
   const fetchJobs = useCallback(
     async (refresh = false) => {
-      if (!token) {
-        return
-      }
+      if (!token) return
 
       if (refresh) {
         setIsRefreshing(true)
       } else {
         setIsLoading(true)
       }
-
       setErrorMessage(null)
 
       try {
-        const data = await getJobs(token)
-        setJobs(data)
+        const result = await getJobs(token, 0)
+        setJobs(result.data)
+        setHasNextPage(result.hasNextPage)
+        setPage(0)
       } catch (err: any) {
         console.error('fetchJobs error:', JSON.stringify(err))
         setErrorMessage("Couldn't load jobs. Pull down to retry.")
@@ -45,6 +47,22 @@ export default function FeedScreen() {
     },
     [token]
   )
+
+  const loadMore = useCallback(async () => {
+    if (!token || !hasNextPage || isLoadingMore) return
+    setIsLoadingMore(true)
+    try {
+      const nextPage = page + 1
+      const result = await getJobs(token, nextPage)
+      setJobs(prev => [...prev, ...result.data])
+      setHasNextPage(result.hasNextPage)
+      setPage(nextPage)
+    } catch (err: any) {
+      console.error('loadMore error:', JSON.stringify(err))
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [token, hasNextPage, isLoadingMore, page])
 
   const fetchJobsRef = useRef(fetchJobs)
   fetchJobsRef.current = fetchJobs
@@ -148,6 +166,9 @@ export default function FeedScreen() {
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.3}
+          ListFooterComponent={isLoadingMore ? <ActivityIndicator size="small" color="#0f172a" style={styles.loadingMore} /> : null}
           refreshControl={
             <RefreshControl
               refreshing={isRefreshing}
@@ -188,6 +209,7 @@ const styles = StyleSheet.create({
   badge_in_progress: { backgroundColor: '#ede9fe' },
   badge_completed:   { backgroundColor: '#dcfce7' },
   badgeText: { fontSize: 11, fontWeight: '600', color: '#334155' },
+  loadingMore: { paddingVertical: 16 },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
   emptyHeading: { marginBottom: 8, fontWeight: '600', color: '#0f172a' },
   emptyBody: { color: '#64748b', textAlign: 'center' },

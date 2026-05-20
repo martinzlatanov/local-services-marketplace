@@ -9,11 +9,13 @@ async function parseResponse<T>(res: Response): Promise<T> {
   return (data as ApiSuccessResponse<T>).data
 }
 
-export async function getJobs(token: string): Promise<JobDto[]> {
-  const res = await fetch(`${API_BASE}/api/jobs?browse=1`, {
+export async function getJobs(token: string, page = 0): Promise<{ data: JobDto[]; hasNextPage: boolean }> {
+  const res = await fetch(`${API_BASE}/api/jobs?browse=1&page=${page}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
-  return parseResponse<JobDto[]>(res)
+  const body = await res.json().catch(() => null)
+  if (!res.ok) throw { status: res.status, ...body }
+  return { data: body.data ?? [], hasNextPage: body.pagination?.hasNextPage ?? false }
 }
 
 export async function getJob(token: string, id: string): Promise<JobDto> {

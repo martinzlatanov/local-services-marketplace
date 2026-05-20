@@ -8,7 +8,15 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "testMatch": ["**/__tests__/**/*.test.(ts|tsx)"],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ]
   },
   "dependencies": {
     "@local/types": "*",
@@ -29,7 +37,10 @@
     "react-native-web": "~0.21.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.10",
+    "jest": "^30.4.2",
+    "jest-expo": "^55.0.18",
     "typescript": "~5.9.2"
   }
 }

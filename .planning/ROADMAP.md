@@ -2,7 +2,7 @@
 
 ## Phase 1: Monorepo Foundation & Shared Types
 **Goal**: Establish the Turborepo structure, shared TypeScript configuration, and common data transfer objects (DTOs)
-**Status**: Complete
+**Status**: ✅ COMPLETE
 **Requirements**: INIT-01, INIT-02, INIT-03
 **Success Criteria** (what must be TRUE):
   1. `npm run typecheck` passes from the root, validating both `apps/web` and `apps/mobile`
@@ -18,6 +18,7 @@ Plans:
 **Goal**: A secure Next.js API route that issues JWTs and manages user sessions in the database
 **Depends on**: Phase 1
 **Requirements**: AUTH-01, AUTH-02, AUTH-03
+**Status**: ✅ COMPLETE
 **Success Criteria** (what must be TRUE):
   1. `POST /api/auth/register` creates a user in the database and returns a JWT
   2. `POST /api/auth/login` validates credentials and returns a JWT
@@ -33,6 +34,7 @@ Plans:
 **Goal**: Both Web and Mobile clients can log in, maintain session state, and protect private routes
 **Depends on**: Phase 2
 **Requirements**: AUTH-04, AUTH-05, AUTH-06
+**Status**: ✅ COMPLETE
 **Success Criteria** (what must be TRUE):
   1. Web client stores JWT in an `httpOnly` cookie and redirects unauthenticated users away from `/dashboard`
   2. Mobile client stores JWT in Expo SecureStore and shows the Auth screen if no token is found
@@ -50,6 +52,7 @@ Plans:
 **Goal**: Clients can post jobs, and the database enforces valid state transitions (PENDING -> ACCEPTED -> IN_PROGRESS -> COMPLETED)
 **Depends on**: Phase 3
 **Requirements**: JOB-POST-01, JOB-POST-02, JOB-POST-03, LIFECYCLE-03
+**Status**: ✅ COMPLETE
 **Success Criteria** (what must be TRUE):
   1. `POST /api/jobs` creates a job with status `PENDING` and `version: 1`
   2. `PATCH /api/jobs/:id/status` successfully transitions a job from `PENDING` to `ACCEPTED`
@@ -64,6 +67,7 @@ Plans:
 **Goal**: Providers can accept jobs safely without race conditions (Optimistic Concurrency Control)
 **Depends on**: Phase 4
 **Requirements**: ACCEPT-01, ACCEPT-02, ACCEPT-03, ACCEPT-04, ACCEPT-05
+**Status**: ✅ COMPLETE
 **Success Criteria** (what must be TRUE):
   1. If two providers try to accept the same `PENDING` job simultaneously, exactly one succeeds (HTTP 200) and one fails (HTTP 409 Conflict)
   2. The successful acceptance increments the job's `version` column in the database
@@ -77,6 +81,7 @@ Plans:
 **Goal**: Every job state transition is broadcast over WebSocket and the client dashboard reflects changes within milliseconds of the provider action
 **Depends on**: Phase 5
 **Requirements**: DASH-01, DASH-02, DASH-03, LIFECYCLE-04
+**Status**: ✅ COMPLETE
 **Success Criteria** (what must be TRUE):
   1. The backend maintains a WebSocket server; clients can connect and authenticate their socket session
   2. When a provider's acceptance transitions a job to `ACCEPTED`, the client's browser dashboard reflects the new status without a page refresh and within seconds of the provider action
@@ -92,6 +97,7 @@ Plans:
 **Goal**: Authenticated clients can post jobs from the web app and see all their jobs with live status on a dashboard
 **Depends on**: Phase 6
 **Requirements**: JOB-POST-04
+**Status**: ✅ COMPLETE
 **Success Criteria** (what must be TRUE):
   1. A logged-in client fills out and submits the job posting form (category from dropdown, description, timeframe, city/area) and sees the new job appear on their dashboard with status `PENDING`
 **Plans**: 2 plans
@@ -104,6 +110,7 @@ Plans:
 **Goal**: Providers can browse available jobs in their area and accept them with a single tap
 **Depends on**: Phase 5
 **Requirements**: DISC-01, DISC-02, DISC-03
+**Status**: ✅ COMPLETE
 **Success Criteria** (what must be TRUE):
   1. The mobile app displays a feed of `PENDING` jobs filtered by the provider's selected city/area
   2. Tapping "Accept" on a job calls the acceptance API and immediately removes the job from the available feed on success
@@ -119,7 +126,7 @@ Plans:
 **Goal**: Providers can manage the lifecycle of an accepted job (In Progress -> Completed)
 **Depends on**: Phase 8
 **Requirements**: LIFECYCLE-01, LIFECYCLE-02
-**Status**: Complete
+**Status**: ✅ COMPLETE
 **Plans**: 3 plans
 
 Plans:
@@ -223,7 +230,7 @@ Plans:
 **Goal**: Extract job categories and service locations from inline enums/varchars into dedicated lookup tables (`job_categories`, `locations`) with foreign keys; each migration is a standalone replayable SQL file
 **Depends on**: Phase 14
 **Requirements**: NORM-01, NORM-02, NORM-03, NORM-04, NORM-05
-**Status**: Complete ✓ (2026-05-20)
+**Status**: ✅ COMPLETE
 **Plans**: 4 plans — all complete
 
 **Success Criteria** (what must be TRUE):

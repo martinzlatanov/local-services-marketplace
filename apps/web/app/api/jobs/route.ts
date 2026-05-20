@@ -6,6 +6,8 @@ import { getAuthenticatedUser } from '@/lib/auth'
 import { CreateJobRequest, JobDto, ApiSuccessResponse, JobStatus, Role } from '@/lib/types'
 import { eq, and } from 'drizzle-orm'
 
+const PAGE_SIZE = 20
+
 export async function GET(req: Request) {
   const user = await getAuthenticatedUser(req)
   if (!user) return NextResponse.json({ errors: { auth: 'unauthorized' } }, { status: 401 })
@@ -16,8 +18,9 @@ export async function GET(req: Request) {
   const browse = url.searchParams.get('browse')
   const providerId = url.searchParams.get('providerId')
   const status = url.searchParams.get('status')
+  const page = Math.max(0, parseInt(url.searchParams.get('page') ?? '0', 10) || 0)
 
-  // If providerId is specified, return jobs for that provider
+  // If providerId is specified, return jobs for that provider (no pagination — scoped set)
   if (providerId) {
     const filters = [eq(jobs.providerId, parseInt(providerId, 10))]
     if (status) filters.push(eq(jobs.status, status as JobStatus))
@@ -27,19 +30,31 @@ export async function GET(req: Request) {
 
   // browse=1 signals the provider job market feed (PENDING jobs only)
   // location/category filters also trigger browse mode for backwards compatibility
-  // Without any of these, return the authenticated user's own jobs
+  // Without any of these, return the authenticated user's own jobs (no pagination — scoped set)
   const isBrowsing = browse || location || category
 
-  const filters = isBrowsing
-    ? [eq(jobs.status, JobStatus.PENDING)]
-    : [eq(jobs.clientId, parseInt(user.id, 10))]
+  if (!isBrowsing) {
+    const filters = [eq(jobs.clientId, parseInt(user.id, 10))]
+    const jobList = await buildJobQuery().where(and(...filters))
+    return NextResponse.json({ data: jobList.map(rowToJobDto) } as ApiSuccessResponse<JobDto[]>)
+  }
 
+  const filters = [eq(jobs.status, JobStatus.PENDING)]
   if (location) filters.push(eq(locations.name, location))
   if (category) filters.push(eq(jobCategories.name, category))
 
-  const jobList = await buildJobQuery().where(and(...filters))
+  const rows = await buildJobQuery()
+    .where(and(...filters))
+    .limit(PAGE_SIZE + 1)
+    .offset(page * PAGE_SIZE)
 
-  return NextResponse.json({ data: jobList.map(rowToJobDto) } as ApiSuccessResponse<JobDto[]>)
+  const hasNextPage = rows.length > PAGE_SIZE
+  const pageRows = hasNextPage ? rows.slice(0, PAGE_SIZE) : rows
+
+  return NextResponse.json({
+    data: pageRows.map(rowToJobDto),
+    pagination: { page, pageSize: PAGE_SIZE, hasNextPage },
+  })
 }
 
 export async function POST(req: Request) {

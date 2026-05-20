@@ -236,6 +236,30 @@ erDiagram
 - `GET /api/admin/reviews/pending` — Pending reviews for admin
 - `PATCH /api/admin/reviews/[id]/approve` — Approve review
 
+## Automated Tests
+
+```bash
+# Web
+cd apps/web && npm test
+
+# Mobile
+cd apps/mobile && npm test
+```
+
+| Suite | Location | Covers |
+|---|---|---|
+| Web integration | `apps/web/__tests__/` | Auth, job acceptance state machine, route tests |
+| Web unit | `apps/web/app/api/users/[id]/__tests__/` | User API route |
+| Web unit | `apps/web/components/dashboard/__tests__/` | JobCard, JobDashboard, JobDetailCard, JobPostingForm |
+| Web unit | `apps/web/app/providers/__tests__/` | Provider profile page |
+| Types unit | `packages/types/src/index.test.ts` | Shared type contracts |
+| Mobile unit | `apps/mobile/__tests__/api.jobs.test.ts` | `getJobs` — auth header, pagination, error handling |
+| Mobile unit | `apps/mobile/__tests__/job-state-machine.test.ts` | State transitions, optimistic locking |
+| Mobile unit | `apps/mobile/__tests__/feed-filter.test.ts` | Category filter, infinite scroll state |
+| Mobile unit | `apps/mobile/__tests__/auth.test.ts` | Login, logout, token rehydration |
+
+Mobile tests use `jest-expo` and test logic only — no native emulator required.
+
 ## Documentation
 
 Extended docs live in [`docs/`](docs/):

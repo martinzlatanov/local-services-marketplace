@@ -17,6 +17,13 @@
       "breakpoints": true
     },
     {
+      "idx": 2,
+      "version": "7",
+      "when": 1747267200000,
+      "tag": "0002_add_user_identity",
+      "breakpoints": true
+    },
+    {
       "idx": 3,
       "version": "7",
       "when": 1747353600000,
@@ -63,6 +70,20 @@
       "version": "7",
       "when": 1778429460000,
       "tag": "0009_drop_users_role_column",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1747516800000,
+      "tag": "0010_add_location_country_city",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1747603200000,
+      "tag": "0011_idempotent_reseed",
       "breakpoints": true
     }
   ]

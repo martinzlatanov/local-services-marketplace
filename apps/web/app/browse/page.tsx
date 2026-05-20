@@ -16,19 +16,23 @@ export default function BrowsePage() {
   const [isLoadingJobs, setIsLoadingJobs] = useState(false)
   const [areas, setAreas] = useState<string[]>([])
   const [categories, setCategories] = useState<string[]>([])
+  const [page, setPage] = useState(0)
+  const [hasNextPage, setHasNextPage] = useState(false)
 
-  const fetchJobs = useCallback(async () => {
+  const fetchJobs = useCallback(async (targetPage: number) => {
     setIsLoadingJobs(true)
     const params = new URLSearchParams()
     params.append('browse', '1')
     if (selectedArea !== 'All') params.append('location', selectedArea)
     if (selectedCategory !== 'All') params.append('category', selectedCategory)
+    params.append('page', String(targetPage))
     const url = `/api/jobs?${params.toString()}`
     try {
       const res = await fetch(url, { credentials: 'include' })
       if (res.ok) {
         const data = await res.json()
         setJobs(data.data ?? [])
+        setHasNextPage(data.pagination?.hasNextPage ?? false)
       }
     } catch {}
     finally {
@@ -37,8 +41,16 @@ export default function BrowsePage() {
   }, [selectedArea, selectedCategory])
 
   useEffect(() => {
-    if (!isLoading && user) fetchJobs()
+    if (!isLoading && user) {
+      setPage(0)
+      fetchJobs(0)
+    }
   }, [fetchJobs, isLoading, user])
+
+  const handlePageChange = (next: number) => {
+    setPage(next)
+    fetchJobs(next)
+  }
 
   useEffect(() => {
     fetch('/api/locations')
@@ -86,7 +98,7 @@ export default function BrowsePage() {
           <p className="eyebrow mb-3">Provider — Browse</p>
           <div className="flex items-end justify-between">
             <h1 className="text-[32px] font-extrabold tracking-[-1px] text-surface-900">Available Jobs</h1>
-            <p className="text-[14px] text-surface-500">{jobs.length} job{jobs.length !== 1 ? 's' : ''} found</p>
+            <p className="text-[14px] text-surface-500">{jobs.length} job{jobs.length !== 1 ? 's' : ''} found{page > 0 ? ` · page ${page + 1}` : ''}</p>
           </div>
         </div>
 
@@ -145,36 +157,57 @@ export default function BrowsePage() {
                 <p className="text-sm mt-1 text-surface-400">Try adjusting your filters or check back later.</p>
               </div>
             ) : (
-              <div className="border border-surface-200 rounded-[var(--radius-card)] overflow-hidden">
-                <table className="w-full text-[14px]">
-                  <thead>
-                    <tr className="border-b border-surface-200 bg-surface-50">
-                      <th className="text-left px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase">Job</th>
-                      <th className="text-left px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase w-32">Area</th>
-                      <th className="text-left px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase w-28">Timeframe</th>
-                      <th className="text-right px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase w-24">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {jobs.map((job, i) => (
-                      <tr
-                        key={job.id}
-                        className={`${i < jobs.length - 1 ? 'border-b border-surface-200' : ''} hover:bg-surface-50 transition-colors`}
-                      >
-                        <td className="px-4 py-4">
-                          <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-400 mb-0.5">{job.category.name}</p>
-                          <p className="text-[14px] font-medium text-surface-800 truncate max-w-xs">{job.description}</p>
-                        </td>
-                        <td className="px-4 py-4 text-[13px] text-surface-600">{job.location.name}</td>
-                        <td className="px-4 py-4 text-[13px] text-surface-600">{job.timeframe}</td>
-                        <td className="px-4 py-4 text-right">
-                          <JobCard key={job.id} job={job} />
-                        </td>
+              <>
+                <div className="border border-surface-200 rounded-[var(--radius-card)] overflow-hidden">
+                  <table className="w-full text-[14px]">
+                    <thead>
+                      <tr className="border-b border-surface-200 bg-surface-50">
+                        <th className="text-left px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase">Job</th>
+                        <th className="text-left px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase w-32">Area</th>
+                        <th className="text-left px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase w-28">Timeframe</th>
+                        <th className="text-right px-4 py-3 text-[11px] font-bold tracking-[0.06em] text-surface-500 uppercase w-24">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {jobs.map((job, i) => (
+                        <tr
+                          key={job.id}
+                          className={`${i < jobs.length - 1 ? 'border-b border-surface-200' : ''} hover:bg-surface-50 transition-colors`}
+                        >
+                          <td className="px-4 py-4">
+                            <p className="text-[11px] font-bold tracking-[0.06em] uppercase text-surface-400 mb-0.5">{job.category.name}</p>
+                            <p className="text-[14px] font-medium text-surface-800 truncate max-w-xs">{job.description}</p>
+                          </td>
+                          <td className="px-4 py-4 text-[13px] text-surface-600">{job.location.name}</td>
+                          <td className="px-4 py-4 text-[13px] text-surface-600">{job.timeframe}</td>
+                          <td className="px-4 py-4 text-right">
+                            <JobCard key={job.id} job={job} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {(page > 0 || hasNextPage) && (
+                  <div className="flex items-center justify-between mt-4">
+                    <button
+                      onClick={() => handlePageChange(page - 1)}
+                      disabled={page === 0}
+                      className="px-3 py-1.5 text-[13px] font-medium border border-surface-200 rounded-[var(--radius-btn)] text-surface-700 hover:bg-surface-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      ← Previous
+                    </button>
+                    <span className="text-[13px] text-surface-500">Page {page + 1}</span>
+                    <button
+                      onClick={() => handlePageChange(page + 1)}
+                      disabled={!hasNextPage}
+                      className="px-3 py-1.5 text-[13px] font-medium border border-surface-200 rounded-[var(--radius-btn)] text-surface-700 hover:bg-surface-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
