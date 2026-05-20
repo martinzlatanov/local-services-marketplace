@@ -160,17 +160,82 @@ for (const review of reviews) {
   console.log(`  + Review for job ${review.jobId} from client ${review.reviewerId}`)
 }
 
+// ── Bulk job generation ──────────────────────────────────────────────────────
+// Insert 10,000 synthetic COMPLETED jobs to validate pagination and scalability.
+const BULK_COUNT = 10_000
+const BATCH_SIZE = 500
+
+const categoryIds = Object.values(categoryMap)
+const locationIds = Object.values(locationMap)
+const clientIds = [james.id, sophie.id, oliver.id, emma.id, alice.id]
+const providerIds = [tom.id, linda.id, dan.id, sarah.id, michael.id, jenny.id, john.id]
+
+const bulkDescriptions = [
+  'Routine boiler service and pressure check.',
+  'Fix leaking kitchen tap and replace washers.',
+  'Install new light switch and socket outlets.',
+  'Full house spring clean including windows.',
+  'Lawn mowing and hedge trimming.',
+  'Assemble flat-pack furniture, 3 pieces.',
+  'Paint hallway and staircase walls.',
+  'Help loading and unloading a moving van.',
+  'Replace bathroom sealant and regrout tiles.',
+  'Install ceiling light fitting in living room.',
+  'Deep clean oven and kitchen appliances.',
+  'Prune fruit trees and clear fallen leaves.',
+  'Hang TV bracket and run cables behind wall.',
+  'Exterior fence painting, 15 panels.',
+  'Clear gutters and downpipes of debris.',
+  'Install door locks and security chain.',
+  'Steam clean carpets in three bedrooms.',
+  'Fix squeaky floorboards and fill gaps.',
+  'Tile bathroom floor, approximately 6 sqm.',
+  'Power wash patio and driveway.',
+]
+
+console.log(`\nGenerating ${BULK_COUNT} bulk jobs in batches of ${BATCH_SIZE}...`)
+
+let bulkInserted = 0
+while (bulkInserted < BULK_COUNT) {
+  const batchSize = Math.min(BATCH_SIZE, BULK_COUNT - bulkInserted)
+  const rows = []
+  const params = []
+  let paramIndex = 1
+
+  for (let i = 0; i < batchSize; i++) {
+    const categoryId = categoryIds[(bulkInserted + i) % categoryIds.length]
+    const locationId = locationIds[(bulkInserted + i) % locationIds.length]
+    const clientId = clientIds[(bulkInserted + i) % clientIds.length]
+    const providerId = providerIds[(bulkInserted + i) % providerIds.length]
+    const description = bulkDescriptions[(bulkInserted + i) % bulkDescriptions.length]
+
+    rows.push(`($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7})`)
+    params.push(categoryId, locationId, description, 'Completed', clientId, 'COMPLETED', providerId, 1)
+    paramIndex += 8
+  }
+
+  await client.query(
+    `INSERT INTO jobs (category_id, location_id, description, timeframe, client_id, status, provider_id, version) VALUES ${rows.join(', ')}`,
+    params
+  )
+
+  bulkInserted += batchSize
+  process.stdout.write(`\r  ${bulkInserted}/${BULK_COUNT} jobs inserted`)
+}
+
+console.log('\n')
+
 await client.end()
 console.log(`
 Seed complete!
 
 ✅ Created 13 users (5 clients, 8 providers)
-✅ Created 30 jobs with mixed statuses:
+✅ Created 30 curated jobs with mixed statuses:
    - 5 PENDING (awaiting acceptance)
    - 5 ACCEPTED (provider accepted)
    - 5 IN_PROGRESS (work in progress)
    - 15 COMPLETED (with reviews)
-
+✅ Created 10,000 bulk COMPLETED jobs for scalability testing
 ✅ Created 14 reviews with mixed ratings:
    - 5 Excellent (5 stars)
    - 5 Good (4 stars)

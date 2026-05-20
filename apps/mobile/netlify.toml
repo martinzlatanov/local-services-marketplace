@@ -1,0 +1,4 @@
+[build]
+  base    = "apps/mobile"
+  command = "npx expo export --platform web --output-dir dist"
+  publish = "apps/mobile/dist"
