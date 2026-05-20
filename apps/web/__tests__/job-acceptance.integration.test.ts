@@ -121,45 +121,45 @@ describe('Job Acceptance State Machine', () => {
     const mockJobs = [
       {
         id: 1,
-        category: 'PLUMBING',
-        cityArea: 'Clapham, London',
+        category: { id: 1, name: 'PLUMBING' },
+        location: { id: 1, name: 'Clapham, London' },
         status: JobStatus.PENDING,
       },
       {
         id: 2,
-        category: 'ELECTRICAL',
-        cityArea: 'Clapham, London',
+        category: { id: 2, name: 'ELECTRICAL' },
+        location: { id: 1, name: 'Clapham, London' },
         status: JobStatus.PENDING,
       },
       {
         id: 3,
-        category: 'PLUMBING',
-        cityArea: 'Hackney, London',
+        category: { id: 1, name: 'PLUMBING' },
+        location: { id: 2, name: 'Hackney, London' },
         status: JobStatus.PENDING,
       },
     ]
 
     it('filters by location', () => {
       const location = 'Clapham, London'
-      const filtered = mockJobs.filter((j) => j.cityArea === location)
+      const filtered = mockJobs.filter((j) => j.location.name === location)
 
       expect(filtered).toHaveLength(2)
-      expect(filtered.every((j) => j.cityArea === location)).toBe(true)
+      expect(filtered.every((j) => j.location.name === location)).toBe(true)
     })
 
     it('filters by category', () => {
       const category = 'PLUMBING'
-      const filtered = mockJobs.filter((j) => j.category === category)
+      const filtered = mockJobs.filter((j) => j.category.name === category)
 
       expect(filtered).toHaveLength(2)
-      expect(filtered.every((j) => j.category === category)).toBe(true)
+      expect(filtered.every((j) => j.category.name === category)).toBe(true)
     })
 
     it('filters by both location and category', () => {
       const location = 'Clapham, London'
       const category = 'PLUMBING'
       const filtered = mockJobs.filter(
-        (j) => j.cityArea === location && j.category === category
+        (j) => j.location.name === location && j.category.name === category
       )
 
       expect(filtered).toHaveLength(1)
@@ -168,7 +168,7 @@ describe('Job Acceptance State Machine', () => {
 
     it('returns empty when no jobs match', () => {
       const location = 'Unknown, City'
-      const filtered = mockJobs.filter((j) => j.cityArea === location)
+      const filtered = mockJobs.filter((j) => j.location.name === location)
 
       expect(filtered).toHaveLength(0)
     })
