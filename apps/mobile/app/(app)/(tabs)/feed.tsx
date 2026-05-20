@@ -1,46 +1,22 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FlatList, RefreshControl, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Appbar, Card, Text, ActivityIndicator, useTheme } from 'react-native-paper'
+import { Appbar, Card, Text, ActivityIndicator } from 'react-native-paper'
 import { JobDto, JobStatus } from '@local/types'
-import { useAuth, TOKEN_KEY } from '../../../contexts/AuthContext'
-import { storage } from '../../../lib/storage'
-import { useServiceArea } from '../../../hooks/useServiceArea'
+import { useAuth } from '../../../contexts/AuthContext'
+import { useServiceArea } from '../../../contexts/ServiceAreaContext'
 import { getJobs } from '../../../lib/api'
 import { useJobsWebSocket } from '../../../hooks/useJobsWebSocket'
 
 export default function FeedScreen() {
-  const { user } = useAuth()
+  const { token } = useAuth()
   const { serviceArea } = useServiceArea()
-  const theme = useTheme()
   const router = useRouter()
-  const [token, setToken] = useState<string | null>(null)
   const [jobs, setJobs] = useState<JobDto[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [activeFilter, setActiveFilter] = useState<string>('All')
-
-  useEffect(() => {
-    let isActive = true
-
-    async function loadToken() {
-      const stored = await storage.getItemAsync(TOKEN_KEY)
-      if (isActive) {
-        setToken(stored)
-      }
-    }
-
-    if (user) {
-      void loadToken()
-    } else {
-      setToken(null)
-    }
-
-    return () => {
-      isActive = false
-    }
-  }, [user])
 
   const fetchJobs = useCallback(
     async (refresh = false) => {
@@ -70,9 +46,12 @@ export default function FeedScreen() {
     [token]
   )
 
+  const fetchJobsRef = useRef(fetchJobs)
+  fetchJobsRef.current = fetchJobs
+
   useEffect(() => {
-    void fetchJobs()
-  }, [fetchJobs])
+    void fetchJobsRef.current()
+  }, [token])
 
   const handleJobUpdated = useCallback(
     (job: JobDto) => {
@@ -100,17 +79,6 @@ export default function FeedScreen() {
       void fetchJobs(true)
     },
   })
-
-  const refreshControl = useMemo(
-    () => (
-      <RefreshControl
-        refreshing={isRefreshing}
-        onRefresh={() => fetchJobs(true)}
-        tintColor={theme.colors.primary}
-      />
-    ),
-    [fetchJobs, isRefreshing, theme.colors.primary]
-  )
 
   const displayedJobs = useMemo(() => {
     if (activeFilter === 'All') return jobs
@@ -181,7 +149,14 @@ export default function FeedScreen() {
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={styles.listContent}
-          refreshControl={refreshControl}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={() => fetchJobs(true)}
+            />
+          }
         />
       )}
     </View>
@@ -201,7 +176,8 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   errorBanner: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fef2f2' },
   errorText: { color: '#b91c1c', fontSize: 13 },
-  listContent: { paddingHorizontal: 16, paddingVertical: 16, gap: 12 },
+  listContent: { paddingHorizontal: 16, paddingVertical: 16 },
+  separator: { height: 12 },
   card: { borderRadius: 12, backgroundColor: '#ffffff', borderWidth: 1, borderColor: '#e2e8f0' },
   cardFeatured: { borderLeftWidth: 3, borderLeftColor: '#14b8a6' },
   cardContent: { paddingVertical: 12 },

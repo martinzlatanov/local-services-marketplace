@@ -9,8 +9,14 @@ function getApiBase(): string {
   if (!__DEV__) {
     return 'https://web-f22sfm8v1-martinzlatanov-8547s-projects.vercel.app'
   }
-  // On a physical device, hostUri is "192.168.x.x:8081" — extract the host IP
-  const hostUri = Constants.expoConfig?.hostUri
+  // hostUri location differs across Expo SDK versions and manifest types.
+  // Check all known locations so physical devices resolve the dev machine IP.
+  const hostUri: string | undefined =
+    Constants.expoConfig?.hostUri ??
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (Constants as any).manifest2?.extra?.expoClient?.hostUri ??
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (Constants as any).manifest?.debuggerHost
   if (hostUri) {
     const host = hostUri.split(':')[0]
     return `http://${host}:3000`
@@ -22,6 +28,7 @@ export const API_BASE = getApiBase()
 
 interface AuthContextValue {
   user: AuthUserDto | null
+  token: string | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -32,22 +39,24 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUserDto | null>(null)
+  const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function rehydrate() {
       try {
-        const token = await storage.getItemAsync(TOKEN_KEY)
-        if (!token) {
+        const stored = await storage.getItemAsync(TOKEN_KEY)
+        if (!stored) {
           return
         }
 
         const res = await fetch(`${API_BASE}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${stored}` },
         })
 
         if (res.ok) {
           const data = (await res.json()) as { user: AuthUserDto }
+          setToken(stored)
           setUser(data.user)
         } else {
           await storage.deleteItemAsync(TOKEN_KEY)
@@ -77,21 +86,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const data = (await res.json()) as { user: AuthUserDto; token: string }
     await storage.setItemAsync(TOKEN_KEY, data.token)
+    setToken(data.token)
     setUser(data.user)
   }
 
   async function logout(): Promise<void> {
     await storage.deleteItemAsync(TOKEN_KEY)
+    setToken(null)
     setUser(null)
   }
 
-  async function setTokenAndUser(token: string, nextUser: AuthUserDto): Promise<void> {
-    await storage.setItemAsync(TOKEN_KEY, token)
+  async function setTokenAndUser(nextToken: string, nextUser: AuthUserDto): Promise<void> {
+    await storage.setItemAsync(TOKEN_KEY, nextToken)
+    setToken(nextToken)
     setUser(nextUser)
   }
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout, setTokenAndUser }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, logout, setTokenAndUser }}>
       {children}
     </AuthContext.Provider>
   )

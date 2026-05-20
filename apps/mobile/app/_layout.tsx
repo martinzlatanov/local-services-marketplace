@@ -3,7 +3,7 @@ import { Stack, useRouter, useSegments } from 'expo-router'
 import { MD3LightTheme, PaperProvider } from 'react-native-paper'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
-import { useServiceArea } from '../hooks/useServiceArea'
+import { ServiceAreaProvider, useServiceArea } from '../contexts/ServiceAreaContext'
 
 const appTheme: typeof MD3LightTheme = {
   ...MD3LightTheme,
@@ -57,9 +57,11 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PaperProvider theme={appTheme}>
         <AuthProvider>
-          <NavigationGuard>
-            <Stack screenOptions={{ headerShown: false }} />
-          </NavigationGuard>
+          <ServiceAreaProvider>
+            <NavigationGuard>
+              <Stack screenOptions={{ headerShown: false }} />
+            </NavigationGuard>
+          </ServiceAreaProvider>
         </AuthProvider>
       </PaperProvider>
     </SafeAreaProvider>

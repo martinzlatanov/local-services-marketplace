@@ -1,16 +1,14 @@
 import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { useRouter } from 'expo-router'
 import { Button, HelperText, RadioButton, Text } from 'react-native-paper'
 import { CITY_AREAS } from '@local/types'
-import { useServiceArea } from '../../hooks/useServiceArea'
+import { useServiceArea } from '../../contexts/ServiceAreaContext'
 
 export default function OnboardingScreen() {
   const { saveServiceArea } = useServiceArea()
   const [selected, setSelected] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   const canSave = Boolean(selected) && !isSaving
 
@@ -24,7 +22,9 @@ export default function OnboardingScreen() {
 
     try {
       await saveServiceArea(selected)
-      router.replace('/(app)/(tabs)/feed')
+      // Navigation is handled by NavigationGuard in _layout.tsx once
+      // serviceArea state updates — avoids a race where router.replace fires
+      // before the context state has propagated, causing a redirect loop.
     } catch {
       setError("Couldn't save your area. Please try again.")
     } finally {

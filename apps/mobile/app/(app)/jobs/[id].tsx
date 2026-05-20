@@ -3,9 +3,8 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Appbar, ActivityIndicator, Snackbar, Text, useTheme } from 'react-native-paper'
 import { JobDto, JobStatus, PublicUserDto } from '@local/types'
-import { TOKEN_KEY } from '../../../contexts/AuthContext'
+import { useAuth } from '../../../contexts/AuthContext'
 import { acceptJob, getJob, getUser, updateJobStatus } from '../../../lib/api'
-import { storage } from '../../../lib/storage'
 import AvatarInitials from '../../../components/AvatarInitials'
 import { Divider } from 'react-native-paper'
 
@@ -13,7 +12,7 @@ export default function JobDetailScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>()
   const router = useRouter()
   const theme = useTheme()
-  const [token, setToken] = useState<string | null>(null)
+  const { token } = useAuth()
   const [job, setJob] = useState<JobDto | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -21,23 +20,6 @@ export default function JobDetailScreen() {
   const [snackbar, setSnackbar] = useState<string | null>(null)
   const [clientUser, setClientUser] = useState<PublicUserDto | null>(null)
   const [isClientLoading, setIsClientLoading] = useState(false)
-
-  useEffect(() => {
-    let isActive = true
-
-    async function loadToken() {
-      const stored = await storage.getItemAsync(TOKEN_KEY)
-      if (isActive) {
-        setToken(stored)
-      }
-    }
-
-    void loadToken()
-
-    return () => {
-      isActive = false
-    }
-  }, [])
 
   useEffect(() => {
     async function loadJob() {

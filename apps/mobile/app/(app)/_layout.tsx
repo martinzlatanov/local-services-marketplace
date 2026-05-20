@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Stack, useRouter, useSegments } from 'expo-router'
-import { useServiceArea } from '../../hooks/useServiceArea'
+import { useServiceArea } from '../../contexts/ServiceAreaContext'
 
 export default function AppLayout() {
   const { serviceArea, isLoading } = useServiceArea()
