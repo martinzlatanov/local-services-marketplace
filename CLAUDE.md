@@ -1,5 +1,24 @@
 # AGENTS.md
 
+## Documentation Index
+
+Extended project documentation is in [`docs/`](docs/):
+
+- [PROJECT-DOCUMENTATION.md](docs/PROJECT-DOCUMENTATION.md) — full architecture and feature reference
+- [NEON-SETUP.md](docs/NEON-SETUP.md) — production database setup
+- [PRODUCTION-ACCESS.md](docs/PRODUCTION-ACCESS.md) — production environment and credentials
+- [E2E-STATUS.md](docs/E2E-STATUS.md) — end-to-end test status and quick-start
+- [E2E-TEST-CHECKLIST.md](docs/E2E-TEST-CHECKLIST.md) — detailed E2E test scenarios
+- [E2E-EXECUTION-SUMMARY.md](docs/E2E-EXECUTION-SUMMARY.md) — E2E execution results
+- [MOBILE-EMULATOR-TEST-GUIDE.md](docs/MOBILE-EMULATOR-TEST-GUIDE.md) — mobile emulator testing
+- [TEST_DATA.md](docs/TEST_DATA.md) — seed data and test accounts
+- [VERCEL-DEPLOYMENT.md](docs/VERCEL-DEPLOYMENT.md) — deployment guide
+- [QUICK-FIX-VERCEL-VARS.md](docs/QUICK-FIX-VERCEL-VARS.md) — Vercel environment variable fixes
+- [10-UI-REVIEW.md](docs/10-UI-REVIEW.md) — UI audit results
+- [behavioral-guideines.md](docs/behavioral-guideines.md) — behavioral guidelines
+
+---
+
 ## 1. Project Context
 **Application:** Local Services Task Marketplace.
 **Scope:** A multi-platform full-stack application connecting Service Providers (Mobile) with Clients (Web).

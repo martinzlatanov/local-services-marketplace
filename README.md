@@ -116,6 +116,16 @@ npx drizzle-kit generate:pg
 - `GET /api/admin/reviews/pending` — Pending reviews for admin
 - `PATCH /api/admin/reviews/[id]/approve` — Approve review
 
+## Documentation
+
+Extended docs live in [`docs/`](docs/):
+
+- [PROJECT-DOCUMENTATION.md](docs/PROJECT-DOCUMENTATION.md) — full project reference
+- [NEON-SETUP.md](docs/NEON-SETUP.md) — database setup
+- [PRODUCTION-ACCESS.md](docs/PRODUCTION-ACCESS.md) — production environment
+- [MOBILE-EMULATOR-TEST-GUIDE.md](docs/MOBILE-EMULATOR-TEST-GUIDE.md) — mobile testing
+- [E2E-STATUS.md](docs/E2E-STATUS.md) — end-to-end test status
+
 ## License
 
 MIT
