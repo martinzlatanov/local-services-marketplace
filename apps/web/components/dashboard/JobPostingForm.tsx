@@ -25,15 +25,15 @@ export default function JobPostingForm({ onSuccess }: JobPostingFormProps) {
 
   useEffect(() => {
     fetch('/api/locations').then(r => r.json()).then(d => {
-      if (d.data?.length) {
-        setAreas(d.data)
-        setLocationId((prev) => prev === 0 ? d.data[0].id : prev)
+      if (Array.isArray(d) && d.length) {
+        setAreas(d)
+        setLocationId((prev) => prev === 0 ? d[0].id : prev)
       }
     }).catch(() => {})
     fetch('/api/categories').then(r => r.json()).then(d => {
-      if (d.data?.length) {
-        setCategories(d.data)
-        setCategoryId((prev) => prev === 0 ? d.data[0].id : prev)
+      if (Array.isArray(d) && d.length) {
+        setCategories(d)
+        setCategoryId((prev) => prev === 0 ? d[0].id : prev)
       }
     }).catch(() => {})
   }, [])
