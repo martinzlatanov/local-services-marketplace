@@ -177,8 +177,8 @@ Plans:
 **Goal**: Replace the current teal-gradient, amber-CTA aesthetic with a clinical monochrome design language across all screens: web (Next.js + Tailwind CSS) and mobile (React Native + Paper). Every public-facing screen is rebuilt to the approved sketch specifications.
 **Depends on**: Phase 11
 **Requirements**: UI-01, UI-02, UI-03, UI-04, UI-05, UI-06, UI-07, UI-08
-**Status**: Ready to plan
-**Plans**: TBD
+**Status**: ✅ COMPLETE
+**Plans**: 7 plans
 
 **Success Criteria** (what must be TRUE):
   1. `apps/web/app/globals.css` primary CTA color is `surface-900` (`#0f172a`); no amber (`#f59e0b`) in any button role
@@ -209,8 +209,8 @@ Plans:
 **Goal**: Admins can manage users (suspend/activate, change roles) in a dedicated admin-only dashboard. A single user can hold multiple roles (CLIENT, PROVIDER, ADMIN) simultaneously. Suspended users cannot log in but their data (jobs, reviews) persists.
 **Depends on**: Phase 13
 **Requirements**: ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04
-**Status**: Ready to spec
-**Plans**: TBD
+**Status**: ✅ COMPLETE
+**Plans**: 4 plans
 
 **Success Criteria** (what must be TRUE):
   1. Admins can list all users (email, role, status) with search and pagination
